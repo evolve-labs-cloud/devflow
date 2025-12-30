@@ -18,11 +18,11 @@ DevFlow é um sistema de 5 agentes especializados que trabalham juntos para tran
 
 | Agente | Papel | Responsabilidade |
 |--------|-------|------------------|
-| **@strategist** | Product Owner | PRDs, user stories, priorização |
-| **@architect** | Tech Lead | Design, ADRs, decisões técnicas |
-| **@builder** | Developer | Implementação, código, refactoring |
-| **@guardian** | QA/Security | Testes, segurança, code review |
-| **@chronicler** | Tech Writer | Documentação, changelog, snapshots |
+| `/agents:strategist` | Product Owner | PRDs, user stories, priorização |
+| `/agents:architect` | Tech Lead | Design, ADRs, decisões técnicas |
+| `/agents:builder` | Developer | Implementação, código, refactoring |
+| `/agents:guardian` | QA/Security | Testes, segurança, code review |
+| `/agents:chronicler` | Tech Writer | Documentação, changelog, snapshots |
 
 ---
 
@@ -41,9 +41,9 @@ cd /caminho/para/seu-projeto
 claude
 
 # Exemplos de uso
-> @strategist Preciso de um sistema de autenticação
-> @architect Faça o design técnico
-> @builder Implemente a feature
+> /agents:strategist Preciso de um sistema de autenticação
+> /agents:architect Faça o design técnico
+> /agents:builder Implemente a feature
 ```
 
 **Vantagens:**
