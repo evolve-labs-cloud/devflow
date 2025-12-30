@@ -20,7 +20,7 @@ O script de instalação copia automaticamente todos os arquivos necessários pa
 
 ```bash
 # 1. Clone o repositório DevFlow
-git clone https://github.com/seu-usuario/devflow.git
+git clone https://github.com/evolve-labs-cloud/devflow.git
 cd devflow
 
 # 2. Execute o instalador
@@ -394,7 +394,7 @@ Após instalar com sucesso:
 ## 🆘 Precisa de Ajuda?
 
 - 📖 Veja a [Documentação Completa](../README.md)
-- 💬 Abra uma [Issue](https://github.com/seu-usuario/devflow/issues)
+- 💬 Abra uma [Issue](https://github.com/evolve-labs-cloud/devflow/issues)
 - 📧 Entre em contato: suporte@devflow.dev
 
 ---

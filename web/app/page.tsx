@@ -104,7 +104,7 @@ export default function HomePage() {
           <nav className="flex items-center gap-6 text-sm text-gray-400">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Docs</a>
-            <a href="https://github.com/evolve-labs-cloud/dexter-devflow" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
+            <a href="https://github.com/evolve-labs-cloud/devflow" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
           </nav>
         </div>
       </header>
@@ -300,7 +300,7 @@ export default function HomePage() {
               Open a Project
             </button>
             <a
-              href="https://github.com/evolve-labs-cloud/dexter-devflow"
+              href="https://github.com/evolve-labs-cloud/devflow"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 border border-white/20 hover:border-white/40 text-white font-medium rounded-xl transition-colors"
@@ -316,7 +316,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-purple-400" />
-            DevFlow v0.2.0
+            DevFlow v0.5.0
           </div>
           <div>
             Powered by Evolve Labs
