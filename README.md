@@ -4,6 +4,11 @@ Sistema multi-agentes para desenvolvimento spec-driven, otimizado para Claude Co
 
 [![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](web/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-evolve--labs--cloud-purple.svg)](https://github.com/evolve-labs-cloud/devflow)
+
+<p align="center">
+  <img src="docs/images/hero.png" alt="DevFlow Home" width="800"/>
+</p>
 
 ---
 
@@ -57,6 +62,10 @@ npm run dev
 # Acesse http://localhost:3000
 ```
 
+<p align="center">
+  <img src="docs/images/terminal.png" alt="Terminal com Quick Actions" width="800"/>
+</p>
+
 **Features da Web IDE v0.5.0:**
 - **Terminal Integrado** - Interface principal para Claude CLI
   - Quick Actions: botões para agentes e comandos
@@ -67,6 +76,17 @@ npm run dev
 - **Editor Monaco** (VS Code engine)
 - **Specs Panel** com progress por spec
 - **Git Integration** visual
+
+<details>
+<summary>📸 Mais Screenshots</summary>
+
+| Feature | Screenshot |
+|---------|------------|
+| Editor Monaco | <img src="docs/images/editor.png" alt="Editor" width="400"/> |
+| Specs Panel | <img src="docs/images/specs.png" alt="Specs" width="400"/> |
+| Dashboard | <img src="docs/images/dashboard.png" alt="Dashboard" width="400"/> |
+
+</details>
 
 ---
 
