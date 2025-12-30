@@ -62,10 +62,6 @@ npm run dev
 # Acesse http://localhost:3000
 ```
 
-<p align="center">
-  <img src="docs/images/terminal.png" alt="Terminal com Quick Actions" width="800"/>
-</p>
-
 **Features da Web IDE v0.5.0:**
 - **Terminal Integrado** - Interface principal para Claude CLI
   - Quick Actions: botões para agentes e comandos
@@ -77,16 +73,27 @@ npm run dev
 - **Specs Panel** com progress por spec
 - **Git Integration** visual
 
-<details>
-<summary>📸 Mais Screenshots</summary>
+### Screenshots
 
-| Feature | Screenshot |
-|---------|------------|
-| Editor Monaco | <img src="docs/images/editor.png" alt="Editor" width="400"/> |
-| Specs Panel | <img src="docs/images/specs.png" alt="Specs" width="400"/> |
-| Dashboard | <img src="docs/images/dashboard.png" alt="Dashboard" width="400"/> |
+<p align="center">
+  <img src="docs/images/terminal.png" alt="Terminal com Quick Actions" width="800"/>
+  <br><em>Terminal com Quick Actions para agentes</em>
+</p>
 
-</details>
+<p align="center">
+  <img src="docs/images/editor.png" alt="Monaco Editor" width="800"/>
+  <br><em>Editor Monaco com syntax highlighting</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/specs.png" alt="Specs Panel" width="800"/>
+  <br><em>Specs Panel com progress bars</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Dashboard" width="800"/>
+  <br><em>Dashboard com métricas do projeto</em>
+</p>
 
 ---
 
