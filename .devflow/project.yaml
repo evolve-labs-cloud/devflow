@@ -1,0 +1,49 @@
+# DevFlow Project Metadata
+# Preencha com as informações do seu projeto
+# Atualizado automaticamente pelo @chronicler
+
+project:
+  name: "YOUR_PROJECT_NAME"
+  version: "0.1.0"
+  description: "Descrição do seu projeto"
+  created: null
+  last_updated: null
+  status: "active"
+  phase: "initial"
+
+# Agentes DevFlow
+agents:
+  - id: "strategist"
+    role: "planning"
+    focus: "Planejamento & Produto"
+  - id: "architect"
+    role: "design"
+    focus: "Design & Arquitetura"
+  - id: "builder"
+    role: "implementation"
+    focus: "Implementação"
+  - id: "guardian"
+    role: "quality"
+    focus: "Qualidade & Segurança"
+  - id: "chronicler"
+    role: "documentation"
+    focus: "Documentação & Memória"
+
+# Stack técnica (preencher conforme seu projeto)
+tech_stack:
+  core: []
+  tools:
+    - "Claude Code"
+    - "Git"
+
+# Features (serão adicionadas conforme desenvolvimento)
+features: []
+
+# Decisões arquiteturais
+decisions: []
+
+# Métricas
+metrics:
+  total_features: 0
+  total_decisions: 0
+  phase: "initial"
