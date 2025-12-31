@@ -47,5 +47,7 @@ Thumbs.db
 test-results/
 playwright-report/
 
-# Claude Code local settings
+# DevFlow (these belong at project root, not in web/)
 .claude/
+.devflow/
+docs/
