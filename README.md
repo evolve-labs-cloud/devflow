@@ -137,8 +137,14 @@ wsl --install
 
 # Reinicie o computador, depois:
 wsl --set-default-version 2
+```
 
-# Abra o Ubuntu e instale Node.js
+```bash
+# Abra o Ubuntu e instale dependências
+sudo apt-get update
+sudo apt-get install -y build-essential python3
+
+# Instale Node.js
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
