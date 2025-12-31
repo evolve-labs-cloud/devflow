@@ -122,10 +122,31 @@ seu-projeto/
 
 ### CLI (Mínimo)
 - Claude Code CLI instalado e autenticado
+- **Windows**: Requer WSL (Windows Subsystem for Linux)
 
 ### Web IDE (Adicional)
 - Node.js 18+
 - npm ou yarn
+- **Windows**: Requer WSL
+
+### Instalando WSL (Windows)
+
+```powershell
+# No PowerShell como Administrador
+wsl --install
+
+# Reinicie o computador, depois:
+wsl --set-default-version 2
+
+# Abra o Ubuntu e instale Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Instale Claude Code no WSL
+npm install -g @anthropic-ai/claude-code
+```
+
+Depois de configurar o WSL, execute todos os comandos DevFlow dentro do terminal WSL/Ubuntu.
 
 ---
 
