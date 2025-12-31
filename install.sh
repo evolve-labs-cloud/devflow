@@ -83,9 +83,10 @@ echo "O que você quer instalar?"
 echo ""
 echo "1) Apenas CLI (.claude/) - Mínimo necessário"
 echo "2) CLI + Memória (.claude/ + .devflow/) - Recomendado"
-echo "3) Instalação completa - Tudo incluindo docs/"
+echo "3) CLI + Memória + Docs - Completo sem Web IDE"
+echo "4) Instalação completa + Web IDE - Tudo incluindo web/"
 echo ""
-read -p "Escolha (1-3): " -n 1 -r INSTALL_OPTION
+read -p "Escolha (1-4): " -n 1 -r INSTALL_OPTION
 echo ""
 echo ""
 
@@ -160,6 +161,60 @@ case $INSTALL_OPTION in
             echo "" >> "$TARGET_DIR/.gitignore"
             echo "# DevFlow" >> "$TARGET_DIR/.gitignore"
             echo ".devflow/memory/" >> "$TARGET_DIR/.gitignore"
+            print_success ".gitignore atualizado"
+        elif [ -f "$SCRIPT_DIR/.gitignore" ]; then
+            cp "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/"
+            print_success ".gitignore criado"
+        fi
+
+        ;;
+    4)
+        print_info "Instalação completa + Web IDE..."
+        echo ""
+
+        # Copy .claude
+        cp -r "$SCRIPT_DIR/.claude" "$TARGET_DIR/"
+        print_success "Agentes instalados (.claude/commands/agents/)"
+
+        # Copy .devflow
+        if [ ! -d "$TARGET_DIR/.devflow" ]; then
+            cp -r "$SCRIPT_DIR/.devflow" "$TARGET_DIR/"
+            print_success "Sistema de memória instalado (.devflow/)"
+        else
+            print_warning "Pasta .devflow já existe - mantendo a existente"
+        fi
+
+        # Copy documentation structure
+        if [ ! -d "$TARGET_DIR/docs" ]; then
+            cp -r "$SCRIPT_DIR/docs" "$TARGET_DIR/"
+            print_success "Documentação instalada (docs/)"
+        else
+            print_warning "Pasta docs/ já existe - mantendo a existente"
+        fi
+
+        # Copy web folder (excluding node_modules and .next)
+        if [ ! -d "$TARGET_DIR/web" ]; then
+            print_info "Copiando Web IDE (isso pode demorar um pouco)..."
+            mkdir -p "$TARGET_DIR/web"
+            rsync -a --exclude 'node_modules' --exclude '.next' "$SCRIPT_DIR/web/" "$TARGET_DIR/web/"
+            print_success "Web IDE instalada (web/)"
+            echo ""
+            print_info "Para iniciar a Web IDE:"
+            echo "   cd $TARGET_DIR/web"
+            echo "   npm install"
+            echo "   npm run dev"
+        else
+            print_warning "Pasta web/ já existe - mantendo a existente"
+        fi
+
+        # Copy .gitignore (merge if exists)
+        if [ -f "$TARGET_DIR/.gitignore" ]; then
+            print_warning ".gitignore já existe - adicionando entradas do DevFlow"
+            echo "" >> "$TARGET_DIR/.gitignore"
+            echo "# DevFlow" >> "$TARGET_DIR/.gitignore"
+            echo ".devflow/memory/" >> "$TARGET_DIR/.gitignore"
+            echo "web/node_modules/" >> "$TARGET_DIR/.gitignore"
+            echo "web/.next/" >> "$TARGET_DIR/.gitignore"
             print_success ".gitignore atualizado"
         elif [ -f "$SCRIPT_DIR/.gitignore" ]; then
             cp "$SCRIPT_DIR/.gitignore" "$TARGET_DIR/"
