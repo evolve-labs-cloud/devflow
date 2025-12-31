@@ -124,6 +124,15 @@
   @apply p-2;
 }
 
+.xterm-screen canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.xterm-viewport {
+  overflow-y: auto !important;
+}
+
 /* Resizable panels */
 .resizable-handle {
   @apply bg-transparent hover:bg-primary/20 transition-colors;

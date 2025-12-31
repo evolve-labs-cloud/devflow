@@ -20,6 +20,7 @@ import { useSettingsStore } from '@/lib/stores/settingsStore';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
+import { WebglAddon } from '@xterm/addon-webgl';
 import '@xterm/xterm/css/xterm.css';
 
 interface TerminalTab {
@@ -181,6 +182,18 @@ export function TerminalPanel({
     fitAddonRef.current = fitAddon;
 
     terminal.open(containerRef.current);
+
+    // Load WebGL addon for sharper rendering on high-DPI displays
+    try {
+      const webglAddon = new WebglAddon();
+      webglAddon.onContextLoss(() => {
+        webglAddon.dispose();
+      });
+      terminal.loadAddon(webglAddon);
+    } catch {
+      // WebGL not supported, fall back to canvas renderer
+      console.warn('WebGL not supported, using canvas renderer');
+    }
 
     // Wait for container to be ready
     setTimeout(() => {
