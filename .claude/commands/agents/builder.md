@@ -43,29 +43,76 @@ SE encontrar problema no design durante implementação:
   → USE a Skill tool: /agents:architect para revisar design
 ```
 
-### 📋 ATUALIZAÇÃO DE TASKS (CRÍTICO)
+### 📋 ATUALIZAÇÃO DE STATUS E BADGES (CRÍTICO)
+
+**OBRIGATÓRIO após completar qualquer task:**
+
+#### 1. Atualizar Story/Task
 ```
-Ao completar uma task, SEMPRE atualize o arquivo da story:
+ENCONTRE o arquivo em docs/planning/stories/ ou docs/planning/
 
-1. ENCONTRE o arquivo da story em docs/planning/stories/
-2. MARQUE checkboxes como concluídos:
-   - [ ] Task pendente  →  - [x] Task concluída
-3. SE todas as tasks estiverem [x]:
-   - Mude "Status: in_progress" para "Status: completed"
-   - Adicione "Concluido em: YYYY-MM-DD"
-4. SALVE o arquivo
+ATUALIZE:
+  a) Checkboxes: - [ ] → - [x]
+  b) Status: "Draft" → "In Progress" → "Completed" ✅
+  c) Data: Adicione "**Concluído em:** YYYY-MM-DD"
+```
 
-Exemplo:
-Antes:
-  **Status**: in_progress
-  - [ ] Implementar componente X
-  - [x] Criar store Y
+#### 2. Atualizar Epic (se existir)
+```
+SE a story pertence a um Epic:
+  a) ABRA o arquivo do Epic (docs/planning/epics/ ou similar)
+  b) CONTE tasks concluídas vs total
+  c) ATUALIZE o contador: "0/27 tasks" → "15/27 tasks"
+  d) ATUALIZE Status se todas stories concluídas:
+     - "Ready for Development" → "In Progress" → "Completed" ✅
+```
 
-Depois:
-  **Status**: completed
-  **Concluido em**: 2025-12-29
-  - [x] Implementar componente X
-  - [x] Criar store Y
+#### 3. Formato de Badges
+```markdown
+**Status:** Draft           → Não iniciado
+**Status:** In Progress     → Trabalhando
+**Status:** Review          → Em revisão
+**Status:** Completed ✅    → Concluído (com emoji!)
+**Status:** Approved        → Aprovado
+```
+
+#### Exemplo Completo:
+```markdown
+ANTES (Story):
+# US-001: Login Feature
+**Status:** In Progress
+**Tasks:** 2/5
+
+- [x] Criar componente LoginForm
+- [x] Implementar validação
+- [ ] Conectar com API
+- [ ] Adicionar loading state
+- [ ] Testes unitários
+
+DEPOIS (após completar todas):
+# US-001: Login Feature
+**Status:** Completed ✅
+**Concluído em:** 2025-12-31
+**Tasks:** 5/5
+
+- [x] Criar componente LoginForm
+- [x] Implementar validação
+- [x] Conectar com API
+- [x] Adicionar loading state
+- [x] Testes unitários
+```
+
+#### TAMBÉM Atualizar Epic:
+```markdown
+ANTES:
+# Epic 01: Authentication
+**Status:** In Progress
+**Progress:** 1/3 stories (33%)
+
+DEPOIS:
+# Epic 01: Authentication
+**Status:** Completed ✅
+**Progress:** 3/3 stories (100%)
 ```
 
 ### 🔄 COMO CHAMAR OUTROS AGENTES

@@ -42,16 +42,63 @@ APÓS criar estratégia de testes:
   → ATUALIZAR status das tasks de teste na story
 ```
 
-### 📋 ATUALIZAÇÃO DE TASKS (CRÍTICO)
-```
-Ao completar review/testes, SEMPRE atualize o arquivo da story:
+### 📋 ATUALIZAÇÃO DE STATUS E BADGES (CRÍTICO)
 
-1. ENCONTRE o arquivo da story em docs/planning/stories/
-2. MARQUE checkboxes de review/testes como concluídos:
-   - [ ] Executar testes  →  - [x] Executar testes
-   - [ ] Security review  →  - [x] Security review
-3. ADICIONE notas de review se necessário
-4. SALVE o arquivo
+**OBRIGATÓRIO após completar review ou testes:**
+
+#### 1. Atualizar Story
+```
+ENCONTRE o arquivo em docs/planning/stories/
+
+ATUALIZE:
+  a) Checkboxes de QA:
+     - [ ] Code review → - [x] Code review ✅
+     - [ ] Security review → - [x] Security review ✅
+     - [ ] Testes passando → - [x] Testes passando ✅
+
+  b) Status (se aprovado):
+     "In Progress" → "Review" → "Approved" ✅
+
+  c) Adicione resultado:
+     **QA Status:** Approved ✅
+     **Reviewed by:** Guardian Agent
+     **Review Date:** YYYY-MM-DD
+```
+
+#### 2. Atualizar Epic (propagar status)
+```
+SE a story foi aprovada e pertence a um Epic:
+  a) CONTE stories aprovadas vs total
+  b) ATUALIZE o contador no Epic
+  c) SE todas stories aprovadas: Status → "Completed" ✅
+```
+
+#### 3. Formato de Badges QA
+```markdown
+**QA Status:** Pending        → Aguardando review
+**QA Status:** In Review      → Em análise
+**QA Status:** Approved ✅    → Aprovado
+**QA Status:** Rejected ❌    → Reprovado (com motivo)
+```
+
+#### Exemplo:
+```markdown
+ANTES:
+# US-001: Login Feature
+**Status:** In Progress
+**QA Status:** Pending
+
+DEPOIS (aprovado):
+# US-001: Login Feature
+**Status:** Approved ✅
+**QA Status:** Approved ✅
+**Reviewed by:** Guardian Agent
+**Review Date:** 2025-12-31
+
+### QA Notes
+- [x] Code review: Código limpo, bem estruturado
+- [x] Security review: Sem vulnerabilidades
+- [x] Testes: 95% coverage, todos passando
 ```
 
 ### 🔄 COMO CHAMAR OUTROS AGENTES

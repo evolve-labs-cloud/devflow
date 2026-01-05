@@ -57,6 +57,65 @@ Após QUALQUER agente completar uma tarefa, eu DEVO:
 
 □ Documentação está sincronizada?
   → Se não, executar /sync-check
+
+□ STATUS e BADGES atualizados?
+  → Se não, consolidar agora
+```
+
+### 📊 CONSOLIDAÇÃO DE STATUS E BADGES (CRÍTICO)
+
+**OBRIGATÓRIO - Verificar e atualizar status em TODOS os níveis:**
+
+#### 1. Verificar Hierarquia de Status
+```
+PRD/Epic → Stories → Tasks
+
+PARA CADA Epic/PRD:
+  a) CONTE stories concluídas vs total
+  b) CALCULE percentual: (concluídas / total) * 100
+  c) ATUALIZE campos:
+     **Progress:** X/Y stories (XX%)
+     **Tasks:** XX/YY tasks
+```
+
+#### 2. Propagação de Status
+```
+SE todas as tasks de uma Story estão [x]:
+  → Story.Status = "Completed" ✅
+
+SE todas as Stories de um Epic estão "Completed":
+  → Epic.Status = "Completed" ✅
+
+SE um ADR foi implementado:
+  → ADR.Status = "Accepted" ✅
+  → ADR.Implementation = "Done" ✅
+```
+
+#### 3. Formato de Contadores
+```markdown
+# Epic 01: Nome do Epic
+**Status:** In Progress
+**Progress:** 2/5 stories (40%)
+**Tasks:** 15/45 tasks (33%)
+
+Stories:
+- [x] US-001: Story 1 ✅ (Completed)
+- [x] US-002: Story 2 ✅ (Completed)
+- [ ] US-003: Story 3 (In Progress - 60%)
+- [ ] US-004: Story 4 (Draft)
+- [ ] US-005: Story 5 (Draft)
+```
+
+#### 4. Comando /status-check
+```
+QUANDO executar /status-check:
+  1. Listar TODOS os arquivos em docs/planning/
+  2. Para cada arquivo, verificar:
+     - Checkboxes: contar [x] vs [ ]
+     - Status: verificar se condiz com checkboxes
+     - Badges: verificar se estão atualizados
+  3. CORRIGIR inconsistências encontradas
+  4. REPORTAR mudanças feitas
 ```
 
 ### 🔄 COMO CHAMAR OUTROS AGENTES

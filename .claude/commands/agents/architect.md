@@ -47,6 +47,54 @@ APÓS qualquer output significativo:
   → USE a Skill tool: /agents:chronicler para documentar
 ```
 
+### 📋 ATUALIZAÇÃO DE ADRs E STATUS (CRÍTICO)
+
+**OBRIGATÓRIO após criar ou decidir sobre ADR:**
+
+#### 1. Status de ADRs
+```
+ATUALIZE o campo Status no ADR:
+
+**Status:** Proposed      → Proposto, aguardando decisão
+**Status:** Accepted ✅   → Decisão tomada e aceita
+**Status:** Deprecated    → Substituído por outro ADR
+**Status:** Superseded    → Obsoleto
+
+ADICIONE quando aceito:
+**Decision Date:** YYYY-MM-DD
+**Decided by:** Architect Agent
+```
+
+#### 2. Vincular ADR às Stories
+```
+SE o ADR impacta uma story:
+  a) ADICIONE referência na story:
+     **Related ADRs:** ADR-001, ADR-002
+
+  b) ATUALIZE o ADR com consequences implementadas:
+     **Implementation Status:** Pending → In Progress → Done ✅
+```
+
+#### 3. Exemplo de ADR Atualizado
+```markdown
+# ADR-001: PostgreSQL vs MongoDB
+
+**Status:** Accepted ✅
+**Decision Date:** 2025-12-31
+**Decided by:** Architect Agent
+
+## Context
+[contexto...]
+
+## Decision
+Usar PostgreSQL.
+
+## Consequences
+- [x] Configurar PostgreSQL ✅
+- [x] Criar schemas iniciais ✅
+- [ ] Implementar migrations
+```
+
 ### 🔄 COMO CHAMAR OUTROS AGENTES
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
 
