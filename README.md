@@ -1,201 +1,190 @@
-# DevFlow v0.5.0
+# DevFlow v0.4.0 - Sistema Multi-Agentes + Web IDE
 
-Sistema multi-agentes para desenvolvimento spec-driven, otimizado para Claude Code.
+Sistema de multi-agentes especializados para desenvolvimento de software, agora com **Web IDE** integrada para visualização e controle do fluxo de trabalho.
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](web/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](docs/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub](https://img.shields.io/badge/GitHub-evolve--labs--cloud-purple.svg)](https://github.com/evolve-labs-cloud/devflow)
 
-<p align="center">
-  <img src="docs/images/hero.png" alt="DevFlow Home" width="800"/>
-</p>
+## 🆕 Novidades v0.4.0 - Web IDE
 
----
-
-## O que é DevFlow?
-
-DevFlow é um sistema de 5 agentes especializados que trabalham juntos para transformar ideias em código de qualidade:
-
-| Agente | Papel | Responsabilidade |
-|--------|-------|------------------|
-| `/agents:strategist` | Product Owner | PRDs, user stories, priorização |
-| `/agents:architect` | Tech Lead | Design, ADRs, decisões técnicas |
-| `/agents:builder` | Developer | Implementação, código, refactoring |
-| `/agents:guardian` | QA/Security | Testes, segurança, code review |
-| `/agents:chronicler` | Tech Writer | Documentação, changelog, snapshots |
-
----
-
-## Modos de Uso
-
-### 1. CLI (Padrão) - Recomendado
-
-Use DevFlow diretamente no terminal com Claude Code:
-
-```bash
-# Copie esta pasta para seu projeto
-cp -r devflow/* /caminho/para/seu-projeto/
-
-# Entre no projeto e use Claude Code
-cd /caminho/para/seu-projeto
-claude
-
-# Exemplos de uso
-> /agents:strategist Preciso de um sistema de autenticação
-> /agents:architect Faça o design técnico
-> /agents:builder Implemente a feature
-```
-
-**Vantagens:**
-- Setup instantâneo
-- Sem dependências extras
-- Integração nativa com Claude Code
-
-### 2. Web IDE (Opcional)
-
+### Web IDE (Nova!)
 Interface visual completa para gerenciar seu projeto DevFlow:
 
+- **Dashboard** - Métricas do projeto, health check, status dos agentes
+- **Specs Panel** - Visualize requirements, design decisions e tasks
+- **File Explorer** - Navegue pelo código com preview de markdown/mermaid
+- **Editor Monaco** - Editor profissional com syntax highlighting
+- **Terminal Integrado** - Execute comandos diretamente na IDE
+- **Chat com Claude** - Converse com os agentes via interface gráfica
+- **Autopilot** - Execute o pipeline completo automaticamente
+- **Settings** - Configure tema, fonte, terminal
+
+### Melhorias CLI
+- Hard Stops aprimorados por agente
+- Delegação obrigatória entre agentes
+- Geração automática de stories
+
+---
+
+## 🚀 Instalação
+
+### Opção 1: CLI (Recomendado)
 ```bash
-cd web
+# Clone o repositório
+git clone https://github.com/evolve-labs-cloud/devflow.git
+cd devflow
+
+# Instale no seu projeto
+./install.sh /caminho/para/seu-projeto
+
+# Use no Claude Code
+cd /caminho/para/seu-projeto
+# @strategist Olá! Quero criar [sua feature]
+```
+
+### Opção 2: Web IDE
+```bash
+# Entre na pasta release/web
+cd devflow/release/web
+
+# Instale dependências
 npm install
+
+# Inicie o servidor
 npm run dev
+
 # Acesse http://localhost:3000
 ```
 
-**Features da Web IDE v0.5.0:**
-- **Terminal Integrado** - Interface principal para Claude CLI
-  - Quick Actions: botões para agentes e comandos
-  - Performance nativa (sem overhead)
-  - Session resume, tools, MCP servers
-- **Dashboard** com métricas e health check
-- **File Explorer** com navegação por teclado
-- **Editor Monaco** (VS Code engine)
-- **Specs Panel** com progress por spec
-- **Git Integration** visual
-
-### Screenshots
-
-<p align="center">
-  <img src="docs/images/terminal.png" alt="Terminal com Quick Actions" width="800"/>
-  <br><em>Terminal com Quick Actions para agentes</em>
-</p>
-
-<p align="center">
-  <img src="docs/images/editor.png" alt="Monaco Editor" width="800"/>
-  <br><em>Editor Monaco com syntax highlighting</em>
-</p>
-
-<p align="center">
-  <img src="docs/images/specs.png" alt="Specs Panel" width="800"/>
-  <br><em>Specs Panel com progress bars</em>
-</p>
-
-<p align="center">
-  <img src="docs/images/dashboard.png" alt="Dashboard" width="800"/>
-  <br><em>Dashboard com métricas do projeto</em>
-</p>
-
 ---
 
-## Estrutura do Projeto
+## 🤖 Os 5 Agentes
+
+| Agente | Função | Uso |
+|--------|--------|-----|
+| **@strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
+| **@architect** | Design & Arquitetura | Decisões técnicas, ADRs, APIs |
+| **@builder** | Implementação | Código, reviews, refactoring |
+| **@guardian** | Qualidade & Segurança | Testes, security, performance |
+| **@chronicler** | Documentação & Memória | CHANGELOG, snapshots, stories |
+
+### 🚨 Hard Stops
+
+Cada agente tem limites rígidos:
 
 ```
-seu-projeto/
-├── .claude/commands/        # Comandos dos agentes (CLI)
-│   ├── agents/              # Definições dos 5 agentes
-│   └── quick/               # Comandos rápidos
-├── .devflow/                # Memória e estado do projeto
-│   ├── memory/              # Contexto ativo
-│   ├── snapshots/           # Histórico
-│   └── project.yaml         # Configuração
-├── docs/                    # Documentação
-│   ├── planning/            # PRDs, specs, stories
-│   ├── decisions/           # ADRs
-│   └── architecture/        # Design docs
-├── web/                     # [OPCIONAL] IDE Web
-└── install.sh               # Script de instalação
+@strategist → APENAS planejamento (NUNCA código)
+@architect  → APENAS design técnico (NUNCA implementação)
+@builder    → APENAS código (NUNCA requisitos)
+@guardian   → APENAS QA/segurança (NUNCA features)
+@chronicler → APENAS documentação (NUNCA código)
+```
+
+### Fluxo de Trabalho
+
+```
+@strategist → @architect → @builder → @guardian → @chronicler
 ```
 
 ---
 
-## Requisitos
+## 🖥️ Web IDE Features
 
-### CLI (Mínimo)
-- Claude Code CLI instalado e autenticado
-- **Windows**: Requer WSL (Windows Subsystem for Linux)
+### Dashboard
+- Métricas do projeto (specs, decisões, tasks)
+- Health check (Claude CLI, .devflow, git)
+- Status em tempo real
 
-### Web IDE (Adicional)
-- Node.js 18+
-- npm ou yarn
-- **Windows**: Requer WSL
+### Specs Panel
+- **Requirements** - User stories com acceptance criteria
+- **Design** - Architecture Decision Records (ADRs)
+- **Tasks** - Tarefas de implementação
 
-### Instalando WSL (Windows)
+### Autopilot
+Execute o pipeline DevFlow completo automaticamente:
+1. Planning (Strategist)
+2. Design (Architect)
+3. Implementation (Builder)
+4. Validation (Guardian)
+5. Documentation (Chronicler)
 
-```powershell
-# No PowerShell como Administrador
-wsl --install
+### Editor
+- Monaco Editor (VS Code engine)
+- Syntax highlighting para 50+ linguagens
+- Preview de Markdown com Mermaid diagrams
+- Múltiplas tabs com indicador de dirty state
 
-# Reinicie o computador, depois:
-wsl --set-default-version 2
+### Terminal
+- Terminal integrado via xterm.js
+- Histórico de comandos
+- Múltiplas sessões
+
+### Chat
+- Converse com Claude diretamente
+- Suporte a imagens (paste/drag-drop)
+- Histórico de mensagens
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+devflow/
+├── .devflow/           # Configuração dos agentes
+│   ├── agents/         # Skills dos 5 agentes
+│   ├── snapshots/      # Histórico do projeto
+│   └── project.yaml    # Estado do projeto
+│
+├── docs/               # Documentação
+│   ├── decisions/      # ADRs
+│   ├── planning/       # Stories e specs
+│   └── security/       # Security audits
+│
+├── release/            # Release folder
+│   └── web/            # Web IDE
+│
+└── web/                # Source da Web IDE (dev)
 ```
 
-```bash
-# Abra o Ubuntu e instale dependências
-sudo apt-get update
-sudo apt-get install -y build-essential python3
+---
 
-# Instale Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+## 📊 Versões
 
-# Instale Claude Code no WSL
-npm install -g @anthropic-ai/claude-code
-```
-
-Depois de configurar o WSL, execute todos os comandos DevFlow dentro do terminal WSL/Ubuntu.
+| Versão | Features |
+|--------|----------|
+| v0.1.0 | Multi-agent system, Documentation automation |
+| v0.2.0 | Structured metadata, Knowledge graph |
+| v0.3.0 | Hard stops, Mandatory delegation |
+| **v0.4.0** | **Web IDE completa** |
 
 ---
 
-## Documentação
+## 📚 Documentação
 
-| Doc | Descrição |
-|-----|-----------|
-| [QUICKSTART.md](docs/QUICKSTART.md) | Guia rápido (5 min) |
-| [INSTALLATION.md](docs/INSTALLATION.md) | Instalação detalhada |
-| [AI_OPTIMIZATION_GUIDE.md](docs/AI_OPTIMIZATION_GUIDE.md) | Maximizar uso com IA |
-| [MEMORY_SYSTEM.md](docs/MEMORY_SYSTEM.md) | Sistema de memória |
-| [web/README.md](web/README.md) | Documentação da Web IDE |
+- **[Quick Start](docs/QUICKSTART.md)** - Comece em 5 minutos
+- **[Instalação](docs/INSTALLATION.md)** - Guia detalhado
+- **[Web IDE](release/web/README.md)** - Guia da interface web
+- **[Arquitetura](docs/ARCHITECTURE.md)** - Como funciona
+- **[Changelog](docs/CHANGELOG.md)** - Histórico de mudanças
 
 ---
 
-## Changelog
+## 🛠️ Tech Stack (Web IDE)
 
-### v0.5.0 (2025-12-29)
-- **Terminal como Interface Principal** - Substituição do Chat
-  - Quick Actions para agentes e comandos
-  - Resize handle para ajustar altura
-  - Performance nativa do Claude CLI
-- **Agent Task Updates** - Agentes atualizam tasks automaticamente
-- **UX Improvements** - Toasts, debouncing, feedback visual
-
-### v0.4.0 (2025-12-26)
-- Navegação avançada (breadcrumbs, tab history, pinned tabs)
-- Acessibilidade (keyboard nav, ARIA, focus trap)
-- Settings Panel com configurações persistentes
-
-### v0.2.0 (2025-12-22)
-- Dashboard com métricas
-- Terminal integrado
-- Git Integration
-
-[Ver changelog completo](web/CHANGELOG.md)
+- **Next.js 16** - Framework React
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Monaco Editor** - Code editing
+- **xterm.js** - Terminal
+- **Zustand** - State management
+- **Lucide Icons** - Iconografia
 
 ---
 
-## Licença
+## 📜 Licença
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)**
+**DevFlow v0.4.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
