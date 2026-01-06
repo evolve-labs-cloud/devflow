@@ -20,6 +20,61 @@ echo -e "${BLUE}  DevFlow Updater v${CURRENT_VERSION}${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+# Get script directory first (where DevFlow source is)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Check for updates in DevFlow repository
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    echo -e "${BLUE}🔍 Verificando atualizações do DevFlow...${NC}"
+
+    ORIGINAL_DIR="$(pwd)"
+    cd "$SCRIPT_DIR"
+
+    # Fetch latest changes
+    git fetch origin main --quiet 2>/dev/null || {
+        echo -e "${YELLOW}⚠️  Não foi possível verificar atualizações (sem conexão?)${NC}"
+    }
+
+    # Check if we're behind
+    LOCAL=$(git rev-parse HEAD 2>/dev/null)
+    REMOTE=$(git rev-parse origin/main 2>/dev/null)
+
+    if [ "$LOCAL" != "$REMOTE" ] && [ -n "$REMOTE" ]; then
+        echo -e "${YELLOW}📥 Nova versão disponível! Atualizando DevFlow...${NC}"
+
+        # Check for local changes
+        if [ -n "$(git status --porcelain)" ]; then
+            echo -e "${YELLOW}⚠️  Existem mudanças locais. Fazendo stash...${NC}"
+            git stash --quiet
+            STASHED=true
+        fi
+
+        # Pull latest changes
+        if git pull origin main --quiet 2>/dev/null; then
+            echo -e "${GREEN}✅ DevFlow atualizado para a última versão!${NC}"
+
+            # Update CURRENT_VERSION from the new file
+            NEW_VERSION=$(grep -E "^CURRENT_VERSION=" "$SCRIPT_DIR/update.sh" | cut -d'"' -f2)
+            if [ -n "$NEW_VERSION" ]; then
+                CURRENT_VERSION="$NEW_VERSION"
+            fi
+        else
+            echo -e "${RED}❌ Falha ao atualizar. Continuando com versão local...${NC}"
+        fi
+
+        # Restore stashed changes
+        if [ "$STASHED" = true ]; then
+            git stash pop --quiet 2>/dev/null || true
+        fi
+    else
+        echo -e "${GREEN}✅ DevFlow já está na última versão${NC}"
+    fi
+
+    # Return to original directory
+    cd "$ORIGINAL_DIR"
+    echo ""
+fi
+
 # Get target directory
 TARGET_DIR="${1:-.}"
 
@@ -35,9 +90,6 @@ if [ ! -d "$TARGET_DIR/.claude/commands/agents" ] && [ ! -d "$TARGET_DIR/.devflo
     echo -e "${YELLOW}   Use install.sh para instalar pela primeira vez.${NC}"
     exit 1
 fi
-
-# Get script directory (where the new version is)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check installed version
 INSTALLED_VERSION="unknown"
