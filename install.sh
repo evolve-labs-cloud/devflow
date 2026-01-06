@@ -106,19 +106,37 @@ case $INSTALL_OPTION in
     1)
         print_info "Instalando apenas agentes..."
         echo ""
-        
-        # Copy .devflow
-        cp -r "$SCRIPT_DIR/.devflow" "$TARGET_DIR/"
-        print_success "Agentes instalados (.devflow/)"
-        
+
+        # Copy .claude/commands (agents)
+        mkdir -p "$TARGET_DIR/.claude/commands"
+        cp -r "$SCRIPT_DIR/.claude/commands/agents" "$TARGET_DIR/.claude/commands/"
+        print_success "Agentes instalados (.claude/commands/agents/)"
+
+        # Copy .devflow structure (clean)
+        mkdir -p "$TARGET_DIR/.devflow/agents"
+        mkdir -p "$TARGET_DIR/.devflow/memory"
+        mkdir -p "$TARGET_DIR/.devflow/sessions"
+        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
+        print_success "Estrutura .devflow/ criada"
+
         ;;
     2)
         print_info "Instalando agentes + estrutura de documentação..."
         echo ""
 
-        # Copy .devflow
-        cp -r "$SCRIPT_DIR/.devflow" "$TARGET_DIR/"
-        print_success "Agentes instalados (.devflow/)"
+        # Copy .claude/commands (agents)
+        mkdir -p "$TARGET_DIR/.claude/commands"
+        cp -r "$SCRIPT_DIR/.claude/commands/agents" "$TARGET_DIR/.claude/commands/"
+        print_success "Agentes instalados (.claude/commands/agents/)"
+
+        # Copy .devflow structure (clean)
+        mkdir -p "$TARGET_DIR/.devflow/agents"
+        mkdir -p "$TARGET_DIR/.devflow/memory"
+        mkdir -p "$TARGET_DIR/.devflow/sessions"
+        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
+        print_success "Estrutura .devflow/ criada"
 
         # Copy documentation structure
         if [ ! -d "$TARGET_DIR/docs" ]; then
@@ -133,9 +151,18 @@ case $INSTALL_OPTION in
         print_info "Instalação completa..."
         echo ""
 
-        # Copy .devflow
-        cp -r "$SCRIPT_DIR/.devflow" "$TARGET_DIR/"
-        print_success "Agentes instalados (.devflow/)"
+        # Copy .claude/commands (agents)
+        mkdir -p "$TARGET_DIR/.claude/commands"
+        cp -r "$SCRIPT_DIR/.claude/commands/agents" "$TARGET_DIR/.claude/commands/"
+        print_success "Agentes instalados (.claude/commands/agents/)"
+
+        # Copy .devflow structure (clean)
+        mkdir -p "$TARGET_DIR/.devflow/agents"
+        mkdir -p "$TARGET_DIR/.devflow/memory"
+        mkdir -p "$TARGET_DIR/.devflow/sessions"
+        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
+        print_success "Estrutura .devflow/ criada"
 
         # Copy documentation structure
         if [ ! -d "$TARGET_DIR/docs" ]; then
@@ -171,13 +198,13 @@ print_info "Próximos passos:"
 echo ""
 echo "1. Abra o projeto no Claude Code:"
 echo "   cd $TARGET_DIR"
-echo "   code ."
+echo "   claude"
 echo ""
-echo "2. No chat do Claude Code, teste:"
-echo "   @strategist Olá! Apresente-se"
+echo "2. No terminal do Claude Code, teste:"
+echo "   /agents:strategist Olá! Apresente-se"
 echo ""
 echo "3. Crie sua primeira feature:"
-echo "   @strategist Quero criar [sua feature]"
+echo "   /agents:strategist Quero criar [sua feature]"
 echo ""
 print_info "Documentação completa em:"
 echo "   $SCRIPT_DIR/README.md"
