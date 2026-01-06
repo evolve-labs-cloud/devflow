@@ -1,32 +1,77 @@
-# DevFlow v0.4.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow v0.5.0 - Sistema Multi-Agentes + Web IDE
 
 Sistema de multi-agentes especializados para desenvolvimento de software, agora com **Web IDE** integrada para visualização e controle do fluxo de trabalho.
 
-[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](docs/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 🆕 Novidades v0.4.0 - Web IDE
+## Screenshots
 
-### Web IDE (Nova!)
+![DevFlow Hero](docs/images/hero.png)
+
+![Dashboard](docs/images/dashboard.png)
+
+![Editor](docs/images/editor.png)
+
+![Terminal](docs/images/terminal.png)
+
+![Specs Panel](docs/images/specs.png)
+
+---
+
+## 🆕 Novidades v0.5.0 - Terminal como Interface Principal
+
+### Web IDE
 Interface visual completa para gerenciar seu projeto DevFlow:
 
+- **Terminal Integrado** - Interface principal via xterm.js + node-pty
 - **Dashboard** - Métricas do projeto, health check, status dos agentes
 - **Specs Panel** - Visualize requirements, design decisions e tasks
 - **File Explorer** - Navegue pelo código com preview de markdown/mermaid
 - **Editor Monaco** - Editor profissional com syntax highlighting
-- **Terminal Integrado** - Execute comandos diretamente na IDE
-- **Chat com Claude** - Converse com os agentes via interface gráfica
-- **Autopilot** - Execute o pipeline completo automaticamente
 - **Settings** - Configure tema, fonte, terminal
 
-### Melhorias CLI
-- Hard Stops aprimorados por agente
-- Delegação obrigatória entre agentes
-- Geração automática de stories
+### Melhorias v0.5.0
+- Terminal substituiu Chat como interface principal
+- WebGL addon para renderização nítida em displays retina
+- Toast notifications para feedback de operações
+- Skeleton loaders para estados de carregamento
+- Suporte a Windows via WSL
 
 ---
 
 ## 🚀 Instalação
+
+### Requisitos
+
+#### CLI (Mínimo)
+- Claude Code CLI instalado e autenticado
+- **Windows**: Requer WSL (Windows Subsystem for Linux)
+
+#### Web IDE (Opcional)
+- Node.js 18+
+- npm ou yarn
+
+### Instalando WSL (Windows)
+
+```bash
+# No PowerShell como Admin
+wsl --install
+
+# Após reiniciar, no terminal WSL (Ubuntu)
+sudo apt-get update
+sudo apt-get install -y build-essential python3
+
+# Instalar Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Instalar Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
 
 ### Opção 1: CLI (Recomendado)
 ```bash
@@ -39,13 +84,13 @@ cd devflow
 
 # Use no Claude Code
 cd /caminho/para/seu-projeto
-# @strategist Olá! Quero criar [sua feature]
+# /agents:strategist Olá! Quero criar [sua feature]
 ```
 
 ### Opção 2: Web IDE
 ```bash
-# Entre na pasta release/web
-cd devflow/release/web
+# Entre na pasta web
+cd devflow/web
 
 # Instale dependências
 npm install
@@ -62,28 +107,28 @@ npm run dev
 
 | Agente | Função | Uso |
 |--------|--------|-----|
-| **@strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
-| **@architect** | Design & Arquitetura | Decisões técnicas, ADRs, APIs |
-| **@builder** | Implementação | Código, reviews, refactoring |
-| **@guardian** | Qualidade & Segurança | Testes, security, performance |
-| **@chronicler** | Documentação & Memória | CHANGELOG, snapshots, stories |
+| **/agents:strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
+| **/agents:architect** | Design & Arquitetura | Decisões técnicas, ADRs, APIs |
+| **/agents:builder** | Implementação | Código, reviews, refactoring |
+| **/agents:guardian** | Qualidade & Segurança | Testes, security, performance |
+| **/agents:chronicler** | Documentação & Memória | CHANGELOG, snapshots, stories |
 
 ### 🚨 Hard Stops
 
 Cada agente tem limites rígidos:
 
 ```
-@strategist → APENAS planejamento (NUNCA código)
-@architect  → APENAS design técnico (NUNCA implementação)
-@builder    → APENAS código (NUNCA requisitos)
-@guardian   → APENAS QA/segurança (NUNCA features)
-@chronicler → APENAS documentação (NUNCA código)
+/agents:strategist → APENAS planejamento (NUNCA código)
+/agents:architect  → APENAS design técnico (NUNCA implementação)
+/agents:builder    → APENAS código (NUNCA requisitos)
+/agents:guardian   → APENAS QA/segurança (NUNCA features)
+/agents:chronicler → APENAS documentação (NUNCA código)
 ```
 
 ### Fluxo de Trabalho
 
 ```
-@strategist → @architect → @builder → @guardian → @chronicler
+/agents:strategist → /agents:architect → /agents:builder → /agents:guardian → /agents:chronicler
 ```
 
 ---
@@ -100,14 +145,6 @@ Cada agente tem limites rígidos:
 - **Design** - Architecture Decision Records (ADRs)
 - **Tasks** - Tarefas de implementação
 
-### Autopilot
-Execute o pipeline DevFlow completo automaticamente:
-1. Planning (Strategist)
-2. Design (Architect)
-3. Implementation (Builder)
-4. Validation (Guardian)
-5. Documentation (Chronicler)
-
 ### Editor
 - Monaco Editor (VS Code engine)
 - Syntax highlighting para 50+ linguagens
@@ -115,14 +152,10 @@ Execute o pipeline DevFlow completo automaticamente:
 - Múltiplas tabs com indicador de dirty state
 
 ### Terminal
-- Terminal integrado via xterm.js
+- Terminal integrado via xterm.js + node-pty
+- WebGL rendering para displays de alta resolução
 - Histórico de comandos
-- Múltiplas sessões
-
-### Chat
-- Converse com Claude diretamente
-- Suporte a imagens (paste/drag-drop)
-- Histórico de mensagens
+- Resize responsivo
 
 ---
 
@@ -130,20 +163,23 @@ Execute o pipeline DevFlow completo automaticamente:
 
 ```
 devflow/
-├── .devflow/           # Configuração dos agentes
-│   ├── agents/         # Skills dos 5 agentes
+├── .claude/            # Comandos e agentes
+│   └── commands/       # Skills dos 5 agentes
+│       └── agents/     # Definições dos agentes
+│
+├── .devflow/           # Configuração do projeto
 │   ├── snapshots/      # Histórico do projeto
 │   └── project.yaml    # Estado do projeto
 │
 ├── docs/               # Documentação
 │   ├── decisions/      # ADRs
 │   ├── planning/       # Stories e specs
-│   └── security/       # Security audits
+│   └── images/         # Screenshots
 │
-├── release/            # Release folder
-│   └── web/            # Web IDE
-│
-└── web/                # Source da Web IDE (dev)
+└── web/                # Web IDE
+    ├── app/            # Next.js pages
+    ├── components/     # React components
+    └── lib/            # Utilities
 ```
 
 ---
@@ -155,7 +191,8 @@ devflow/
 | v0.1.0 | Multi-agent system, Documentation automation |
 | v0.2.0 | Structured metadata, Knowledge graph |
 | v0.3.0 | Hard stops, Mandatory delegation |
-| **v0.4.0** | **Web IDE completa** |
+| v0.4.0 | Web IDE completa |
+| **v0.5.0** | **Terminal como interface principal, WSL support** |
 
 ---
 
@@ -163,7 +200,6 @@ devflow/
 
 - **[Quick Start](docs/QUICKSTART.md)** - Comece em 5 minutos
 - **[Instalação](docs/INSTALLATION.md)** - Guia detalhado
-- **[Web IDE](release/web/README.md)** - Guia da interface web
 - **[Arquitetura](docs/ARCHITECTURE.md)** - Como funciona
 - **[Changelog](docs/CHANGELOG.md)** - Histórico de mudanças
 
@@ -171,11 +207,12 @@ devflow/
 
 ## 🛠️ Tech Stack (Web IDE)
 
-- **Next.js 16** - Framework React
+- **Next.js 15** - Framework React
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
 - **Monaco Editor** - Code editing
-- **xterm.js** - Terminal
+- **xterm.js** - Terminal emulator
+- **node-pty** - PTY para terminal real
 - **Zustand** - State management
 - **Lucide Icons** - Iconografia
 
@@ -187,4 +224,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v0.4.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v0.5.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
