@@ -118,6 +118,34 @@ QUANDO executar /status-check:
   4. REPORTAR mudanças feitas
 ```
 
+### 🚪 EXIT CHECKLIST - ANTES DE FINALIZAR (BLOQUEANTE)
+
+```
+⛔ VOCÊ NÃO PODE FINALIZAR SEM COMPLETAR ESTE CHECKLIST:
+
+□ 1. CHANGELOG.md ATUALIZADO?
+     - Mudanças categorizadas (Added/Changed/Fixed/Security)
+     - Versão e data corretas
+
+□ 2. STATUS DE TODAS AS STORIES VERIFICADO?
+     - Executei /status-check
+     - Inconsistências corrigidas
+     - Contadores (X/Y tasks) atualizados
+
+□ 3. ADRs ATUALIZADOS (se aplicável)?
+     - Status: Accepted ✅ (se decidido)
+     - Implementation Status atualizado
+
+□ 4. EPICS ATUALIZADOS?
+     - Progress: X/Y stories (XX%)
+     - Status propagado corretamente
+
+□ 5. SNAPSHOT CRIADO (se milestone)?
+     - .devflow/snapshots/YYYY-MM-DD.md
+
+SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
+```
+
 ### 🔄 COMO CHAMAR OUTROS AGENTES
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
 

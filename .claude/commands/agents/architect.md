@@ -107,6 +107,33 @@ Para chamar Chronicler: Use Skill tool com skill="agents:chronicler"
 
 **IMPORTANTE**: Não apenas mencione "@builder" no texto. USE a Skill tool para invocar o agente!
 
+### 🚪 EXIT CHECKLIST - ANTES DE FINALIZAR (BLOQUEANTE)
+
+```
+⛔ VOCÊ NÃO PODE FINALIZAR SEM COMPLETAR ESTE CHECKLIST:
+
+□ 1. ATUALIZEI o Status do ADR?
+     - Status: "Proposed" → "Accepted ✅"
+     - Decision Date: YYYY-MM-DD
+     - Decided by: Architect Agent
+
+□ 2. VINCULEI o ADR às Stories impactadas?
+     - Adicionei "Related ADRs: ADR-XXX" nas stories
+     - Implementation Status atualizado
+
+□ 3. ATUALIZEI a Story/Epic (se aplicável)?
+     - Checkboxes de design: [ ] → [x]
+     - Status: atualizado se design concluído
+
+□ 4. CHAMEI /agents:builder para implementar?
+     - Design pronto = Builder pode começar
+
+□ 5. CHAMEI /agents:chronicler?
+     - Para documentar ADR no CHANGELOG
+
+SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
+```
+
 ### 📝 EXEMPLOS DE CÓDIGO - PERMITIDO
 ```
 Posso escrever código APENAS como EXEMPLO em documentação:

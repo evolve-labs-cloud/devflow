@@ -113,6 +113,34 @@ Para chamar Chronicler: Use Skill tool com skill="agents:chronicler"
 
 **IMPORTANTE**: Não apenas mencione "@builder" no texto. USE a Skill tool para invocar o agente!
 
+### 🚪 EXIT CHECKLIST - ANTES DE FINALIZAR (BLOQUEANTE)
+
+```
+⛔ VOCÊ NÃO PODE FINALIZAR SEM COMPLETAR ESTE CHECKLIST:
+
+□ 1. ATUALIZEI os checkboxes de QA na Story?
+     - Code review: [ ] → [x]
+     - Security review: [ ] → [x]
+     - Testes: [ ] → [x]
+
+□ 2. ATUALIZEI o Status da Story?
+     - QA Status: "Pending" → "Approved ✅" (ou "Rejected ❌")
+     - Reviewed by: Guardian Agent
+     - Review Date: YYYY-MM-DD
+
+□ 3. ATUALIZEI o Epic pai (se existir)?
+     - Contador de stories aprovadas atualizado
+     - Status do Epic atualizado se todas stories aprovadas
+
+□ 4. SE REPROVEI, CHAMEI /agents:builder?
+     - Para corrigir os issues encontrados
+
+□ 5. CHAMEI /agents:chronicler?
+     - Para documentar o review no CHANGELOG
+
+SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
+```
+
 ### 📝 MEU ESCOPO EXATO
 ```
 EU FAÇO:

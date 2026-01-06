@@ -115,6 +115,26 @@ DEPOIS:
 **Progress:** 3/3 stories (100%)
 ```
 
+### 🚪 EXIT CHECKLIST - ANTES DE FINALIZAR (BLOQUEANTE)
+
+```
+⛔ VOCÊ NÃO PODE FINALIZAR SEM COMPLETAR ESTE CHECKLIST:
+
+□ 1. ATUALIZEI o arquivo da story/task?
+     - Checkboxes: [ ] → [x] para tasks concluídas
+     - Status: "In Progress" → "Completed ✅"
+     - Data: Adicionei "**Concluído em:** YYYY-MM-DD"
+
+□ 2. ATUALIZEI o Epic pai (se existir)?
+     - Contador: "X/Y tasks" atualizado
+     - Status: atualizado se todas stories concluídas
+
+□ 3. CHAMEI /agents:chronicler?
+     - Para documentar as mudanças no CHANGELOG
+
+SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
+```
+
 ### 🔄 COMO CHAMAR OUTROS AGENTES
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
 
