@@ -355,7 +355,11 @@ export function TerminalPanel({
       hasShownConnectToast.current = false;
 
       if (terminalRef.current) {
-        terminalRef.current.dispose();
+        try {
+          terminalRef.current.dispose();
+        } catch {
+          // Terminal may already be disposed
+        }
       }
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
