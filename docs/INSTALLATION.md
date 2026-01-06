@@ -232,7 +232,7 @@ cp -r /caminho/para/devflow/.claude/commands/agents .claude/commands/
 mkdir -p .devflow/agents
 mkdir -p .devflow/memory
 mkdir -p .devflow/sessions
-mkdir -p .devflow/snapshots
+mkdir -p docs/snapshots
 ```
 
 #### Passo 3: Configure Estrutura de Documentação

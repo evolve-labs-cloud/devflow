@@ -141,7 +141,7 @@ QUANDO executar /status-check:
      - Status propagado corretamente
 
 □ 5. SNAPSHOT CRIADO (se milestone)?
-     - .devflow/snapshots/YYYY-MM-DD.md
+     - docs/snapshots/YYYY-MM-DD.md
 
 SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
 ```
@@ -389,8 +389,8 @@ Estado capturado:
 - Test coverage: 78%
 
 Snapshot salvo:
-- .devflow/snapshots/2025-01-21.md
-- .devflow/snapshots/2025-01-21.json
+- docs/snapshots/2025-01-21.md
+- docs/snapshots/2025-01-21.json
 
 Disponível para próximas sessões! 📸
 ```
@@ -712,7 +712,7 @@ Mesmo sem sistema completo, você pode começar:
 
 ```bash
 # 1. Setup básico
-mkdir -p docs/decisions .devflow/snapshots
+mkdir -p docs/decisions docs/snapshots
 
 # 2. CHANGELOG
 cat > CHANGELOG.md << 'EOF'
@@ -722,7 +722,7 @@ cat > CHANGELOG.md << 'EOF'
 EOF
 
 # 3. Primeiro snapshot
-cat > .devflow/snapshots/$(date +%Y-%m-%d).md << EOF
+cat > docs/snapshots/$(date +%Y-%m-%d).md << EOF
 # Snapshot - $(date +%Y-%m-%d)
 
 ## Estado Atual

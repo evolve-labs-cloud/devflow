@@ -44,7 +44,7 @@ if [ -d "$SCRIPT_DIR/docs/planning/stories" ]; then
 fi
 
 # Scan Snapshots
-if [ -d "$SCRIPT_DIR/.devflow/snapshots" ]; then
+if [ -d "$SCRIPT_DIR/docs/snapshots" ]; then
   echo "  → Scanning snapshots..."
   # TODO: Parse snapshot files and add to index
 fi

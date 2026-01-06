@@ -3,7 +3,7 @@
 Por favor, analise e mostre o estado atual do projeto DevFlow:
 
 ## 1. Snapshots Recentes
-- Ler `.devflow/snapshots/`
+- Ler `docs/snapshots/`
 - Mostrar último snapshot (data, features principais)
 
 ## 2. Decisões Arquiteturais (ADRs)

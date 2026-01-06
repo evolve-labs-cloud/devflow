@@ -67,7 +67,7 @@ env/
 
 # Snapshots podem ser grandes, você decide se quer versionar
 # Descomente a linha abaixo se NÃO quiser versionar snapshots:
-# .devflow/snapshots/*.json
+# docs/snapshots/*.json
 
 # DevFlow Development (não incluir no release)
 build-release.sh  # Script de build fica apenas no dev

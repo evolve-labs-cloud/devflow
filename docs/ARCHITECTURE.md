@@ -53,7 +53,7 @@ DevFlow é um sistema de multi-agentes especializados para desenvolvimento de so
 ### Chronicler (Documentação)
 - **Função**: CHANGELOG, snapshots, sync de docs
 - **Input**: Mudanças no projeto
-- **Output**: `docs/CHANGELOG.md`, `.devflow/snapshots/`
+- **Output**: `docs/CHANGELOG.md`, `docs/snapshots/`
 - **Hard Stop**: NUNCA escreve código
 
 ---

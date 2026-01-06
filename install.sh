@@ -336,7 +336,7 @@ case $INSTALL_OPTION in
         mkdir -p "$TARGET_DIR/.devflow/agents"
         mkdir -p "$TARGET_DIR/.devflow/memory"
         mkdir -p "$TARGET_DIR/.devflow/sessions"
-        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        mkdir -p "$TARGET_DIR/docs/snapshots"
         cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
         print_success "Estrutura .devflow/ criada"
 
@@ -354,7 +354,7 @@ case $INSTALL_OPTION in
         mkdir -p "$TARGET_DIR/.devflow/agents"
         mkdir -p "$TARGET_DIR/.devflow/memory"
         mkdir -p "$TARGET_DIR/.devflow/sessions"
-        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        mkdir -p "$TARGET_DIR/docs/snapshots"
         cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
         print_success "Estrutura .devflow/ criada"
 
@@ -380,7 +380,7 @@ case $INSTALL_OPTION in
         mkdir -p "$TARGET_DIR/.devflow/agents"
         mkdir -p "$TARGET_DIR/.devflow/memory"
         mkdir -p "$TARGET_DIR/.devflow/sessions"
-        mkdir -p "$TARGET_DIR/.devflow/snapshots"
+        mkdir -p "$TARGET_DIR/docs/snapshots"
         cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/" 2>/dev/null || touch "$TARGET_DIR/.devflow/project.yaml"
         print_success "Estrutura .devflow/ criada"
 

@@ -215,14 +215,14 @@ seu-projeto/
 │
 ├── .devflow/
 │   ├── memory/               # Memória do projeto
-│   ├── sessions/             # Sessões
-│   └── snapshots/            # Histórico do projeto
+│   └── sessions/             # Sessões
 │
 ├── docs/
 │   ├── planning/             # PRDs e stories
 │   │   └── stories/
 │   ├── architecture/         # Design docs
 │   ├── decisions/            # ADRs
+│   ├── snapshots/            # Histórico do projeto
 │   └── CHANGELOG.md
 │
 └── seu-codigo/
@@ -258,7 +258,7 @@ seu-projeto/
 
 ```bash
 # Leia o snapshot mais recente
-cat .devflow/snapshots/$(ls -t .devflow/snapshots/ | head -1)
+cat docs/snapshots/$(ls -t docs/snapshots/ | head -1)
 
 # Ou peça ao Chronicler
 /agents:chronicler Criar snapshot do estado atual

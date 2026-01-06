@@ -147,7 +147,7 @@ echo -e "  → Atualizando estrutura .devflow/..."
 mkdir -p "$TARGET_DIR/.devflow/agents"
 mkdir -p "$TARGET_DIR/.devflow/memory"
 mkdir -p "$TARGET_DIR/.devflow/sessions"
-mkdir -p "$TARGET_DIR/.devflow/snapshots"
+mkdir -p "$TARGET_DIR/docs/snapshots"
 
 # Update project.yaml version
 echo -e "  → Atualizando project.yaml..."

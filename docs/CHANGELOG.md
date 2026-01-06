@@ -162,7 +162,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **`.devflow/project.yaml`**: Metadata estruturada do projeto para parse rápido pela IA
 - **`.devflow/agents/*.meta.yaml`**: Metadata YAML para cada agente (5 arquivos)
 - **Knowledge Graph**: `.devflow/knowledge-graph.json` conectando decisões, features, agentes e documentos
-- **Snapshots Estruturados**: `.devflow/snapshots/2025-11-15.json` (além do .md)
+- **Snapshots Estruturados**: `docs/snapshots/2025-11-15.json` (além do .md)
 - **ADR com YAML Frontmatter**: Template atualizado com metadata estruturada
 - **ADR-001**: Decisão formal documentada - "5 Agentes ao invés de 19+"
 - **Build System**: `build-release.sh` para gerar releases limpas

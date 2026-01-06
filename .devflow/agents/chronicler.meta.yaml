@@ -49,7 +49,7 @@ responsibilities:
       location: "docs/CHANGELOG.md"
       format: "markdown (keep-a-changelog)"
     - type: "Snapshot"
-      location: ".devflow/snapshots/"
+      location: "docs/snapshots/"
       format: "markdown + json"
     - type: "Knowledge Graph"
       location: ".devflow/knowledge-graph.json"
@@ -163,7 +163,7 @@ commands:
 
   - name: "/snapshot"
     description: "Cria snapshot do estado atual"
-    output: ".devflow/snapshots/{date}.md + .json"
+    output: "docs/snapshots/{date}.md + .json"
 
   - name: "/sync-check"
     description: "Verifica drift de documentação"
