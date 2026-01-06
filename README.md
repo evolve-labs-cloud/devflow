@@ -45,59 +45,78 @@ Interface visual completa para gerenciar seu projeto DevFlow:
 ### Requisitos
 
 #### CLI (Mínimo)
-- Claude Code CLI instalado e autenticado
-- **Windows**: Requer WSL (Windows Subsystem for Linux)
+- Claude Code CLI (`npm i -g @anthropic-ai/claude-code`)
+- Git
+- Bash
 
-#### Web IDE (Opcional)
-- Node.js 18+
-- npm ou yarn
+#### Web IDE (Adicional)
+- Node.js 18+ (recomendado 20 LTS)
+- Python 3 (para node-gyp)
+- GCC/G++ e Make (compilação do node-pty)
 
-### Instalando WSL (Windows)
+### Instalação Rápida
 
-```bash
-# No PowerShell como Admin
-wsl --install
-
-# Após reiniciar, no terminal WSL (Ubuntu)
-sudo apt-get update
-sudo apt-get install -y build-essential python3
-
-# Instalar Node.js
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Instalar Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
-```
-
-### Opção 1: CLI (Recomendado)
 ```bash
 # Clone o repositório
 git clone https://github.com/evolve-labs-cloud/devflow.git
 cd devflow
 
-# Instale no seu projeto
+# Instale no seu projeto (verifica dependências automaticamente)
 ./install.sh /caminho/para/seu-projeto
 
-# Use no Claude Code
-cd /caminho/para/seu-projeto
-# /agents:strategist Olá! Quero criar [sua feature]
+# Opções do instalador:
+./install.sh --help        # Ver ajuda
+./install.sh --skip-deps   # Pular verificação de dependências
 ```
 
-### Opção 2: Web IDE
+O instalador detecta seu sistema operacional e mostra os comandos para instalar dependências faltantes.
+
+### Dependências por Sistema
+
+#### Debian/Ubuntu
 ```bash
-# Entre na pasta web
+sudo apt-get update
+sudo apt-get install -y build-essential python3 git
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+npm install -g @anthropic-ai/claude-code
+```
+
+#### Fedora
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3 git nodejs npm
+npm install -g @anthropic-ai/claude-code
+```
+
+#### RHEL/CentOS/Rocky
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3 git
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
+npm install -g @anthropic-ai/claude-code
+```
+
+#### macOS
+```bash
+xcode-select --install
+brew install node
+npm install -g @anthropic-ai/claude-code
+```
+
+#### Windows (WSL)
+```powershell
+# PowerShell como Admin
+wsl --install
+```
+Depois siga as instruções de Debian/Ubuntu no terminal WSL.
+
+### Web IDE (Opcional)
+```bash
 cd devflow/web
-
-# Instale dependências
 npm install
-
-# Inicie o servidor
 npm run dev
-
 # Acesse http://localhost:3000
 ```
 
