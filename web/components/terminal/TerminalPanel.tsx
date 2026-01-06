@@ -74,14 +74,21 @@ export function TerminalPanel({
   const eventSourceRef = useRef<EventSource | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
-  // Buffer for batching terminal writes
+  // Buffer for batching terminal writes (input)
   const writeBufferRef = useRef<string>('');
   const writeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Buffer for batching terminal reads (output) - reduces flickering
+  const readBufferRef = useRef<string>('');
+  const readTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isConnectedRef = useRef(false);
   const hasShownConnectToast = useRef(false);
-  const WRITE_BUFFER_DELAY = 10; // ms - batch writes within this window
-  const RESIZE_DEBOUNCE_DELAY = 150; // ms - debounce resize events
+
+  const WRITE_BUFFER_DELAY = 10; // ms - batch input writes
+  const READ_BUFFER_DELAY = 16; // ms - batch output reads (~1 frame at 60fps)
+  const RESIZE_DEBOUNCE_DELAY = 200; // ms - debounce resize events
 
   const { terminalFontSize } = useSettingsStore();
 
@@ -243,8 +250,27 @@ export function TerminalPanel({
         try {
           const message = JSON.parse(event.data);
           if (message.type === 'data' && message.data) {
-            terminal.write(message.data);
+            // Buffer reads to reduce flickering
+            readBufferRef.current += message.data;
+
+            // Clear existing timeout
+            if (readTimeoutRef.current) {
+              clearTimeout(readTimeoutRef.current);
+            }
+
+            // Flush buffer after delay (batches rapid updates into single repaint)
+            readTimeoutRef.current = setTimeout(() => {
+              if (readBufferRef.current && terminalRef.current) {
+                terminalRef.current.write(readBufferRef.current);
+                readBufferRef.current = '';
+              }
+            }, READ_BUFFER_DELAY);
           } else if (message.type === 'exit') {
+            // Flush any pending buffer before exit message
+            if (readBufferRef.current && terminalRef.current) {
+              terminalRef.current.write(readBufferRef.current);
+              readBufferRef.current = '';
+            }
             terminal.write('\r\n\x1b[90m[Process exited]\x1b[0m\r\n');
           }
         } catch {
@@ -348,10 +374,14 @@ export function TerminalPanel({
       if (writeTimeoutRef.current) {
         clearTimeout(writeTimeoutRef.current);
       }
+      if (readTimeoutRef.current) {
+        clearTimeout(readTimeoutRef.current);
+      }
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
       writeBufferRef.current = '';
+      readBufferRef.current = '';
       hasShownConnectToast.current = false;
 
       if (terminalRef.current) {
