@@ -13,7 +13,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 # Current version
-CURRENT_VERSION="0.3.0"
+CURRENT_VERSION="0.5.0"
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}  DevFlow Updater v${CURRENT_VERSION}${NC}"
@@ -29,8 +29,8 @@ TARGET_DIR="$(cd "$TARGET_DIR" 2>/dev/null && pwd)" || {
     exit 1
 }
 
-# Check if DevFlow is installed
-if [ ! -d "$TARGET_DIR/.devflow" ]; then
+# Check if DevFlow is installed (check for .claude/commands/agents or .devflow)
+if [ ! -d "$TARGET_DIR/.claude/commands/agents" ] && [ ! -d "$TARGET_DIR/.devflow" ]; then
     echo -e "${RED}❌ DevFlow não encontrado em: $TARGET_DIR${NC}"
     echo -e "${YELLOW}   Use install.sh para instalar pela primeira vez.${NC}"
     exit 1
@@ -58,7 +58,7 @@ fi
 
 # Confirm update
 echo -e "${YELLOW}⚠️  O update vai sobrescrever os arquivos de agentes.${NC}"
-echo -e "${YELLOW}   Customizações em .devflow/agents/ serão perdidas.${NC}"
+echo -e "${YELLOW}   Customizações em .claude/commands/agents/ serão perdidas.${NC}"
 echo ""
 read -p "Continuar com o update? (y/N) " -n 1 -r
 echo ""
@@ -71,51 +71,52 @@ fi
 echo ""
 echo -e "${YELLOW}🔄 Atualizando DevFlow...${NC}"
 
-# Backup existing agents (optional)
+# Backup existing agents
 BACKUP_DIR="$TARGET_DIR/.devflow/backup-$(date +%Y%m%d-%H%M%S)"
 echo -e "  → Criando backup em ${BACKUP_DIR}"
 mkdir -p "$BACKUP_DIR"
-cp -r "$TARGET_DIR/.devflow/agents" "$BACKUP_DIR/" 2>/dev/null || true
+cp -r "$TARGET_DIR/.claude/commands/agents" "$BACKUP_DIR/" 2>/dev/null || true
 cp "$TARGET_DIR/.devflow/project.yaml" "$BACKUP_DIR/" 2>/dev/null || true
 
-# Update agents
+# Update .claude/commands/agents
 echo -e "  → Atualizando agentes..."
-cp "$SCRIPT_DIR/.devflow/agents/"*.md "$TARGET_DIR/.devflow/agents/"
-cp "$SCRIPT_DIR/.devflow/agents/"*.meta.yaml "$TARGET_DIR/.devflow/agents/"
+mkdir -p "$TARGET_DIR/.claude/commands/agents"
+cp "$SCRIPT_DIR/.claude/commands/agents/"*.md "$TARGET_DIR/.claude/commands/agents/"
+cp "$SCRIPT_DIR/.claude/commands/agents/"*.meta.yaml "$TARGET_DIR/.claude/commands/agents/" 2>/dev/null || true
 
-# Update knowledge graph structure (preserve user data if possible)
-echo -e "  → Atualizando knowledge graph..."
-cp "$SCRIPT_DIR/.devflow/knowledge-graph.json" "$TARGET_DIR/.devflow/"
+# Migrate from old structure if needed
+if [ -d "$TARGET_DIR/.devflow/agents" ] && [ -f "$TARGET_DIR/.devflow/agents/strategist.md" ]; then
+    echo -e "  → Migrando estrutura antiga..."
+    rm -rf "$TARGET_DIR/.devflow/agents"
+fi
 
-# Update project.yaml version (preserve user customizations)
+# Update .devflow structure
+echo -e "  → Atualizando estrutura .devflow/..."
+mkdir -p "$TARGET_DIR/.devflow/agents"
+mkdir -p "$TARGET_DIR/.devflow/memory"
+mkdir -p "$TARGET_DIR/.devflow/sessions"
+mkdir -p "$TARGET_DIR/.devflow/snapshots"
+
+# Update project.yaml version
 echo -e "  → Atualizando project.yaml..."
 if [ -f "$TARGET_DIR/.devflow/project.yaml" ]; then
-    # Update version in existing file
     sed -i.bak "s/version:.*/version: \"$CURRENT_VERSION\"/" "$TARGET_DIR/.devflow/project.yaml"
     rm -f "$TARGET_DIR/.devflow/project.yaml.bak"
 else
     cp "$SCRIPT_DIR/.devflow/project.yaml" "$TARGET_DIR/.devflow/"
 fi
 
-# Update .claude_project if exists
-if [ -f "$SCRIPT_DIR/.claude_project" ]; then
-    echo -e "  → Atualizando .claude_project..."
-    cp "$SCRIPT_DIR/.claude_project" "$TARGET_DIR/"
-fi
-
-# Create new directories if they don't exist (v0.3.0)
-echo -e "  → Criando novos diretórios..."
+# Create docs directories if they don't exist
+echo -e "  → Verificando estrutura de documentação..."
+mkdir -p "$TARGET_DIR/docs/planning/stories"
+mkdir -p "$TARGET_DIR/docs/architecture/diagrams"
+mkdir -p "$TARGET_DIR/docs/decisions"
 mkdir -p "$TARGET_DIR/docs/security"
 mkdir -p "$TARGET_DIR/docs/performance"
-mkdir -p "$TARGET_DIR/docs/planning/stories"
-touch "$TARGET_DIR/docs/security/.gitkeep" 2>/dev/null || true
-touch "$TARGET_DIR/docs/performance/.gitkeep" 2>/dev/null || true
+touch "$TARGET_DIR/docs/planning/.gitkeep" 2>/dev/null || true
 touch "$TARGET_DIR/docs/planning/stories/.gitkeep" 2>/dev/null || true
-
-# Copy new documentation files
-echo -e "  → Atualizando documentação..."
-cp "$SCRIPT_DIR/docs/AI_OPTIMIZATION_GUIDE.md" "$TARGET_DIR/docs/" 2>/dev/null || true
-cp "$SCRIPT_DIR/docs/CHANGELOG.md" "$TARGET_DIR/docs/" 2>/dev/null || true
+touch "$TARGET_DIR/docs/architecture/.gitkeep" 2>/dev/null || true
+touch "$TARGET_DIR/docs/decisions/.gitkeep" 2>/dev/null || true
 
 echo ""
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -124,23 +125,21 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo ""
 
 echo -e "${BLUE}📦 O que foi atualizado:${NC}"
-echo "  • Agentes com Hard Stops (v0.3.0)"
-echo "  • Delegação obrigatória entre agentes"
-echo "  • Geração automática de stories"
-echo "  • AI_OPTIMIZATION_GUIDE.md"
-echo "  • Novos diretórios: docs/security/, docs/performance/"
+echo "  • Agentes em .claude/commands/agents/"
+echo "  • Instruções de atualização de badges/status"
+echo "  • Estrutura de documentação"
 echo ""
 
 echo -e "${BLUE}📁 Backup salvo em:${NC}"
 echo "  $BACKUP_DIR"
 echo ""
 
-echo -e "${BLUE}🆕 Novidades v0.3.0:${NC}"
-echo "  • Hard Stops: Agentes não fazem trabalho de outros"
-echo "  • Delegação: Fluxo obrigatório entre agentes"
-echo "  • Auto Stories: @chronicler gera se @strategist não criar"
+echo -e "${BLUE}🆕 Novidades v0.5.0:${NC}"
+echo "  • Agentes usam /agents:nome ao invés de @nome"
+echo "  • Atualização automática de badges e status"
+echo "  • Suporte a Windows via WSL"
+echo "  • Web IDE com terminal integrado"
 echo ""
 
-echo -e "${YELLOW}💡 Dica:${NC} Leia docs/AI_OPTIMIZATION_GUIDE.md para maximizar"
-echo "   as capacidades do DevFlow com IA."
+echo -e "${YELLOW}💡 Dica:${NC} Use /agents:strategist para iniciar uma nova feature"
 echo ""
