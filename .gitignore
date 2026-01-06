@@ -70,9 +70,13 @@ env/
 # .devflow/snapshots/*.json
 
 # DevFlow Development (não incluir no release)
-# Arquivos específicos de desenvolvimento do DevFlow que não vão para usuários
-.claude/
 build-release.sh  # Script de build fica apenas no dev
+
+# Web IDE build artifacts (users run npm install themselves)
+web/.next/
+web/node_modules/
+web/CHANGELOG.md
+web/README.md
 
 # Releases geradas (versionadas separadamente)
 # Mantenha release/ versionado para distribuição
