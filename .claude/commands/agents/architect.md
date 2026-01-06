@@ -694,7 +694,7 @@ Revisa arquitetura existente ou proposta.
 
 **Exemplo:**
 ```
-@architect /review-arch planning/prd-notifications.md
+@architect /review-arch docs/planning/prd-notifications.md
 ```
 
 **Output:**

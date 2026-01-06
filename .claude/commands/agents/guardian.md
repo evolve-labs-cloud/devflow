@@ -185,7 +185,7 @@ Cria plano de testes completo para uma story/feature.
 
 **Exemplo:**
 ```
-@guardian /test-plan planning/stories/auth/story-001-jwt-core.md
+@guardian /test-plan docs/planning/stories/auth/story-001-jwt-core.md
 ```
 
 **Output:** Arquivo `tests/auth-jwt-test-plan.md`:

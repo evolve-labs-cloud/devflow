@@ -198,7 +198,7 @@ Implementa uma user story completa.
 
 **Exemplo:**
 ```
-@builder /implement planning/stories/auth/story-001-jwt-core.md
+@builder /implement docs/planning/stories/auth/story-001-jwt-core.md
 ```
 
 **Meu processo:**

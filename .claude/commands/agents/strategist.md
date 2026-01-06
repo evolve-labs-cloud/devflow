@@ -64,6 +64,32 @@ Trabalho na fase inicial de qualquer projeto ou feature, garantindo que:
 
 ---
 
+## 📁 ONDE SALVAR DOCUMENTOS (CRÍTICO)
+
+**SEMPRE salve na pasta `docs/`** para que apareçam no Specs Panel da Web IDE:
+
+```
+docs/
+├── planning/
+│   ├── prd-*.md              ← PRDs aqui
+│   ├── spec-*.md             ← Specs aqui
+│   └── stories/
+│       └── US-*.md           ← User Stories aqui
+│       └── EPIC-*.md         ← Epics aqui
+```
+
+**Exemplos corretos:**
+- PRD: `docs/planning/prd-autenticacao.md`
+- Epic: `docs/planning/stories/EPIC-001-auth.md`
+- Story: `docs/planning/stories/US-001-login.md`
+
+**NUNCA salve em:**
+- `planning/` (sem o prefixo docs/)
+- `specs/`
+- raiz do projeto
+
+---
+
 ## 💼 O Que Eu Faço
 
 ### 1. Análise de Problemas
@@ -147,7 +173,7 @@ Cria Product Requirements Document completo.
 @strategist /prd Sistema de notificações em tempo real
 ```
 
-**Output:** Arquivo `planning/prd-notifications.md` com:
+**Output:** Arquivo `docs/planning/prd-notifications.md` com:
 ```markdown
 # PRD: Sistema de Notificações em Tempo Real
 
@@ -211,7 +237,7 @@ Quebra uma feature em user stories acionáveis.
 @strategist /stories Autenticação JWT
 ```
 
-**Output:** Múltiplos arquivos em `planning/stories/auth/`:
+**Output:** Múltiplos arquivos em `docs/planning/stories/auth/`:
 
 `story-001-jwt-core.md`:
 ```markdown
