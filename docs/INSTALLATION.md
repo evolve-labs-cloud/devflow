@@ -6,26 +6,180 @@ Guia completo para instalar e configurar o DevFlow no seu projeto.
 
 ## Pré-requisitos
 
+### CLI (Agentes) - Mínimo
 - Claude Code CLI instalado e autenticado (`claude`)
+- Bash shell
 - Git (opcional, mas recomendado)
-- Projeto existente ou novo
-- **Windows**: Requer WSL (Windows Subsystem for Linux)
 
-### Instalando no Windows (WSL)
+### Web IDE - Requer compilação nativa
+- Node.js 18+ (recomendado 20 LTS)
+- Python 3.x (para node-gyp)
+- GCC/G++ (compiladores C/C++)
+- Make
+
+---
+
+## Verificar Dependências
+
+Execute o script de verificação:
 
 ```bash
-# No PowerShell como Admin
-wsl --install
+./check-deps.sh
+```
 
-# Após reiniciar, no terminal WSL (Ubuntu)
+---
+
+## Instalação por Sistema Operacional
+
+### Linux - Debian/Ubuntu
+
+```bash
+# Atualizar repositórios
 sudo apt-get update
-sudo apt-get install -y build-essential python3
 
-# Instalar Node.js
+# Build essentials (gcc, g++, make)
+sudo apt-get install -y build-essential
+
+# Python 3 (para node-gyp)
+sudo apt-get install -y python3
+
+# Git
+sudo apt-get install -y git
+
+# Node.js 20 LTS (via NodeSource)
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Instalar Claude Code
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### Linux - Fedora
+
+```bash
+# Atualizar
+sudo dnf update -y
+
+# Development Tools (gcc, g++, make)
+sudo dnf groupinstall -y "Development Tools"
+
+# Python 3 (geralmente já instalado)
+sudo dnf install -y python3
+
+# Git
+sudo dnf install -y git
+
+# Node.js (Fedora tem versões atualizadas)
+sudo dnf install -y nodejs npm
+
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### Linux - RHEL/CentOS/Rocky/AlmaLinux
+
+```bash
+# Atualizar
+sudo dnf update -y  # ou yum em versões antigas
+
+# Development Tools
+sudo dnf groupinstall -y "Development Tools"
+# ou individualmente:
+# sudo dnf install -y gcc gcc-c++ make
+
+# Python 3
+sudo dnf install -y python3
+
+# Git
+sudo dnf install -y git
+
+# Node.js 20 LTS (via NodeSource)
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
+
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### Linux - Arch/Manjaro
+
+```bash
+# Atualizar
+sudo pacman -Syu
+
+# Build tools + Node.js
+sudo pacman -S base-devel python git nodejs npm
+
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### Linux - openSUSE
+
+```bash
+# Development pattern
+sudo zypper install -t pattern devel_basis
+
+# Dependências
+sudo zypper install python3 git nodejs npm
+
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### macOS
+
+```bash
+# Xcode Command Line Tools (inclui gcc, make)
+xcode-select --install
+
+# Homebrew (se não tiver)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Node.js
+brew install node
+
+# Claude Code
+npm install -g @anthropic-ai/claude-code
+
+# Autenticar
+claude login
+```
+
+### Windows (via WSL)
+
+```powershell
+# No PowerShell como Admin
+wsl --install
+```
+
+Após reiniciar, no terminal WSL (Ubuntu):
+
+```bash
+# Dependências
+sudo apt-get update
+sudo apt-get install -y build-essential python3 git
+
+# Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Claude Code
 npm install -g @anthropic-ai/claude-code
 
 # Autenticar
@@ -221,6 +375,97 @@ npm run dev
 ```bash
 chmod +x install.sh
 ./install.sh /caminho/para/seu-projeto
+```
+
+### node-pty não compila (Linux)
+
+**Problema**: Erro ao executar `npm install` na Web IDE.
+
+```
+gyp ERR! build error
+gyp ERR! stack Error: `make` failed with exit code: 2
+```
+
+**Solução - Debian/Ubuntu**:
+```bash
+sudo apt-get install -y build-essential python3
+```
+
+**Solução - Fedora**:
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3
+```
+
+**Solução - RHEL/CentOS**:
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3
+```
+
+### npm: command not found
+
+**Problema**: npm não está instalado ou não está no PATH.
+
+**Solução - Debian/Ubuntu**:
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+**Solução - Fedora/RHEL**:
+```bash
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
+```
+
+### Python não encontrado pelo node-gyp
+
+**Problema**:
+```
+gyp ERR! find Python
+```
+
+**Solução**:
+```bash
+# Debian/Ubuntu
+sudo apt-get install -y python3
+
+# Fedora/RHEL
+sudo dnf install -y python3
+
+# Configurar npm para usar python3
+npm config set python /usr/bin/python3
+```
+
+### GCC versão muito antiga (RHEL 7/CentOS 7)
+
+**Problema**: GCC 4.x não suporta padrões C++ modernos.
+
+**Solução** (habilitar devtoolset):
+```bash
+# CentOS 7 / RHEL 7
+sudo yum install -y centos-release-scl
+sudo yum install -y devtoolset-11
+scl enable devtoolset-11 bash
+
+# Depois execute npm install
+cd web && npm install
+```
+
+### Erro de permissão ao instalar pacotes globais
+
+**Problema**: `EACCES: permission denied` ao instalar Claude Code.
+
+**Solução** (configurar npm para usar diretório local):
+```bash
+mkdir -p ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# Agora instale
+npm install -g @anthropic-ai/claude-code
 ```
 
 ### Windows: node-pty não compila
