@@ -1,4 +1,4 @@
-# DevFlow v0.5.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow - Sistema Multi-Agentes + Web IDE
 
 Sistema de multi-agentes especializados para desenvolvimento de software, agora com **Web IDE** integrada para visualização e controle do fluxo de trabalho.
 
