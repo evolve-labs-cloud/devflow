@@ -1,6 +1,6 @@
 {
   "name": "@evolve.labs/devflow",
-  "version": "0.9.2",
+  "version": "1.0.0",
   "description": "Multi-agent system for software development with Claude Code. 6 specialized agents (Strategist, Architect, System Designer, Builder, Guardian, Chronicler) as slash commands.",
   "keywords": [
     "claude-code",
