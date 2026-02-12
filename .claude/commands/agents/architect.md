@@ -476,7 +476,7 @@ Cria Architecture Decision Record.
 
 **Status**: Accepted  
 **Date**: 2025-01-23  
-**Deciders**: @architect, @strategist, Rafael  
+**Deciders**: @architect, @strategist, [Tech Lead]  
 **Technical Story**: Setup inicial do projeto
 
 ## Context

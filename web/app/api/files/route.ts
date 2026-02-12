@@ -3,6 +3,31 @@ import fs from 'fs/promises';
 import path from 'path';
 
 /**
+ * Resolve and validate a file path against the project root.
+ * Returns the resolved absolute path or null if invalid.
+ */
+function safePath(filePath: string): string | null {
+  const projectRoot = process.env.DEVFLOW_PROJECT_PATH;
+  if (!projectRoot) return null;
+
+  const resolved = path.resolve(projectRoot, filePath);
+
+  // Must be within the project root
+  if (!resolved.startsWith(projectRoot + path.sep) && resolved !== projectRoot) {
+    return null;
+  }
+
+  return resolved;
+}
+
+function pathError() {
+  return NextResponse.json(
+    { error: 'Path must be within the project directory' },
+    { status: 403 }
+  );
+}
+
+/**
  * GET /api/files?path=/path/to/file
  * Read file content
  */
@@ -18,16 +43,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Security check
-    if (filePath.includes('..')) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 400 }
-      );
-    }
+    const resolved = safePath(filePath);
+    if (!resolved) return pathError();
 
     try {
-      const stat = await fs.stat(filePath);
+      const stat = await fs.stat(resolved);
 
       if (!stat.isFile()) {
         return NextResponse.json(
@@ -44,7 +64,7 @@ export async function GET(req: NextRequest) {
         );
       }
 
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await fs.readFile(resolved, 'utf-8');
 
       return NextResponse.json({
         path: filePath,
@@ -85,17 +105,12 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Security check
-    if (filePath.includes('..')) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 400 }
-      );
-    }
+    const resolved = safePath(filePath);
+    if (!resolved) return pathError();
 
-    await fs.writeFile(filePath, content, 'utf-8');
+    await fs.writeFile(resolved, content, 'utf-8');
 
-    const stat = await fs.stat(filePath);
+    const stat = await fs.stat(resolved);
 
     return NextResponse.json({
       success: true,
@@ -126,17 +141,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Security check
-    if (filePath.includes('..')) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 400 }
-      );
-    }
+    const resolved = safePath(filePath);
+    if (!resolved) return pathError();
 
     // Check if already exists
     try {
-      await fs.access(filePath);
+      await fs.access(resolved);
       return NextResponse.json(
         { error: 'Path already exists' },
         { status: 409 }
@@ -146,12 +156,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (type === 'directory') {
-      await fs.mkdir(filePath, { recursive: true });
+      await fs.mkdir(resolved, { recursive: true });
     } else {
       // Ensure parent directory exists
-      const parentDir = path.dirname(filePath);
+      const parentDir = path.dirname(resolved);
       await fs.mkdir(parentDir, { recursive: true });
-      await fs.writeFile(filePath, content, 'utf-8');
+      await fs.writeFile(resolved, content, 'utf-8');
     }
 
     return NextResponse.json({
@@ -183,17 +193,13 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Security check
-    if (oldPath.includes('..') || newPath.includes('..')) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 400 }
-      );
-    }
+    const resolvedOld = safePath(oldPath);
+    const resolvedNew = safePath(newPath);
+    if (!resolvedOld || !resolvedNew) return pathError();
 
     // Check if old path exists
     try {
-      await fs.access(oldPath);
+      await fs.access(resolvedOld);
     } catch {
       return NextResponse.json(
         { error: 'Source path not found' },
@@ -203,7 +209,7 @@ export async function PATCH(req: NextRequest) {
 
     // Check if new path already exists
     try {
-      await fs.access(newPath);
+      await fs.access(resolvedNew);
       return NextResponse.json(
         { error: 'Destination path already exists' },
         { status: 409 }
@@ -212,7 +218,7 @@ export async function PATCH(req: NextRequest) {
       // Path doesn't exist, good to rename
     }
 
-    await fs.rename(oldPath, newPath);
+    await fs.rename(resolvedOld, resolvedNew);
 
     return NextResponse.json({
       success: true,
@@ -243,20 +249,15 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Security check
-    if (filePath.includes('..')) {
-      return NextResponse.json(
-        { error: 'Invalid path' },
-        { status: 400 }
-      );
-    }
+    const resolved = safePath(filePath);
+    if (!resolved) return pathError();
 
-    const stat = await fs.stat(filePath);
+    const stat = await fs.stat(resolved);
 
     if (stat.isDirectory()) {
-      await fs.rm(filePath, { recursive: true });
+      await fs.rm(resolved, { recursive: true });
     } else {
-      await fs.unlink(filePath);
+      await fs.unlink(resolved);
     }
 
     return NextResponse.json({

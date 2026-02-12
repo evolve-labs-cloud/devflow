@@ -67,7 +67,7 @@ export default function HomePage() {
           <nav className="flex items-center gap-6 text-sm text-gray-400">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Docs</a>
-            <a href="https://github.com/evolve-labs-cloud/dexter-devflow" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
+            <a href="https://github.com/evolve-labs-cloud/devflow" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a>
           </nav>
         </div>
       </header>
@@ -263,7 +263,7 @@ export default function HomePage() {
               Open a Project
             </button>
             <a
-              href="https://github.com/evolve-labs-cloud/dexter-devflow"
+              href="https://github.com/evolve-labs-cloud/devflow"
               target="_blank"
               rel="noopener noreferrer"
               className="px-8 py-3 border border-white/20 hover:border-white/40 text-white font-medium rounded-xl transition-colors"
