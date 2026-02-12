@@ -1,6 +1,6 @@
 {
   "name": "devflow-agents",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Multi-agent system for software development with Claude Code. 6 specialized agents (Strategist, Architect, System Designer, Builder, Guardian, Chronicler) as slash commands.",
   "keywords": [
     "claude-code",
