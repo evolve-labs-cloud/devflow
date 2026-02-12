@@ -1,9 +1,104 @@
 # Changelog
 
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2026-02-11
+
+### Security Hardening
+
+- **File API path scoping**: `safePath()` valida todas as operacoes de arquivo contra `DEVFLOW_PROJECT_PATH`, prevenindo path traversal
+- **Session ID sanitization**: IDs de terminal sanitizados para prevenir command injection
+- **Temp file permissions**: Arquivos temporarios do autopilot criados com 0o600
+- **Shell detection**: Fallback chain segura (`SHELL` → `/bin/zsh` → `/bin/bash` → `/bin/sh`)
+
+### Fixed
+
+- **npm global install**: `devflow web` agora funciona corretamente quando instalado via `npm install -g`
+  - SWC/Next.js nao compilava TypeScript dentro de `node_modules`
+  - Solucao: `resolveWebDir()` copia fonte web para `~/.devflow/_web/` com cache por versao
+- **node-pty spawn-helper**: `fixSpawnHelperPermissions()` corrige permissoes do binario prebuilt apos npm install
+  - `npm install` removia bit de execucao do `spawn-helper` em macOS/Linux
+  - Solucao: `fs.chmodSync(helper, 0o755)` automatico ao iniciar Web IDE
+- **Dados pessoais removidos**: Nome pessoal substituido por `[Tech Lead]` em templates
+- **URLs corrigidas**: GitHub URLs atualizadas para `evolve-labs-cloud/devflow`
+
+### Changed
+
+- Versao publica estavel no npm como `@evolve.labs/devflow`
+- Documentacao completamente atualizada (ARCHITECTURE, INSTALLATION, QUICKSTART, CHANGELOG)
+
+---
+
+## [0.9.0] - 2026-02-10
+
+### Added - Autopilot Terminal-Based + CLI
+
+- **Autopilot no terminal**: Agents rodam no terminal panel do Web IDE com output streaming em tempo real
+  - `terminal-execute` API route: executa agent via PTY em vez de `execSync`
+  - Marker-based completion detection (`___DEVFLOW_PHASE_DONE_<exitCode>___`)
+  - `ptyManager` extended com autopilot collector
+  - SSE event `autopilot-phase-done` para notificacao ao frontend
+  - Tab "Autopilot" criada automaticamente no terminal
+
+- **CLI `devflow autopilot`**: Comando headless para rodar autopilot sem Web IDE
+  - `devflow autopilot <spec-file>` com `spawn` streaming
+  - `--phases <list>`: selecionar fases (default: todas)
+  - `--project <path>`: diretorio do projeto
+  - `--no-update`: nao auto-atualizar tasks no spec
+  - Auto-task tracking: tasks na spec marcadas automaticamente como concluidas
+
+- **Autopilot shared constants**: `autopilotConstants.ts` extraido de `execute/route.ts`
+  - `AGENT_PROMPTS`, `AGENT_SKILLS`, `AGENT_TIMEOUTS`
+  - `autoUpdateSpecTasks()` reutilizavel
+
+### Changed - Web IDE Refactoring
+
+- **Removido File Explorer**: Navegacao por projeto removida
+- **Multi-project support**: `ProjectSelector` para alternar entre projetos
+- **Agent completion tracking**: Badges visuais por agente
+- **Layout simplificado**: Sem sidebar, foco em specs + terminal
+- **AutopilotPanel**: Simplificado — output principal no terminal, panel mostra status/duracao/tasks
+- **Abort button**: Envia Ctrl+C ao terminal e marca fases como failed/skipped
+
+---
+
+## [0.8.0] - 2026-02-08
+
+### Added - npm Package + CLI Commands
+
+- **npm package**: Publicado como `@evolve.labs/devflow` no npm
+  - `npm install -g @evolve.labs/devflow`
+  - `bin/devflow.js` com commander CLI
+
+- **`devflow init [path]`**: Inicializar DevFlow num projeto
+  - `--agents-only`: apenas agentes (minimo)
+  - `--full`: tudo incluindo .gitignore
+  - `--web`: inclui Web IDE
+  - Copia agentes, metadata, estrutura de docs, project.yaml
+
+- **`devflow update [path]`**: Atualizar instalacao existente
+  - Preserva customizacoes do usuario
+  - Atualiza apenas agentes e metadata
+
+- **`devflow web`**: Iniciar Web IDE
+  - `--port <number>`: porta customizada
+  - `--project <path>`: projeto especifico
+  - `--dev`: modo desenvolvimento
+  - Instala dependencias automaticamente se necessario
+
+- **Constantes centralizadas**: `lib/constants.js` com VERSION, diretories, copy mappings
+
+### Changed
+
+- **Removido `install.sh`**: Substituido por `devflow init`
+- **Removido `update.sh`**: Substituido por `devflow update`
+- **`.gitignore` reescrito**: Exclui runtime data, package-lock files, legacy scripts
+- **Estrutura de pastas**: `docs/snapshots/` padronizado (antes era `.devflow/snapshots/`)
+
+---
 
 ## [0.7.0] - 2026-02-11
 
@@ -21,7 +116,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Novos arquivos criados**:
   - `.claude/commands/agents/system-designer.md` (~1100 linhas, spec completa)
   - `.devflow/agents/system-designer.meta.yaml` (metadata estruturada)
-  - `.claude/commands/agents/system-designer.meta.yaml` (copia sincronizada)
   - `.claude/commands/quick/system-design.md` (wizard de quick start)
   - `docs/system-design/{sdd,rfc,capacity,trade-offs}/` (diretorios de output)
 
@@ -38,35 +132,19 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - `guardian.md`: Reporta problemas de escala/performance ao @system-designer
   - `chronicler.md`: Documenta SDDs e RFCs automaticamente
 
-- **Meta.yamls sincronizados (.claude <-> .devflow)**:
-  - `builder.meta.yaml`: position 3->4, previous_agents inclui system-designer
-  - `architect.meta.yaml`: next_agents inclui system-designer
-  - `guardian.meta.yaml`: position 4->5, should_delegate_to inclui system-designer
-  - `chronicler.meta.yaml`: position 5->6, previous_agents inclui system-designer
-  - `strategist.meta.yaml`: should_delegate_to inclui system-designer
-
-- **Commands faltantes adicionados**:
-  - `/prioritize` no strategist.meta.yaml (ambos diretorios)
-  - `/status-check` no chronicler.meta.yaml (ambos diretorios)
+- **Token optimization (~30% reducao nos 3 maiores agentes)**:
+  - `guardian.md`: ~1535 -> ~600 linhas
+  - `chronicler.md`: ~789 -> ~550 linhas
+  - `strategist.md`: ~535 -> ~430 linhas
 
 - **EXIT CHECKLIST adicionado ao strategist.md** (era o unico agente sem)
 
-- **Token optimization (~30% reducao nos 3 maiores agentes)**:
-  - `guardian.md`: ~1535 -> ~600 linhas (exemplos de codigo inline condensados)
-  - `chronicler.md`: ~789 -> ~550 linhas (cenarios repetitivos removidos)
-  - `strategist.md`: ~535 -> ~430 linhas (sessao de exemplo removida)
-
-- **`.claude_project`**: @system-designer na lista de agentes, workflow atualizado
-- **`.devflow/project.yaml`**: system-designer agent entry, total_agents: 6
-- **`.claude/settings.local.json`**: Permissoes para system-designer skill
-- **`.claude/commands/devflow-help.md`**: 5->6 agentes, novo workflow
-
 ### Fixed - Agent Consistency Issues
 
-- **Meta.yaml desync**: .claude/commands/agents/ e .devflow/agents/ tinham positions conflitantes (builder position 3 vs 4) - agora sincronizados
-- **Missing @system-designer refs**: 4 de 5 agentes existentes nao referenciavam @system-designer - corrigido em todos
-- **Guardian should_not_do incompleto**: Faltava "Projetar infraestrutura em escala" - adicionado
-- **Builder should_not_do incompleto**: Faltava "Fazer decisoes de infraestrutura ou escala" - adicionado
+- **Meta.yaml desync**: .claude/ e .devflow/ tinham positions conflitantes - sincronizados
+- **Missing @system-designer refs**: 4 de 5 agentes existentes nao referenciavam - corrigido
+- **Guardian should_not_do incompleto**: Faltava "Projetar infraestrutura em escala"
+- **Builder should_not_do incompleto**: Faltava "Fazer decisoes de infraestrutura ou escala"
 
 ---
 
@@ -74,29 +152,16 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added - Permission Mode Configuration
 
-- **ChatSettings Component**: Nova configuração de permissões no chat
-  - Popover elegante com 3 modos de permissão
-  - Auto-Accept Edits (recomendado para web)
-  - Bypass All (para automação total)
-  - Ask Permission (modo padrão do CLI)
-  - Persistência em localStorage
+- **ChatSettings Component**: Configuracao de permissoes no chat
+  - 3 modos: Auto-Accept Edits, Bypass All, Ask Permission
+  - Persistencia em localStorage
 
-- **Permission Mode API**: Suporte a permission mode dinâmico
-  - `settingsStore.ts`: Nova configuração `chatPermissionMode`
-  - `chatStore.ts`: Passa permissionMode para API
-  - `/api/chat/route.ts`: Aceita e aplica permissionMode
-  - Resolve problema de permissões bloqueando na web UI
-
-### Changed - User Stories Completed
-
-- **US-001 a US-010**: Todas marcadas como completed (testadas)
-- **US-019**: UX Improvements - completed
-- **US-020**: Performance Optimization - completed
-- **US-021**: Automated Testing - deferred (para futura implementação)
+- **Permission Mode API**: Suporte a permission mode dinamico
+  - `settingsStore.ts`, `chatStore.ts`, `/api/chat/route.ts`
 
 ### Fixed
 
-- **Web UI Permission Blocking**: Claude CLI agora usa `--permission-mode acceptEdits` por padrão na web, evitando bloqueios de permissão que não podem ser respondidos na interface web
+- **Web UI Permission Blocking**: Claude CLI usa `--permission-mode acceptEdits` por padrao na web
 
 ---
 
@@ -104,80 +169,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added - Web IDE Complete
 
-- **Web IDE Interface**: Interface visual completa para gerenciar projetos DevFlow
-  - Dashboard Panel com métricas do projeto e health check
-  - Specs Panel para visualizar requirements, design e tasks
-  - File Explorer com context menu e navegação por teclado
-  - Monaco Editor com syntax highlighting para 50+ linguagens
+- **Web IDE Interface**: Interface visual completa para projetos DevFlow
+  - Dashboard Panel com metricas e health check
+  - Specs Panel (requirements, design, tasks)
+  - File Explorer com context menu
+  - Monaco Editor com syntax highlighting
   - Terminal integrado via xterm.js
-  - Chat com Claude direto na IDE
-  - Settings Panel (Cmd+,) para configurar tema, fonte e terminal
+  - Chat com Claude
+  - Settings Panel (Cmd+,)
 
-- **Autopilot System**: Execute o pipeline DevFlow automaticamente
-  - 5 fases sequenciais: Planning → Design → Implementation → Validation → Documentation
-  - Execução simplificada sem streaming (mais estável)
-  - Feedback visual do progresso
+- **Autopilot System**: Pipeline DevFlow automatico (5 fases sequenciais)
+- **Keyboard Shortcuts**: Cmd+P, Cmd+Shift+F, Cmd+Shift+P, Cmd+S, Cmd+W, etc.
+- **Markdown Preview**: GFM, Mermaid diagrams, syntax highlighting
 
-- **Keyboard Shortcuts**:
-  - `Cmd+P` - Quick Open (arquivos)
-  - `Cmd+Shift+F` - Busca global
-  - `Cmd+Shift+P` - Command Palette
-  - `Cmd+,` - Settings
-  - `Cmd+S` - Salvar arquivo
-  - `Cmd+W` - Fechar tab
-  - `Cmd+Shift+T` - Reabrir tab fechada
-  - `Cmd+[/]` - Navegação back/forward
+### Changed
 
-- **Markdown Preview**: Suporte completo com:
-  - GitHub Flavored Markdown (GFM)
-  - Mermaid diagrams (lazy loaded)
-  - Syntax highlighting para code blocks
-  - Checkboxes, tabelas, blockquotes
-
-- **Toast Notifications**: Sistema de feedback visual (sonner)
-- **Skeleton Loaders**: Loading states para melhor UX
-- **Image Support in Chat**: Paste (Ctrl+V), drag-drop, file picker
-
-### Changed - Performance Optimizations
-
-- **Mermaid Diagrams**: Lazy loaded com React.lazy() + Suspense
-- **MarkdownPreview Components**: Memoizados com useMemo
-- **FileTree Component**: React.memo com comparação customizada
-- **Zustand Selectors**: Selectors específicos ao invés de subscribe ao store inteiro
-- **Terminal Writes**: Buffering com debounce (10ms) para reduzir chamadas de rede
-
-### Changed - Autopilot Simplification
-
-- Removido SSE streaming (causa de instabilidade)
-- Execução sequencial com fetch por fase
-- Removido pause/resume/cancel (simplificação)
-- Removido checkpoints (complexidade desnecessária)
-- Timeout aumentado para 5 minutos por fase
-
-### Fixed - Stability
-
-- **Autopilot JSON Parsing**: Resolvido erros de parse em streaming
-- **Autopilot Timeouts**: Execução mais estável sem SSE
-- **FileTree Re-renders**: Memoização previne re-renders desnecessários
-- **Terminal Performance**: Buffering reduz latência de input
+- Mermaid diagrams lazy loaded
+- Components memoizados
+- Terminal writes com buffering
 
 ### Removed
 
-- Knowledge Graph visualization (complexidade vs uso)
-- Kanban Board (movido para futura versão)
-- Checkpoints no Autopilot
-
-### Tech Stack (Web IDE)
-
-- **Next.js 16** - Framework React com App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Monaco Editor** - Code editing (VS Code engine)
-- **xterm.js** - Terminal emulation
-- **Zustand** - State management
-- **Lucide Icons** - Iconografia
-- **Sonner** - Toast notifications
-- **Mermaid** - Diagramas (lazy loaded)
+- Knowledge Graph visualization
+- Kanban Board
 
 ---
 
@@ -185,99 +199,42 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added - Hard Stops & Mandatory Delegation
 
-- **Hard Stops em todos os agentes**: Seção `🚨 REGRAS CRÍTICAS - LEIA PRIMEIRO` no topo de cada arquivo `.md`
-- **Regras de NUNCA FAÇA**: Instruções explícitas `⛔ NUNCA FAÇA (HARD STOP)` com lógica IF/THEN para parar e delegar
-- **Regras de SEMPRE FAÇA**: Instruções `✅ SEMPRE FAÇA (OBRIGATÓRIO)` para delegação mandatória
-- **Geração automática de stories**: Chronicler agora DEVE gerar user stories se strategist não criar
-- **Checklist pós-ação**: Chronicler executa verificações após qualquer agente completar tarefa
-- **Detection patterns**: Padrões de código em `strategist.meta.yaml` para detectar violações de escopo
-- **Mandatory delegation triggers**: Em todos os `.meta.yaml` com regras de quando delegar
+- **Hard Stops em todos os agentes**: Secao critica no topo de cada .md
+- **Regras de NUNCA FACA / SEMPRE FACA** com logica IF/THEN
+- **Geracao automatica de stories**: Chronicler gera se strategist nao criar
+- **Detection patterns**: Padroes de codigo para detectar violacoes de escopo
+- **Mandatory delegation triggers**: Em todos os .meta.yaml
 
-### Changed - Orchestration System
+### Changed
 
-- **`.claude_project`**: Adicionadas regras obrigatórias de orquestração no topo do arquivo
-- **`strategist.md`**: Hard stops para nunca escrever código, sempre delegar para architect/builder
-- **`strategist.meta.yaml`**: Versão 1.1.0 com `hard_stops` e `mandatory_delegation` sections
-- **`architect.md`**: Hard stops para apenas exemplos de código, nunca produção
-- **`builder.md`**: Hard stops para verificar design antes de implementar, delegar após implementar
-- **`guardian.md`**: Hard stops e fluxo de aprovação/rejeição com delegação
-- **`chronicler.md`**: Ações automáticas obrigatórias e geração de stories
-- **`chronicler.meta.yaml`**: Versão 1.1.0 com `mandatory_actions` para cada evento
+- Orquestracao completa com regras obrigatorias
+- Todos os agentes com hard stops e EXIT CHECKLIST
 
-### Fixed - Agent Role Violations
-
-- **Bug**: Strategist escrevia código ao invés de delegar para builder
-  - **Solução**: Hard stops explícitos + detection patterns para keywords de código
-- **Bug**: Stories não eram geradas automaticamente
-  - **Solução**: Chronicler agora tem trigger obrigatório `after_strategist_prd`
-- **Bug**: Documentação não era atualizada após implementações
-  - **Solução**: Checklist pós-ação em chronicler com verificações automáticas
-
-### Benefits - Por que isso melhora?
-
-- **Zero violações de papel**: Agentes param imediatamente ao detectar ação fora do escopo
-- **Delegação garantida**: Fluxo obrigatório strategist → architect → builder → guardian → chronicler
-- **Stories sempre disponíveis**: Se strategist não criar, chronicler gera automaticamente
-- **Documentação sincronizada**: Checklist automático garante docs atualizados
-- **Detecção proativa**: Patterns de código identificam quando strategist tenta implementar
+---
 
 ## [0.2.0] - 2025-11-15
 
-### Added - Metadata Estruturada (IA-Optimized)
-- **`.devflow/project.yaml`**: Metadata estruturada do projeto para parse rápido pela IA
-- **`.devflow/agents/*.meta.yaml`**: Metadata YAML para cada agente (5 arquivos)
-- **Knowledge Graph**: `.devflow/knowledge-graph.json` conectando decisões, features, agentes e documentos
-- **Snapshots Estruturados**: `.devflow/snapshots/2025-11-15.json` (além do .md)
-- **ADR com YAML Frontmatter**: Template atualizado com metadata estruturada
-- **ADR-001**: Decisão formal documentada - "5 Agentes ao invés de 19+"
-- **Build System**: `build-release.sh` para gerar releases limpas
-- **Release Structure**: `release/v0.2.0/` com estrutura pronta para distribuição
-- **Release Docs**: `RELEASE.md` com processo completo de release
+### Added - Metadata Estruturada
 
-### Changed - Metadata Layer
-- Template ADR (`docs/decisions/000-template.md`) agora inclui YAML frontmatter completo
-- Snapshots agora disponíveis em 2 formatos: .md (humanos) + .json (IA)
-- Sistema de tags implementado em ADRs para queries rápidas
-- Estrutura separada: desenvolvimento vs release
+- `.devflow/project.yaml`: Metadata do projeto
+- `.devflow/agents/*.meta.yaml`: Metadata por agente
+- Knowledge Graph: `.devflow/knowledge-graph.json`
+- ADR com YAML Frontmatter
+- ADR-001: "5 Agentes ao inves de 19+"
 
-### Benefits - Por que isso melhora?
-- **Parse 100x mais rápido**: IA lê JSON em milissegundos vs. interpretar markdown
-- **Zero ambiguidade**: Dados estruturados eliminam interpretação incorreta
-- **Knowledge Graph**: IA vê todas as conexões entre decisões, features e agentes instantaneamente
-- **Queries complexas**: IA pode responder "Quais decisões impactam X?" sem grep
-- **Contexto preservado**: Metadata garante que nada seja esquecido entre sessões
-- **Distribuição limpa**: Release separada de arquivos de desenvolvimento
+---
 
 ## [0.1.0] - 2025-11-15
 
 ### Added - Release Inicial
-- Sistema DevFlow multi-agentes implementado
-- 5 agentes especializados:
-  - Strategist (Planejamento & Produto)
-  - Architect (Design & Arquitetura)
-  - Builder (Implementação)
-  - Guardian (Qualidade & Segurança)
-  - Chronicler (Documentação & Memória)
-- Estrutura de documentação automática
-- Sistema de snapshots para prevenir drift de contexto
-- Workflow adaptativo (4 níveis de complexidade)
-- Documentação completa de instalação em `docs/INSTALLATION.md`
-- Guia de quick start em `docs/QUICKSTART.md`
-- Documentação de arquitetura em `docs/ARCHITECTURE.md`
 
-### Changed
-- Reorganizada estrutura de pastas: toda documentação movida para `docs/`
-- README.md simplificado com foco em instalação rápida
-- Estrutura mais clara: código do usuário separado de documentação DevFlow
-- Pastas `architecture/` e `planning/` movidas para dentro de `docs/` para centralização completa
-
-### Fixed
-- Script `install.sh` atualizado para refletir nova estrutura de pastas
-- Links quebrados corrigidos em `docs/ARCHITECTURE.md`
-- Arquivo `.claude_project` atualizado com estrutura correta
-- Adicionados arquivos `.gitkeep` em pastas vazias (api, migration, architecture/diagrams, planning/stories)
+- Sistema DevFlow multi-agentes (5 agentes iniciais)
+- Strategist, Architect, Builder, Guardian, Chronicler
+- Estrutura de documentacao automatica
+- Sistema de snapshots
+- Workflow adaptativo (4 niveis de complexidade)
 
 ---
 
-<!-- O Chronicler manterá este arquivo atualizado automaticamente -->
-<!-- Não edite manualmente - use @chronicler /document -->
+<!-- O Chronicler mantera este arquivo atualizado automaticamente -->
+<!-- Nao edite manualmente - use @chronicler /document -->

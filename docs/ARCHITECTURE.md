@@ -1,60 +1,86 @@
 # DevFlow - Arquitetura
 
-Documentação técnica da arquitetura do sistema DevFlow.
+Documentacao tecnica da arquitetura do sistema DevFlow v1.0.0.
 
 ---
 
-## Visão Geral
+## Visao Geral
 
-DevFlow é um sistema de multi-agentes especializados para desenvolvimento de software, integrado ao Claude Code CLI.
+DevFlow e um sistema de multi-agentes especializados para desenvolvimento de software, integrado ao Claude Code CLI. Distribuido via npm como `@evolve.labs/devflow`.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     Claude Code CLI                      │
-├─────────────────────────────────────────────────────────┤
-│  /agents:strategist  →  /agents:architect  →            │
-│  /agents:builder     →  /agents:guardian   →            │
-│  /agents:chronicler                                      │
-├─────────────────────────────────────────────────────────┤
-│                    .claude/commands/agents/              │
-│                    .devflow/ (estado do projeto)         │
-│                    docs/ (documentação)                  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                        Claude Code CLI                            │
+├──────────────────────────────────────────────────────────────────┤
+│  /agents:strategist  →  /agents:architect  →                      │
+│  /agents:system-designer  →  /agents:builder  →                   │
+│  /agents:guardian  →  /agents:chronicler                          │
+├──────────────────────────────────────────────────────────────────┤
+│  .claude/commands/agents/    (definicoes dos agentes)             │
+│  .devflow/                   (estado do projeto)                  │
+│  docs/                       (documentacao)                       │
+│  web/                        (Web IDE - opcional)                 │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Os 5 Agentes
+## Instalacao
 
-### Strategist (Planejamento)
-- **Função**: Análise de requisitos, PRDs, user stories
+```bash
+# Via npm (recomendado)
+npm install -g @evolve.labs/devflow
+
+# Inicializar no projeto
+devflow init /caminho/para/seu-projeto
+
+# Opcoes
+devflow init                    # Agentes + estrutura de docs (padrao)
+devflow init --agents-only      # Apenas agentes (minimo)
+devflow init --full             # Tudo incluindo .gitignore
+devflow init --web              # Inclui Web IDE (opcional)
+```
+
+---
+
+## Os 6 Agentes
+
+### 1. Strategist (Planejamento)
+- **Funcao**: Analise de requisitos, PRDs, user stories
 - **Input**: Ideias, problemas, features
 - **Output**: `docs/planning/`, `docs/planning/stories/`
-- **Hard Stop**: NUNCA escreve código
+- **Hard Stop**: NUNCA escreve codigo
 
-### Architect (Design)
-- **Função**: Design técnico, ADRs, diagramas
-- **Input**: PRDs, requisitos técnicos
+### 2. Architect (Design)
+- **Funcao**: Design tecnico, ADRs, diagramas
+- **Input**: PRDs, requisitos tecnicos
 - **Output**: `docs/architecture/`, `docs/decisions/`
 - **Hard Stop**: NUNCA implementa
 
-### Builder (Implementação)
-- **Função**: Código, refactoring, code review
+### 3. System Designer (System Design & Escala)
+- **Funcao**: System design em escala, SDDs, RFCs, capacity planning
+- **Input**: Requisitos de escala, SLAs, problemas de infraestrutura
+- **Output**: `docs/system-design/sdd/`, `docs/system-design/rfc/`, `docs/system-design/capacity/`, `docs/system-design/trade-offs/`
+- **Hard Stop**: NUNCA escreve codigo de producao, apenas exemplos/diagramas
+- **Inspiracao**: DDIA (Kleppmann), Alex Xu, Sam Newman, Google SRE Book
+
+### 4. Builder (Implementacao)
+- **Funcao**: Codigo, refactoring, code review
 - **Input**: Stories, specs, bugs
-- **Output**: Código fonte, testes
+- **Output**: Codigo fonte, testes
 - **Hard Stop**: NUNCA cria requisitos
 
-### Guardian (Qualidade)
-- **Função**: Testes, segurança, performance
-- **Input**: Código, endpoints, arquivos
+### 5. Guardian (Qualidade)
+- **Funcao**: Testes, seguranca, performance
+- **Input**: Codigo, endpoints, arquivos
 - **Output**: `docs/security/`, `docs/performance/`
 - **Hard Stop**: NUNCA adiciona features
 
-### Chronicler (Documentação)
-- **Função**: CHANGELOG, snapshots, sync de docs
-- **Input**: Mudanças no projeto
+### 6. Chronicler (Documentacao)
+- **Funcao**: CHANGELOG, snapshots, sync de docs
+- **Input**: Mudancas no projeto
 - **Output**: `docs/CHANGELOG.md`, `docs/snapshots/`
-- **Hard Stop**: NUNCA escreve código
+- **Hard Stop**: NUNCA escreve codigo
 
 ---
 
@@ -64,33 +90,57 @@ DevFlow é um sistema de multi-agentes especializados para desenvolvimento de so
 projeto/
 ├── .claude/
 │   └── commands/
-│       └── agents/              # Definições dos agentes
-│           ├── strategist.md
-│           ├── architect.md
-│           ├── builder.md
-│           ├── guardian.md
-│           └── chronicler.md
+│       ├── agents/                 # Definicoes dos 6 agentes
+│       │   ├── strategist.md
+│       │   ├── architect.md
+│       │   ├── system-designer.md
+│       │   ├── builder.md
+│       │   ├── guardian.md
+│       │   └── chronicler.md
+│       └── quick/                  # Quick start commands
+│           ├── new-feature.md
+│           ├── security-check.md
+│           ├── create-adr.md
+│           └── system-design.md
 │
 ├── .devflow/
-│   ├── agents/                  # Metadados
-│   ├── memory/                  # Memória do projeto
-│   ├── sessions/                # Sessões de trabalho
-│   └── snapshots/               # Histórico
+│   ├── agents/                     # Metadados dos agentes
+│   ├── memory/                     # Memoria do projeto
+│   ├── sessions/                   # Sessoes de trabalho
+│   └── project.yaml                # Estado do projeto
 │
-└── docs/
-    ├── planning/                # PRDs (Strategist)
-    │   └── stories/             # User stories
-    ├── architecture/            # Design (Architect)
-    │   └── diagrams/
-    ├── decisions/               # ADRs (Architect)
-    ├── security/                # Audits (Guardian)
-    ├── performance/             # Reports (Guardian)
-    └── CHANGELOG.md             # Mantido pelo Chronicler
+├── docs/
+│   ├── planning/                   # PRDs (Strategist)
+│   │   └── stories/                # User stories
+│   ├── architecture/               # Design (Architect)
+│   │   └── diagrams/
+│   ├── decisions/                  # ADRs (Architect)
+│   ├── system-design/              # System Designer
+│   │   ├── sdd/                    # System Design Documents
+│   │   ├── rfc/                    # Requests for Comments
+│   │   ├── capacity/               # Capacity Plans
+│   │   └── trade-offs/             # Trade-off Analysis
+│   ├── security/                   # Audits (Guardian)
+│   ├── performance/                # Reports (Guardian)
+│   ├── snapshots/                  # Historico (Chronicler)
+│   └── CHANGELOG.md                # Mantido pelo Chronicler
+│
+└── web/                            # Web IDE (opcional, com --web)
+    ├── app/                        # Next.js pages + API routes
+    ├── components/                 # React components
+    ├── hooks/                      # Custom hooks
+    └── lib/                        # Stores, utils, types
 ```
 
 ---
 
 ## Fluxo de Trabalho
+
+### Pipeline Completo
+
+```
+Strategist → Architect → System Designer → Builder → Guardian → Chronicler
+```
 
 ### Feature Nova
 
@@ -103,15 +153,19 @@ projeto/
    └→ Cria design em docs/architecture/
    └→ Cria ADR em docs/decisions/
 
-3. /agents:builder "Implementar story Y"
-   └→ Escreve código
+3. /agents:system-designer "System design para feature X"
+   └→ Cria SDD em docs/system-design/sdd/
+   └→ Capacity plan se necessario
+
+4. /agents:builder "Implementar story Y"
+   └→ Escreve codigo
    └→ Escreve testes
 
-4. /agents:guardian "Review de segurança"
-   └→ Analisa código
+5. /agents:guardian "Review de seguranca"
+   └→ Analisa codigo
    └→ Aprova ou rejeita
 
-5. Chronicler (automático)
+6. Chronicler (automatico)
    └→ Atualiza CHANGELOG
    └→ Cria snapshot
 ```
@@ -119,93 +173,158 @@ projeto/
 ### Bug Fix
 
 ```
-1. /agents:builder "Fix: descrição do bug"
-   └→ Investiga
-   └→ Corrige
-   └→ Testa
+1. /agents:builder "Fix: descricao do bug"
+   └→ Investiga, corrige, testa
 
-2. Chronicler (automático)
+2. Chronicler (automatico)
    └→ Documenta fix
 ```
 
 ---
 
-## Delegação entre Agentes
+## Delegacao entre Agentes
 
-Cada agente DEVE delegar para o próximo no fluxo:
+Cada agente DEVE delegar para o proximo no fluxo:
 
 ```
-Strategist → Architect → Builder → Guardian → (Chronicler automático)
+Strategist → Architect → System Designer → Builder → Guardian → (Chronicler automatico)
 ```
 
-### Regras de Delegação
+### Regras de Delegacao
 
-1. **Strategist** sempre chama Architect após criar specs
-2. **Architect** sempre chama Builder após design
-3. **Builder** sempre chama Guardian após implementar
-4. **Guardian** aprova ou rejeita (Builder corrige se rejeitado)
-5. **Chronicler** documenta automaticamente todas as mudanças
+1. **Strategist** chama Architect apos criar specs; chama System Designer se NFRs envolvem escala
+2. **Architect** chama System Designer apos design que envolve escala/infra
+3. **System Designer** chama Builder apos SDD/RFC
+4. **Builder** chama Guardian apos implementar
+5. **Guardian** aprova ou rejeita (Builder corrige se rejeitado)
+6. **Chronicler** documenta automaticamente todas as mudancas
 
 ---
 
 ## Hard Stops
 
-Cada agente tem limites rígidos que não podem ser violados:
-
-| Agente | Pode Fazer | Não Pode Fazer |
+| Agente | Pode Fazer | Nao Pode Fazer |
 |--------|------------|----------------|
-| Strategist | PRDs, stories, análise | Código, design técnico |
-| Architect | Design, ADRs, diagramas | Código, implementação |
-| Builder | Código, testes, refactor | Requisitos, specs |
-| Guardian | Testes, security, perf | Features, código novo |
-| Chronicler | Docs, changelog, snapshots | Código, decisões |
+| Strategist | PRDs, stories, analise | Codigo, design tecnico |
+| Architect | Design, ADRs, diagramas | Codigo, implementacao |
+| System Designer | SDDs, RFCs, capacity plans | Codigo de producao |
+| Builder | Codigo, testes, refactor | Requisitos, specs |
+| Guardian | Testes, security, perf | Features, codigo novo |
+| Chronicler | Docs, changelog, snapshots | Codigo, decisoes |
+
+---
+
+## Autopilot
+
+O autopilot executa os agentes em sequencia automaticamente. Cada fase recebe o output da anterior como contexto.
+
+### Via CLI (headless)
+
+```bash
+devflow autopilot docs/specs/minha-spec.md
+devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builder"
+devflow autopilot docs/specs/minha-spec.md --project /path/to/project
+devflow autopilot docs/specs/minha-spec.md --no-update
+```
+
+### Via Web IDE
+
+1. Selecionar spec no Specs Panel
+2. Clicar "Start Autopilot"
+3. Output streaming em tempo real no terminal integrado
+4. Cada fase completa e avanca automaticamente
+5. Tasks no spec sao marcadas como concluidas
 
 ---
 
 ## Web IDE (Opcional)
 
-Interface web para gerenciar projetos DevFlow:
+Interface web para gerenciar projetos DevFlow.
+
+### Iniciar
+
+```bash
+devflow web                     # Abre http://localhost:3000
+devflow web --port 8080         # Porta customizada
+devflow web --project /path     # Projeto especifico
+```
+
+### Features
+
+- **Dashboard**: Metricas do projeto, health check, status em tempo real
+- **Specs Panel**: Requirements, Design (ADRs), Tasks com acceptance criteria
+- **Editor**: Monaco Editor com syntax highlighting para 50+ linguagens, Markdown preview com Mermaid
+- **Terminal**: xterm.js + node-pty, multiplas tabs, Autopilot integrado
+- **Multi-Project**: ProjectSelector para alternar entre projetos
+
+### Arquitetura Web
 
 ```
 web/
-├── app/                    # Next.js pages
+├── app/                        # Next.js 16 App Router
+│   ├── api/                    # API routes
+│   │   ├── files/              # File CRUD (path-scoped)
+│   │   ├── terminal/           # PTY SSE + commands
+│   │   ├── autopilot/          # Autopilot execution
+│   │   ├── git/                # Git operations
+│   │   └── dashboard/          # Project metrics
+│   └── page.tsx                # Main layout
 ├── components/
-│   ├── editor/            # Monaco Editor
-│   ├── terminal/          # xterm.js + node-pty
-│   ├── specs/             # Painel de specs
-│   └── dashboard/         # Métricas
+│   ├── editor/                 # Monaco Editor
+│   ├── terminal/               # xterm.js + node-pty
+│   ├── specs/                  # Painel de specs
+│   ├── autopilot/              # Autopilot UI
+│   └── dashboard/              # Metricas
 └── lib/
-    └── stores/            # Zustand state
+    ├── stores/                 # Zustand state management
+    └── ptyManager.ts           # Terminal process manager
 ```
 
 ### Tech Stack
-- Next.js 16
-- TypeScript
-- Tailwind CSS
-- Monaco Editor
-- xterm.js + node-pty
-- Zustand
+
+- **Next.js 16** - Framework React com App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Monaco Editor** - Code editing (VS Code engine)
+- **xterm.js + node-pty** - Terminal emulation real
+- **Zustand** - State management
+- **Lucide Icons** - Iconografia
+- **Mermaid** - Diagramas (lazy loaded)
+
+---
+
+## Seguranca
+
+- **File API path scoping**: Todas as operacoes de arquivo sao validadas contra o project root
+- **Session ID sanitization**: IDs de terminal sao sanitizados antes de uso
+- **Temp file permissions**: Arquivos temporarios criados com permissoes restritas (0o600)
+- **Shell detection**: Fallback chain segura para deteccao de shell
 
 ---
 
 ## Versionamento
 
-| Versão | Mudanças |
+| Versao | Mudancas |
 |--------|----------|
-| 0.1.0 | Sistema multi-agente inicial |
-| 0.2.0 | Metadata estruturado |
-| 0.3.0 | Hard stops, delegação obrigatória |
-| 0.4.0 | Web IDE |
+| 0.1.0 | Sistema multi-agente inicial (5 agentes) |
+| 0.2.0 | Metadata estruturado, knowledge graph |
+| 0.3.0 | Hard stops, delegacao obrigatoria |
+| 0.4.0 | Web IDE completa |
 | 0.5.0 | Terminal como interface principal, WSL support |
+| 0.6.0 | Permission mode configuration |
+| 0.7.0 | System Designer agent (6th), npm package |
+| 0.8.0 | Autopilot terminal-based, CLI commands, multi-project |
+| 0.9.0 | Web IDE refactoring, agent completion tracking |
+| **1.0.0** | **Security hardening, npm global install fix, node-pty reliability** |
 
 ---
 
-## Referências
+## Referencias
 
 - [Quick Start](QUICKSTART.md)
-- [Instalação](INSTALLATION.md)
+- [Instalacao](INSTALLATION.md)
 - [Changelog](CHANGELOG.md)
 
 ---
 
-**DevFlow v0.5.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v1.0.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)

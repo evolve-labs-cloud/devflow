@@ -1,146 +1,75 @@
-# Guia de Instalação - DevFlow
+# Guia de Instalacao - DevFlow v1.0.0
 
 Guia completo para instalar e configurar o DevFlow no seu projeto.
 
 ---
 
-## Pré-requisitos
+## Pre-requisitos
 
-### CLI (Agentes) - Mínimo
-- Claude Code CLI instalado e autenticado (`claude`)
-- Bash shell
-- Git (opcional, mas recomendado)
+- **Node.js 18+** (recomendado 20 LTS)
+- **Claude Code CLI** instalado e autenticado (`npm i -g @anthropic-ai/claude-code`)
+- **Git** (recomendado)
 
-### Web IDE - Requer compilação nativa
-- Node.js 18+ (recomendado 20 LTS)
-- Python 3.x (para node-gyp)
+Para a **Web IDE** (opcional), tambem precisa de:
+- Python 3.x (para compilar node-pty via node-gyp)
 - GCC/G++ (compiladores C/C++)
 - Make
 
 ---
 
-## Verificar Dependências
-
-Execute o script de verificação:
+## Instalacao Rapida
 
 ```bash
-./check-deps.sh
+# 1. Instalar DevFlow globalmente
+npm install -g @evolve.labs/devflow
+
+# 2. Inicializar no seu projeto
+cd /caminho/para/seu-projeto
+devflow init
+
+# 3. Pronto! Use no Claude Code:
+claude
+/agents:strategist Quero criar uma nova feature...
 ```
 
 ---
 
-## Instalação por Sistema Operacional
-
-### Linux - Debian/Ubuntu
+## Opcoes de Instalacao
 
 ```bash
-# Atualizar repositórios
-sudo apt-get update
-
-# Build essentials (gcc, g++, make)
-sudo apt-get install -y build-essential
-
-# Python 3 (para node-gyp)
-sudo apt-get install -y python3
-
-# Git
-sudo apt-get install -y git
-
-# Node.js 20 LTS (via NodeSource)
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
+devflow init                    # Agentes + estrutura de docs (padrao)
+devflow init --agents-only      # Apenas agentes (minimo)
+devflow init --full             # Tudo incluindo .gitignore
+devflow init --web              # Inclui Web IDE (opcional)
+devflow init --full --web       # Tudo + Web IDE
 ```
 
-### Linux - Fedora
+### O que cada modo instala
+
+| Componente | `--agents-only` | Padrao | `--full` |
+|-----------|:-:|:-:|:-:|
+| 6 agentes (.claude/commands/agents/) | x | x | x |
+| Quick commands (.claude/commands/quick/) | x | x | x |
+| .claude_project | x | x | x |
+| .devflow/ (metadata, project.yaml) | x | x | x |
+| docs/ (planning, architecture, decisions, etc.) | | x | x |
+| .gitignore configurado | | | x |
+| Web IDE (web/) | Com `--web` | Com `--web` | Com `--web` |
+
+---
+
+## Comandos CLI
 
 ```bash
-# Atualizar
-sudo dnf update -y
-
-# Development Tools (gcc, g++, make)
-sudo dnf groupinstall -y "Development Tools"
-
-# Python 3 (geralmente já instalado)
-sudo dnf install -y python3
-
-# Git
-sudo dnf install -y git
-
-# Node.js (Fedora tem versões atualizadas)
-sudo dnf install -y nodejs npm
-
-# Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
+devflow init [path]             # Inicializar DevFlow num projeto
+devflow update [path]           # Atualizar instalacao existente
+devflow web                     # Iniciar Web IDE (http://localhost:3000)
+devflow autopilot <spec-file>   # Rodar autopilot nos agentes
 ```
 
-### Linux - RHEL/CentOS/Rocky/AlmaLinux
+---
 
-```bash
-# Atualizar
-sudo dnf update -y  # ou yum em versões antigas
-
-# Development Tools
-sudo dnf groupinstall -y "Development Tools"
-# ou individualmente:
-# sudo dnf install -y gcc gcc-c++ make
-
-# Python 3
-sudo dnf install -y python3
-
-# Git
-sudo dnf install -y git
-
-# Node.js 20 LTS (via NodeSource)
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo dnf install -y nodejs
-
-# Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
-```
-
-### Linux - Arch/Manjaro
-
-```bash
-# Atualizar
-sudo pacman -Syu
-
-# Build tools + Node.js
-sudo pacman -S base-devel python git nodejs npm
-
-# Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
-```
-
-### Linux - openSUSE
-
-```bash
-# Development pattern
-sudo zypper install -t pattern devel_basis
-
-# Dependências
-sudo zypper install python3 git nodejs npm
-
-# Claude Code
-npm install -g @anthropic-ai/claude-code
-
-# Autenticar
-claude login
-```
+## Instalacao de Dependencias por Sistema
 
 ### macOS
 
@@ -148,16 +77,72 @@ claude login
 # Xcode Command Line Tools (inclui gcc, make)
 xcode-select --install
 
-# Homebrew (se não tiver)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Node.js
+# Node.js (via Homebrew)
 brew install node
 
 # Claude Code
 npm install -g @anthropic-ai/claude-code
 
-# Autenticar
+# DevFlow
+npm install -g @evolve.labs/devflow
+
+# Autenticar Claude
+claude login
+```
+
+### Debian/Ubuntu
+
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential python3 git
+
+# Node.js 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Claude Code + DevFlow
+npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
+
+claude login
+```
+
+### Fedora
+
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3 git nodejs npm
+
+npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
+
+claude login
+```
+
+### RHEL/CentOS/Rocky/AlmaLinux
+
+```bash
+sudo dnf groupinstall -y "Development Tools"
+sudo dnf install -y python3 git
+
+# Node.js 20 LTS
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
+
+npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
+
+claude login
+```
+
+### Arch/Manjaro
+
+```bash
+sudo pacman -S base-devel python git nodejs npm
+
+npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
+
 claude login
 ```
 
@@ -168,103 +153,36 @@ claude login
 wsl --install
 ```
 
-Após reiniciar, no terminal WSL (Ubuntu):
+Apos reiniciar, no terminal WSL (Ubuntu):
 
 ```bash
-# Dependências
 sudo apt-get update
 sudo apt-get install -y build-essential python3 git
 
-# Node.js 20 LTS
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# Claude Code
 npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
 
-# Autenticar
 claude login
 ```
 
 ---
 
-## Instalação
-
-### Método 1: Script Automático (Recomendado)
+## Verificando a Instalacao
 
 ```bash
-# 1. Clone o repositório DevFlow
-git clone https://github.com/evolve-labs-cloud/devflow.git
-cd devflow
+# Verificar versao
+devflow --version
 
-# 2. Execute o instalador
-./install.sh /caminho/para/seu-projeto
-
-# 3. Pronto!
-```
-
-**O que o script faz:**
-- Copia `.claude/commands/agents/` (os 5 agentes)
-- Cria estrutura `.devflow/` para o projeto
-- Cria estrutura `docs/` se não existir
-- Copia `.gitignore` configurado (opcional)
-
----
-
-### Método 2: Instalação Manual
-
-Se preferir fazer manualmente:
-
-#### Passo 1: Copie os Agentes (ESSENCIAL)
-
-```bash
-cd /caminho/para/seu-projeto
-
-# Copie a pasta de agentes
-mkdir -p .claude/commands
-cp -r /caminho/para/devflow/.claude/commands/agents .claude/commands/
-```
-
-#### Passo 2: Crie a Estrutura DevFlow
-
-```bash
-# Crie as pastas necessárias
-mkdir -p .devflow/agents
-mkdir -p .devflow/memory
-mkdir -p .devflow/sessions
-mkdir -p docs/snapshots
-```
-
-#### Passo 3: Configure Estrutura de Documentação
-
-```bash
-# Crie as pastas de docs
-mkdir -p docs/planning/stories
-mkdir -p docs/architecture/diagrams
-mkdir -p docs/decisions
-mkdir -p docs/security
-mkdir -p docs/performance
-
-# Adicione .gitkeep para manter pastas vazias
-touch docs/planning/.gitkeep
-touch docs/planning/stories/.gitkeep
-touch docs/architecture/.gitkeep
-touch docs/decisions/.gitkeep
-```
-
----
-
-## Verificando a Instalação
-
-Após instalar, verifique se tudo está no lugar:
-
-```bash
-# Verifique os agentes
+# Verificar agentes instalados
 ls -la .claude/commands/agents/
 
-# Deve mostrar os 5 agentes:
+# Deve mostrar os 6 agentes:
 # strategist.md
 # architect.md
+# system-designer.md
 # builder.md
 # guardian.md
 # chronicler.md
@@ -283,10 +201,8 @@ claude
 
 ### 2. Teste um Agente
 
-No terminal do Claude Code:
-
 ```
-/agents:strategist Olá! Pode me explicar como você funciona?
+/agents:strategist Ola! Pode me explicar como voce funciona?
 ```
 
 ### 3. Crie um Snapshot Inicial
@@ -299,216 +215,178 @@ No terminal do Claude Code:
 
 ## Estrutura Final
 
-Após a instalação completa:
+Apos a instalacao completa:
 
 ```
 seu-projeto/
 ├── .claude/
 │   └── commands/
-│       └── agents/              # 5 agentes especializados
-│           ├── strategist.md
-│           ├── architect.md
-│           ├── builder.md
-│           ├── guardian.md
-│           └── chronicler.md
+│       ├── agents/                 # 6 agentes especializados
+│       │   ├── strategist.md
+│       │   ├── architect.md
+│       │   ├── system-designer.md
+│       │   ├── builder.md
+│       │   ├── guardian.md
+│       │   └── chronicler.md
+│       └── quick/                  # Quick start commands
 │
 ├── .devflow/
-│   ├── agents/                  # Metadados dos agentes
-│   ├── memory/                  # Memória do projeto
-│   ├── sessions/                # Sessões de trabalho
-│   └── snapshots/               # Histórico do projeto
+│   ├── agents/                     # Metadados dos agentes
+│   ├── memory/                     # Memoria do projeto
+│   ├── sessions/                   # Sessoes de trabalho
+│   └── project.yaml                # Estado do projeto
 │
 ├── docs/
-│   ├── planning/                # PRDs e specs
-│   │   └── stories/             # User stories
-│   ├── architecture/            # Design docs
+│   ├── planning/                   # PRDs e specs
+│   │   └── stories/                # User stories
+│   ├── architecture/               # Design docs
 │   │   └── diagrams/
-│   ├── decisions/               # ADRs
-│   ├── security/                # Security audits
-│   └── performance/             # Performance reports
+│   ├── decisions/                  # ADRs
+│   ├── system-design/              # SDDs, RFCs, capacity plans
+│   │   ├── sdd/
+│   │   ├── rfc/
+│   │   ├── capacity/
+│   │   └── trade-offs/
+│   ├── security/                   # Security audits
+│   ├── performance/                # Performance reports
+│   ├── snapshots/                  # Historico do projeto
+│   └── CHANGELOG.md
 │
-└── seu-codigo/
+└── web/                            # Web IDE (se --web)
 ```
 
 ---
 
-## Configuração Avançada
+## Web IDE (Opcional)
 
-### Customizando Agentes
-
-Você pode editar os arquivos em `.claude/commands/agents/`:
+### Iniciar
 
 ```bash
-# Exemplo: Adicionar contexto específico ao Builder
-nano .claude/commands/agents/builder.md
+devflow web                     # Abre http://localhost:3000
+devflow web --port 8080         # Porta customizada
+devflow web --project /path     # Projeto especifico
+devflow web --dev               # Modo desenvolvimento
 ```
 
-### Web IDE (Opcional)
+O comando `devflow web` instala dependencias automaticamente na primeira execucao.
 
-Para usar a interface web:
+---
+
+## Autopilot
 
 ```bash
-cd devflow/web
-npm install
-npm run dev
-# Acesse http://localhost:3000
+# Rodar todas as fases
+devflow autopilot docs/specs/minha-spec.md
+
+# Escolher fases especificas
+devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builder"
+
+# Apontar para outro projeto
+devflow autopilot docs/specs/minha-spec.md --project /path/to/project
+
+# Sem auto-update de tasks
+devflow autopilot docs/specs/minha-spec.md --no-update
 ```
 
 ---
 
-## Solução de Problemas
+## Atualizando DevFlow
 
-### Agentes não aparecem
+```bash
+# Atualizar o pacote npm
+npm update -g @evolve.labs/devflow
 
-**Problema**: `/agents:strategist` não funciona.
+# Atualizar agentes e metadata no projeto
+devflow update /caminho/para/seu-projeto
+```
 
-**Solução**:
+---
+
+## Desinstalacao
+
+```bash
+# Remover do projeto
+rm -rf .claude/commands/agents/
+rm -rf .claude/commands/quick/
+rm -rf .devflow/
+
+# (Opcional) Remover docs - CUIDADO: faca backup!
+# rm -rf docs/
+
+# Remover pacote global
+npm uninstall -g @evolve.labs/devflow
+```
+
+---
+
+## Solucao de Problemas
+
+### Agentes nao aparecem
+
+**Problema**: `/agents:strategist` nao funciona.
+
+**Solucao**:
 1. Verifique se `.claude/commands/agents/` existe
-2. Confirme que os arquivos .md estão na pasta
+2. Confirme que os 6 arquivos .md estao na pasta
 3. Reinicie o Claude Code
 
-### Script de instalação falha
-
-**Problema**: `./install.sh: permission denied`
-
-**Solução**:
-```bash
-chmod +x install.sh
-./install.sh /caminho/para/seu-projeto
-```
-
-### node-pty não compila (Linux)
+### node-pty nao compila (Linux)
 
 **Problema**: Erro ao executar `npm install` na Web IDE.
 
-```
-gyp ERR! build error
-gyp ERR! stack Error: `make` failed with exit code: 2
-```
-
-**Solução - Debian/Ubuntu**:
+**Solucao - Debian/Ubuntu**:
 ```bash
 sudo apt-get install -y build-essential python3
 ```
 
-**Solução - Fedora**:
+**Solucao - Fedora**:
 ```bash
 sudo dnf groupinstall -y "Development Tools"
 sudo dnf install -y python3
 ```
 
-**Solução - RHEL/CentOS**:
+### Terminal nao conecta na Web IDE
+
+**Problema**: "Failed to connect to terminal session"
+
+**Solucao**: Geralmente causado por permissoes do spawn-helper do node-pty. O `devflow web` corrige automaticamente. Se persistir:
 ```bash
-sudo dnf groupinstall -y "Development Tools"
-sudo dnf install -y python3
+chmod +x ~/.devflow/_web/node_modules/node-pty/prebuilds/*/spawn-helper
 ```
 
 ### npm: command not found
 
-**Problema**: npm não está instalado ou não está no PATH.
-
-**Solução - Debian/Ubuntu**:
+**Solucao - Debian/Ubuntu**:
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-**Solução - Fedora/RHEL**:
-```bash
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo dnf install -y nodejs
-```
+### Erro de permissao ao instalar pacotes globais
 
-### Python não encontrado pelo node-gyp
-
-**Problema**:
-```
-gyp ERR! find Python
-```
-
-**Solução**:
-```bash
-# Debian/Ubuntu
-sudo apt-get install -y python3
-
-# Fedora/RHEL
-sudo dnf install -y python3
-
-# Configurar npm para usar python3
-npm config set python /usr/bin/python3
-```
-
-### GCC versão muito antiga (RHEL 7/CentOS 7)
-
-**Problema**: GCC 4.x não suporta padrões C++ modernos.
-
-**Solução** (habilitar devtoolset):
-```bash
-# CentOS 7 / RHEL 7
-sudo yum install -y centos-release-scl
-sudo yum install -y devtoolset-11
-scl enable devtoolset-11 bash
-
-# Depois execute npm install
-cd web && npm install
-```
-
-### Erro de permissão ao instalar pacotes globais
-
-**Problema**: `EACCES: permission denied` ao instalar Claude Code.
-
-**Solução** (configurar npm para usar diretório local):
+**Solucao** (configurar npm para diretorio local):
 ```bash
 mkdir -p ~/.npm-global
 npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
-# Agora instale
-npm install -g @anthropic-ai/claude-code
+npm install -g @evolve.labs/devflow
 ```
 
-### Windows: node-pty não compila
+### Python nao encontrado pelo node-gyp
 
-**Problema**: Erro ao instalar dependências da Web IDE no Windows.
-
-**Solução**: Use WSL (veja seção de pré-requisitos).
-
----
-
-## Atualizando DevFlow
-
-Use o script de atualização:
-
+**Solucao**:
 ```bash
-cd /caminho/para/devflow
-git pull origin main
-
-./update.sh /caminho/para/seu-projeto
+sudo apt-get install -y python3
+npm config set python /usr/bin/python3
 ```
 
 ---
 
-## Desinstalação
+## Proximos Passos
 
-Se quiser remover o DevFlow:
-
-```bash
-# Remova os agentes
-rm -rf .claude/commands/agents/
-
-# Remova a estrutura DevFlow
-rm -rf .devflow/
-
-# (Opcional) Remova docs - ATENÇÃO: faça backup!
-# rm -rf docs/
-```
-
----
-
-## Próximos Passos
-
-1. **Leia o [Quick Start](QUICKSTART.md)** - Aprenda os comandos básicos
+1. **Leia o [Quick Start](QUICKSTART.md)** - Aprenda os comandos basicos
 2. **Crie seu primeiro snapshot** - `/agents:chronicler snapshot`
 3. **Comece a desenvolver** - `/agents:strategist [sua ideia]`
 
@@ -516,9 +394,9 @@ rm -rf .devflow/
 
 ## Precisa de Ajuda?
 
-- [Documentação](https://github.com/evolve-labs-cloud/devflow)
+- [Documentacao](https://github.com/evolve-labs-cloud/devflow)
 - [Issues](https://github.com/evolve-labs-cloud/devflow/issues)
 
 ---
 
-**Instalação completa! Agora você está pronto para desenvolver com DevFlow.**
+**DevFlow v1.0.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
