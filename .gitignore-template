@@ -81,3 +81,4 @@ web/README.md
 # Releases geradas (versionadas separadamente)
 # Mantenha release/ versionado para distribuição
 !release/
+web/.devflow/
