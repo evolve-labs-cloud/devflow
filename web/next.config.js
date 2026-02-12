@@ -7,7 +7,9 @@ const nextConfig = {
   transpilePackages: ['@monaco-editor/react'],
 
   // Turbopack config (Next.js 16+)
-  turbopack: {},
+  turbopack: {
+    root: __dirname,
+  },
 
   // Exclude native modules from client-side bundling
   serverExternalPackages: ['node-pty'],
