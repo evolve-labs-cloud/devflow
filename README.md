@@ -1,9 +1,9 @@
-# DevFlow v0.7.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow v0.8.0 - Sistema Multi-Agentes + Web IDE
 
-Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes** e **Web IDE** integrada.
+Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes**, **Web IDE** integrada e **Autopilot** para execução automatizada.
 
-[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](docs/CHANGELOG.md)
-[![npm](https://img.shields.io/npm/v/devflow-agents.svg)](https://www.npmjs.com/package/devflow-agents)
+[![Version](https://img.shields.io/badge/version-0.8.0-blue.svg)](docs/CHANGELOG.md)
+[![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Screenshots
@@ -20,68 +20,107 @@ Sistema de multi-agentes especializados para desenvolvimento de software, com **
 
 ---
 
-## 🆕 Novidades v0.7.0
+## Novidades v0.8.0
+
+### Autopilot
+- **Terminal-based**: Agents rodam no terminal com output streaming em tempo real
+- **CLI headless**: `devflow autopilot <spec-file>` para rodar sem Web IDE
+- **Auto-task tracking**: Tasks na spec sao marcadas automaticamente como concluidas
+- **Abort**: Cancele a qualquer momento
+
+### Web IDE
+- Removido File Explorer (navegacao por projeto)
+- Multi-project support com ProjectSelector
+- Agent completion tracking com badges visuais
+- Layout simplificado sem sidebar
 
 ### System Designer Agent (6th agent)
 - System Design Documents (SDDs) com back-of-the-envelope calculations
 - RFCs, capacity planning, trade-off analysis
 - SLA/SLO/SLI definitions e reliability patterns
 
-### npm Package
-- `npx devflow-agents init` para instalacao rapida
-- `devflow update` para atualizacoes
-- Flag `--web` para incluir Web IDE
-
-### Web IDE (Opcional)
-Interface visual completa para gerenciar seu projeto DevFlow:
-
-- **Terminal Integrado** - Interface principal via xterm.js + node-pty
-- **Dashboard** - Metricas do projeto, health check, status dos agentes
-- **Specs Panel** - Visualize requirements, design decisions e tasks
-- **File Explorer** - Navegue pelo codigo com preview de markdown/mermaid
-- **Editor Monaco** - Editor profissional com syntax highlighting
-- **Settings** - Configure tema, fonte, terminal
-
 ---
 
-## 🚀 Instalacao
+## Instalacao
 
 ### Via npm (Recomendado)
 
 ```bash
-# Instala DevFlow no seu projeto (sem instalar nada globalmente)
-npx devflow-agents init
+# Instalar globalmente
+npm install -g @evolve.labs/devflow
 
-# Ou instale globalmente para usar em multiplos projetos
-npm install -g devflow-agents
+# Inicializar no seu projeto
 devflow init /caminho/para/seu-projeto
 
-# Opcoes de instalacao
+# Ou usar npx (sem instalar)
+npx @evolve.labs/devflow init
+```
+
+### Opcoes de instalacao
+
+```bash
 devflow init                    # Agentes + estrutura de docs (padrao)
 devflow init --agents-only      # Apenas agentes (minimo)
 devflow init --full             # Tudo incluindo .gitignore
 devflow init --web              # Inclui Web IDE (opcional)
 devflow init --full --web       # Tudo + Web IDE
-
-# Atualizar instalacao existente
-devflow update
 ```
 
-### Via bash script (Alternativa)
+### Comandos
 
 ```bash
-git clone https://github.com/evolve-labs-cloud/devflow.git
-cd devflow
-./install.sh /caminho/para/seu-projeto
+devflow init [path]             # Inicializar DevFlow num projeto
+devflow update [path]           # Atualizar instalacao existente
+devflow web                     # Iniciar Web IDE (http://localhost:3000)
+devflow autopilot <spec-file>   # Rodar autopilot nos agentes
+```
+
+### Autopilot
+
+```bash
+# Rodar todas as fases
+devflow autopilot docs/specs/minha-spec.md
+
+# Escolher fases especificas
+devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builder"
+
+# Apontar para outro projeto
+devflow autopilot docs/specs/minha-spec.md --project /path/to/project
+
+# Sem auto-update de tasks
+devflow autopilot docs/specs/minha-spec.md --no-update
+```
+
+### Web IDE
+
+```bash
+# Iniciar (abre browser automaticamente)
+devflow web
+
+# Porta customizada
+devflow web --port 8080
+
+# Apontar para projeto especifico
+devflow web --project /path/to/project
+
+# Modo desenvolvimento
+devflow web --dev
 ```
 
 ### Requisitos
 
 - **Claude Code CLI** (`npm i -g @anthropic-ai/claude-code`)
-- **Node.js 18+** (para o CLI npm)
+- **Node.js 18+**
 - **Git** (recomendado)
 
-### Dependências por Sistema
+### Dependencias por Sistema
+
+#### macOS
+```bash
+xcode-select --install
+brew install node
+npm install -g @anthropic-ai/claude-code
+```
 
 #### Debian/Ubuntu
 ```bash
@@ -99,40 +138,15 @@ sudo dnf install -y python3 git nodejs npm
 npm install -g @anthropic-ai/claude-code
 ```
 
-#### RHEL/CentOS/Rocky
-```bash
-sudo dnf groupinstall -y "Development Tools"
-sudo dnf install -y python3 git
-curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-sudo dnf install -y nodejs
-npm install -g @anthropic-ai/claude-code
-```
-
-#### macOS
-```bash
-xcode-select --install
-brew install node
-npm install -g @anthropic-ai/claude-code
-```
-
 #### Windows (WSL)
 ```powershell
-# PowerShell como Admin
 wsl --install
 ```
-Depois siga as instruções de Debian/Ubuntu no terminal WSL.
-
-### Web IDE (Opcional)
-```bash
-cd devflow/web
-npm install
-npm run dev
-# Acesse http://localhost:3000
-```
+Depois siga as instrucoes de Debian/Ubuntu no terminal WSL.
 
 ---
 
-## 🤖 Os 6 Agentes
+## Os 6 Agentes
 
 | # | Agente | Funcao | Uso |
 |---|--------|--------|-----|
@@ -151,62 +165,85 @@ strategist → architect → system-designer → builder → guardian → chroni
 
 Cada agente tem **hard stops** — limites rigidos que impedem de fazer trabalho de outros agentes.
 
+### Autopilot
+
+O autopilot executa os agentes em sequencia automaticamente. Cada fase recebe o output da anterior como contexto:
+
+```
+1. Strategist analisa a spec e refina requisitos
+2. Architect define a arquitetura baseado na analise
+3. System Designer projeta o sistema em escala
+4. Builder implementa conforme design
+5. Guardian revisa seguranca e qualidade
+6. Chronicler documenta tudo
+```
+
 ---
 
-## 🖥️ Web IDE Features
+## Web IDE Features
 
 ### Dashboard
-- Métricas do projeto (specs, decisões, tasks)
+- Metricas do projeto (specs, decisoes, tasks)
 - Health check (Claude CLI, .devflow, git)
 - Status em tempo real
 
 ### Specs Panel
 - **Requirements** - User stories com acceptance criteria
 - **Design** - Architecture Decision Records (ADRs)
-- **Tasks** - Tarefas de implementação
+- **Tasks** - Tarefas de implementacao
+
+### Terminal + Autopilot
+- Terminal integrado via xterm.js + node-pty
+- Autopilot roda direto no terminal com streaming
+- Tab dedicada "Autopilot" criada automaticamente
+- Botao Abort para cancelar execucao
 
 ### Editor
 - Monaco Editor (VS Code engine)
 - Syntax highlighting para 50+ linguagens
 - Preview de Markdown com Mermaid diagrams
-- Múltiplas tabs com indicador de dirty state
+- Multiplas tabs com indicador de dirty state
 
-### Terminal
-- Terminal integrado via xterm.js + node-pty
-- WebGL rendering para displays de alta resolução
-- Histórico de comandos
-- Resize responsivo
+### Multi-Project
+- ProjectSelector para alternar entre projetos
+- Cada projeto com seus proprios specs e agents
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
-devflow/
+seu-projeto/
 ├── .claude/            # Comandos e agentes
-│   └── commands/       # Skills dos 6 agentes
-│       └── agents/     # Definições dos agentes
+│   └── commands/
+│       ├── agents/     # Definicoes dos 6 agentes
+│       └── quick/      # Quick start commands
 │
-├── .devflow/           # Configuração do projeto
-│   ├── snapshots/      # Histórico do projeto
+├── .devflow/           # Configuracao do projeto
+│   ├── agents/         # Metadata dos agentes
 │   └── project.yaml    # Estado do projeto
 │
-├── docs/               # Documentação
+├── docs/               # Documentacao
 │   ├── decisions/      # ADRs
 │   ├── planning/       # Stories e specs
-│   └── images/         # Screenshots
+│   ├── snapshots/      # Historico do projeto
+│   └── system-design/  # SDDs, RFCs, capacity plans
+│       ├── sdd/
+│       ├── rfc/
+│       ├── capacity/
+│       └── trade-offs/
 │
-└── web/                # Web IDE
-    ├── app/            # Next.js pages
+└── web/                # Web IDE (opcional, com --web)
+    ├── app/            # Next.js pages + API routes
     ├── components/     # React components
-    └── lib/            # Utilities
+    └── lib/            # Stores, utils, types
 ```
 
 ---
 
-## 📊 Versões
+## Versoes
 
-| Versão | Features |
+| Versao | Features |
 |--------|----------|
 | v0.1.0 | Multi-agent system, Documentation automation |
 | v0.2.0 | Structured metadata, Knowledge graph |
@@ -214,20 +251,21 @@ devflow/
 | v0.4.0 | Web IDE completa |
 | v0.5.0 | Terminal como interface principal, WSL support |
 | v0.6.0 | Permission mode configuration |
-| **v0.7.0** | **System Designer agent (6th), npm package, token optimization** |
+| v0.7.0 | System Designer agent (6th), npm package |
+| **v0.8.0** | **Autopilot terminal-based, CLI commands, Multi-project, Web IDE refactoring** |
 
 ---
 
-## 📚 Documentação
+## Documentacao
 
 - **[Quick Start](docs/QUICKSTART.md)** - Comece em 5 minutos
-- **[Instalação](docs/INSTALLATION.md)** - Guia detalhado
+- **[Instalacao](docs/INSTALLATION.md)** - Guia detalhado
 - **[Arquitetura](docs/ARCHITECTURE.md)** - Como funciona
-- **[Changelog](docs/CHANGELOG.md)** - Histórico de mudanças
+- **[Changelog](docs/CHANGELOG.md)** - Historico de mudancas
 
 ---
 
-## 🛠️ Tech Stack (Web IDE)
+## Tech Stack (Web IDE)
 
 - **Next.js 15** - Framework React
 - **TypeScript** - Type safety
@@ -240,10 +278,10 @@ devflow/
 
 ---
 
-## 📜 Licença
+## Licenca
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v0.7.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v0.8.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
