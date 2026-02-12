@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # DevFlow v0.9.2 - Sistema Multi-Agentes + Web IDE
-=======
-# DevFlow - Sistema Multi-Agentes + Web IDE
->>>>>>> 73f942219a4c21e903f955064c3017ba76f73749
 
 Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes**, **Web IDE** integrada e **Autopilot** para execução automatizada.
 

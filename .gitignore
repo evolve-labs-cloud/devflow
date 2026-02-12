@@ -1,7 +1,8 @@
 # DevFlow .gitignore
 
-# Node modules (se usar JavaScript/TypeScript)
+# Node
 node_modules/
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -11,22 +12,17 @@ yarn-error.log*
 .env.local
 .env.*.local
 
-# Local settings (não distribuir)
+# Local settings
 *.local.json
-settings.local.json
 
-# IDE específicos
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# IDE
+.vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS específicos
+# OS
 .DS_Store
 Thumbs.db
 
@@ -44,41 +40,19 @@ tmp/
 temp/
 *.tmp
 
-# Python (se usar)
-__pycache__/
-*.py[cod]
-*$py.class
-.Python
-venv/
-env/
+# DevFlow runtime data (not source)
+.devflow/knowledge-graph.json
+.devflow/memory/
+.devflow/sessions/
+.devflow/snapshots/
+docs/snapshots/
 
-# Arquivos grandes ou sensíveis
-*.zip
-*.tar.gz
-*.rar
-
-# Mantenha estas pastas (não ignore)
-# Importante: queremos versionar a documentação!
-!.devflow/
-!docs/
-!planning/
-!architecture/
-!CHANGELOG.md
-
-# Snapshots podem ser grandes, você decide se quer versionar
-# Descomente a linha abaixo se NÃO quiser versionar snapshots:
-# docs/snapshots/*.json
-
-# DevFlow Development (não incluir no release)
-build-release.sh  # Script de build fica apenas no dev
-
-# Web IDE build artifacts (users run npm install themselves)
+# Web IDE build artifacts
 web/.next/
 web/node_modules/
-web/CHANGELOG.md
-web/README.md
-
-# Releases geradas (versionadas separadamente)
-# Mantenha release/ versionado para distribuição
-!release/
+web/package-lock.json
 web/.devflow/
+
+# Legacy / obsolete
+install.sh
+build-release.sh
