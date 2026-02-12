@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable React strict mode for better development experience
@@ -14,8 +16,14 @@ const nextConfig = {
   // Exclude native modules from client-side bundling
   serverExternalPackages: ['node-pty'],
 
-  // Webpack config for native modules
+  // Webpack config for native modules and path resolution
   webpack: (config, { isServer }) => {
+    // Ensure @/ alias resolves correctly even when running from node_modules
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+    };
+
     if (!isServer) {
       // Don't bundle node-pty on client side
       config.resolve.fallback = {

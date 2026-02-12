@@ -1,8 +1,8 @@
-# DevFlow v0.8.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow v0.9.2 - Sistema Multi-Agentes + Web IDE
 
 Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes**, **Web IDE** integrada e **Autopilot** para execução automatizada.
 
-[![Version](https://img.shields.io/badge/version-0.8.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.9.2-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -20,7 +20,7 @@ Sistema de multi-agentes especializados para desenvolvimento de software, com **
 
 ---
 
-## Novidades v0.8.0
+## Novidades v0.9.x
 
 ### Autopilot
 - **Terminal-based**: Agents rodam no terminal com output streaming em tempo real
@@ -252,7 +252,8 @@ seu-projeto/
 | v0.5.0 | Terminal como interface principal, WSL support |
 | v0.6.0 | Permission mode configuration |
 | v0.7.0 | System Designer agent (6th), npm package |
-| **v0.8.0** | **Autopilot terminal-based, CLI commands, Multi-project, Web IDE refactoring** |
+| v0.8.0 | Autopilot terminal-based, CLI commands, Multi-project, Web IDE refactoring |
+| **v0.9.2** | **Security hardening, npm global install fix, node-pty reliability** |
 
 ---
 
@@ -267,7 +268,7 @@ seu-projeto/
 
 ## Tech Stack (Web IDE)
 
-- **Next.js 15** - Framework React
+- **Next.js 16** - Framework React
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
 - **Monaco Editor** - Code editing
@@ -284,4 +285,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v0.8.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v0.9.2** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
