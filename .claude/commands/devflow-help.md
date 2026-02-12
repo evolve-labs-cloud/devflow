@@ -2,7 +2,7 @@
 
 Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimento.
 
-## 🤖 Os 5 Agentes
+## 🤖 Os 6 Agentes
 
 ### @strategist - Planejamento & Produto
 **Use quando:** Iniciar nova feature, criar requisitos, definir prioridades
@@ -13,6 +13,11 @@ Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimen
 **Use quando:** Decisões técnicas, escolha de tech stack, design de sistemas
 **Output:** ADRs, Database schemas, API design
 **Exemplo:** `@architect Design sistema de autenticação`
+
+### @system-designer - System Design & Infraestrutura
+**Use quando:** Projetar sistemas em escala, capacity planning, SLOs, infra, reliability
+**Output:** SDDs, RFCs, Capacity Plans, Trade-off Analysis
+**Exemplo:** `@system-designer /system-design Chat system para 10M usuários`
 
 ### @builder - Implementação
 **Use quando:** Escrever código, implementar features, refactoring
@@ -34,14 +39,15 @@ Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimen
 ## 🔄 Fluxo de Trabalho
 
 ```
-@strategist → @architect → @builder → @guardian → @chronicler
+@strategist → @architect → @system-designer → @builder → @guardian → @chronicler
 ```
 
 1. **Planejamento** (@strategist): Define o QUÊ fazer
-2. **Design** (@architect): Define COMO fazer tecnicamente
-3. **Implementação** (@builder): Faz acontecer
-4. **Qualidade** (@guardian): Garante que está correto
-5. **Documentação** (@chronicler): Registra para sempre
+2. **Design** (@architect): Define COMO fazer tecnicamente (patterns, ADRs)
+3. **System Design** (@system-designer): Projeta COMO funciona em escala/produção
+4. **Implementação** (@builder): Faz acontecer
+5. **Qualidade** (@guardian): Garante que está correto
+6. **Documentação** (@chronicler): Registra para sempre
 
 ---
 
@@ -52,6 +58,7 @@ Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimen
 - `/new-feature` - Iniciar nova feature (wizard guiado)
 - `/create-adr` - Criar Architecture Decision Record
 - `/security-check` - Audit de segurança rápido
+- `/system-design` - Criar System Design Document guiado
 
 ---
 
@@ -59,7 +66,7 @@ Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimen
 
 ```
 .devflow/
-├── agents/              # 5 agentes especializados
+├── agents/              # 6 agentes especializados
 ├── snapshots/           # Histórico do projeto
 ├── project.yaml         # Estado atual
 └── knowledge-graph.json # Conexões entre decisões

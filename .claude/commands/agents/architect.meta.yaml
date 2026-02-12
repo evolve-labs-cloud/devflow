@@ -53,6 +53,7 @@ workflow:
   previous_agents:
     - "strategist"
   next_agents:
+    - "system-designer"
     - "builder"
 
   typical_flow:
@@ -61,7 +62,8 @@ workflow:
     - "Propõe soluções arquiteturais"
     - "Documenta decisões (ADRs)"
     - "Cria design técnico"
-    - "Passa para @builder"
+    - "Se envolve escala/infra → passa para @system-designer"
+    - "Se simples → passa para @builder"
 
 constraints:
   should_not_do:
@@ -69,10 +71,13 @@ constraints:
     - "Implementar código"
     - "Escrever testes"
     - "Fazer code review"
+    - "Projetar infraestrutura em escala (capacity, SLOs, sharding)"
 
   should_delegate_to:
     - agent: "strategist"
       when: "Requisitos não claros"
+    - agent: "system-designer"
+      when: "Design envolve escala, infra, reliability ou capacity planning"
     - agent: "builder"
       when: "Implementação necessária"
     - agent: "guardian"

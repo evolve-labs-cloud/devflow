@@ -1,49 +1,242 @@
 # DevFlow Project Metadata
-# Preencha com as informações do seu projeto
+# Este arquivo contém informação estruturada sobre o estado do projeto
 # Atualizado automaticamente pelo @chronicler
 
 project:
-  name: "YOUR_PROJECT_NAME"
-  version: "0.1.0"
-  description: "Descrição do seu projeto"
-  created: null
-  last_updated: null
-  status: "active"
-  phase: "initial"
+  name: "DevFlow"
+  version: "0.7.0"
+  description: "Sistema multi-agentes para desenvolvimento de software"
+  created: "2025-11-15"
+  last_updated: "2026-02-11"
 
-# Agentes DevFlow
+  # Estado atual
+  status: "active"
+  phase: "system-design-integrated"
+
+  # Repositório
+  repository:
+    url: "https://github.com/seu-usuario/devflow"
+    main_branch: "main"
+
+# Agentes disponíveis
 agents:
   - id: "strategist"
+    name: "Strategist"
     role: "planning"
     focus: "Planejamento & Produto"
+    triggers:
+      - "@strategist"
+      - "PRD"
+      - "requirements"
+      - "user stories"
+    outputs:
+      - "docs/planning/"
+      - "PRDs"
+      - "User stories"
+
   - id: "architect"
+    name: "Architect"
     role: "design"
     focus: "Design & Arquitetura"
+    triggers:
+      - "@architect"
+      - "ADR"
+      - "design"
+      - "architecture"
+    outputs:
+      - "docs/decisions/"
+      - "docs/architecture/"
+      - "ADRs"
+      - "Diagramas técnicos"
+
+  - id: "system-designer"
+    name: "System Designer"
+    role: "system-design"
+    focus: "System Design, Escalabilidade & Confiabilidade"
+    triggers:
+      - "@system-designer"
+      - "system design"
+      - "SDD"
+      - "RFC"
+      - "capacity planning"
+      - "scalability"
+      - "SLA"
+      - "infrastructure"
+      - "sharding"
+      - "reliability"
+    outputs:
+      - "docs/system-design/"
+      - "SDDs"
+      - "RFCs"
+      - "Capacity Plans"
+      - "Trade-off Analysis"
+
   - id: "builder"
+    name: "Builder"
     role: "implementation"
     focus: "Implementação"
+    triggers:
+      - "@builder"
+      - "implement"
+      - "code"
+      - "refactor"
+    outputs:
+      - "Código fonte"
+      - "Testes"
+      - "Code reviews"
+
   - id: "guardian"
+    name: "Guardian"
     role: "quality"
     focus: "Qualidade & Segurança"
+    triggers:
+      - "@guardian"
+      - "test"
+      - "security"
+      - "performance"
+    outputs:
+      - "Estratégia de testes"
+      - "Security audits"
+      - "Performance reports"
+
   - id: "chronicler"
+    name: "Chronicler"
     role: "documentation"
     focus: "Documentação & Memória"
+    triggers:
+      - "@chronicler"
+      - "document"
+      - "snapshot"
+      - "changelog"
+    outputs:
+      - "docs/CHANGELOG.md"
+      - ".devflow/snapshots/"
+      - "ADRs automáticos"
+      - "Knowledge graph"
 
-# Stack técnica (preencher conforme seu projeto)
+# Tecnologias e stack
 tech_stack:
-  core: []
+  core:
+    - "Markdown"
+    - "YAML"
+    - "JSON"
+    - "Bash"
+
   tools:
     - "Claude Code"
     - "Git"
 
-# Features (serão adicionadas conforme desenvolvimento)
-features: []
+# Estrutura do projeto
+structure:
+  source_dirs:
+    - ".devflow/"
+    - "docs/"
 
-# Decisões arquiteturais
-decisions: []
+  documentation_dirs:
+    - "docs/decisions/"
+    - "docs/architecture/"
+    - "docs/planning/"
+    - "docs/api/"
+    - "docs/migration/"
+    - "docs/system-design/"
 
-# Métricas
+  output_dirs:
+    - ".devflow/snapshots/"
+
+# Features implementadas
+features:
+  - id: "multi-agent-system"
+    name: "Sistema Multi-Agentes"
+    status: "implemented"
+    version: "0.1.0"
+    description: "6 agentes especializados para desenvolvimento"
+
+  - id: "documentation-automation"
+    name: "Documentação Automática"
+    status: "implemented"
+    version: "0.1.0"
+    description: "Chronicler mantém CHANGELOG e snapshots"
+
+  - id: "context-snapshots"
+    name: "Context Snapshots"
+    status: "implemented"
+    version: "0.1.0"
+    description: "Prevenção de drift através de snapshots"
+
+  - id: "structured-metadata"
+    name: "Metadata Estruturada"
+    status: "implemented"
+    version: "0.2.0"
+    description: "YAML/JSON para parse rápido pela IA"
+
+  - id: "hard-stops"
+    name: "Hard Stops & Role Enforcement"
+    status: "implemented"
+    version: "0.3.0"
+    description: "Regras explícitas que impedem agentes de fazer trabalho de outros"
+
+  - id: "mandatory-delegation"
+    name: "Delegação Obrigatória"
+    status: "implemented"
+    version: "0.3.0"
+    description: "Fluxo mandatório de delegação entre agentes"
+
+  - id: "auto-story-generation"
+    name: "Geração Automática de Stories"
+    status: "implemented"
+    version: "0.3.0"
+    description: "Chronicler gera stories se strategist não criar"
+
+  - id: "system-designer-agent"
+    name: "System Designer Agent"
+    status: "implemented"
+    version: "0.6.0"
+    description: "6th agent specializing in system design at scale (DDIA, SRE)"
+
+# Decisões arquiteturais (resumo - detalhes em ADRs)
+decisions:
+  - id: "ADR-001"
+    title: "6 Agentes especializados ao invés de 19+ (inicialmente 5, expandido para 6 em v0.7.0)"
+    status: "accepted"
+    date: "2025-11-15"
+    tags: ["architecture", "agents", "simplicity"]
+
+  - id: "ADR-002"
+    title: "Documentação centralizada em docs/"
+    status: "accepted"
+    date: "2025-11-15"
+    tags: ["structure", "documentation"]
+
+  - id: "ADR-003"
+    title: "Metadata estruturada (YAML/JSON)"
+    status: "accepted"
+    date: "2025-11-15"
+    tags: ["metadata", "ai-optimization"]
+
+# Métricas (atualizadas pelo Chronicler)
 metrics:
-  total_features: 0
-  total_decisions: 0
-  phase: "initial"
+  total_files: 28
+  total_agents: 6
+  total_decisions: 3
+  total_adrs: 2
+  total_features: 8
+  documentation_coverage: "excellent"
+  metadata_coverage: "excellent"
+  orchestration_coverage: "complete"
+  last_snapshot: "2026-02-11"
+
+# Configurações
+config:
+  chronicler:
+    auto_snapshot: false
+    snapshot_frequency: "on-demand"
+    auto_changelog: true
+
+  documentation:
+    format: "markdown"
+    adr_template: "docs/decisions/000-template.md"
+
+  quality:
+    require_tests: true
+    require_security_review: true
+    require_documentation: true

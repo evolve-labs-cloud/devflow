@@ -1,35 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProjectStore } from '@/lib/stores/projectStore';
-import { useFileStore } from '@/lib/stores/fileStore';
 
 export default function IDELayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { currentProject, openProject } = useProjectStore();
-  const { loadTree } = useFileStore();
+  const { projects, restoreProjects } = useProjectStore();
+  const [restoring, setRestoring] = useState(true);
 
   useEffect(() => {
-    // Check for stored project path
-    const storedPath = localStorage.getItem('devflow:projectPath');
-
-    if (!currentProject && storedPath) {
-      openProject(storedPath).then(() => {
-        loadTree(storedPath);
-      });
-    } else if (!storedPath) {
-      // No project, redirect to home
-      router.push('/');
+    if (projects.length > 0) {
+      // Already have projects loaded
+      setRestoring(false);
+      return;
     }
-  }, [currentProject, openProject, loadTree, router]);
 
-  if (!currentProject) {
+    // Try to restore from persisted state
+    restoreProjects().then(() => {
+      const current = useProjectStore.getState();
+      if (current.projects.length === 0) {
+        // No projects could be restored, redirect to home
+        router.push('/');
+      } else {
+        setRestoring(false);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (restoring && projects.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
         <div className="text-center space-y-4">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto" />
-          <p className="text-muted-foreground">Loading project...</p>
+          <div className="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto" />
+          <p className="text-gray-400">Loading projects...</p>
         </div>
       </div>
     );

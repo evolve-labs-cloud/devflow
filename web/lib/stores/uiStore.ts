@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { ModelId, AutopilotConfig } from '@/lib/types';
 
 type Theme = 'light' | 'dark' | 'system';
-type SidebarPanel = 'explorer' | 'git' | 'specs' | 'graph' | 'dashboard';
+type SidebarPanel = 'specs' | 'git' | 'dashboard';
 type RightPanel = 'chat' | 'tasks';
 type ModalType = 'quickOpen' | 'globalSearch' | 'commandPalette' | 'recentFiles' | null;
 
@@ -59,7 +59,7 @@ export const useUIStore = create<UIState>()(
       sidebarWidth: 280,
       chatPanelVisible: true,
       chatPanelWidth: 420,
-      activePanel: 'explorer',
+      activePanel: 'specs',
       activeRightPanel: 'chat',
       terminalVisible: false,
       terminalHeight: 200,

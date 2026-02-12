@@ -5,6 +5,71 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-02-11
+
+### Added - System Designer Agent (6th Agent)
+
+- **@system-designer**: Novo agente especializado em System Design em escala
+  - Inspirado por DDIA (Kleppmann), Alex Xu, Sam Newman, Google SRE Book
+  - 4 Pilares: Escalabilidade & Distribuicao, Data Systems, Infra & Cloud, Reliability & Observability
+  - 7 Comandos: `/system-design`, `/rfc`, `/capacity-planning`, `/trade-off-analysis`, `/data-model`, `/infra-design`, `/reliability-review`
+  - Templates completos: SDD (System Design Document) e RFC (Request for Comments)
+  - Hard stops: NUNCA escreve codigo de producao, apenas exemplos/diagramas
+  - EXIT CHECKLIST bloqueante com 8 verificacoes
+  - Boundary clara com @architect: architect="QUAL pattern/tech" vs system-designer="COMO funciona em producao"
+
+- **Novos arquivos criados**:
+  - `.claude/commands/agents/system-designer.md` (~1100 linhas, spec completa)
+  - `.devflow/agents/system-designer.meta.yaml` (metadata estruturada)
+  - `.claude/commands/agents/system-designer.meta.yaml` (copia sincronizada)
+  - `.claude/commands/quick/system-design.md` (wizard de quick start)
+  - `docs/system-design/{sdd,rfc,capacity,trade-offs}/` (diretorios de output)
+
+- **`/system-design` slash command**: Quick start wizard para system design
+
+### Changed - Agent Integration & Audit
+
+- **Workflow atualizado para 6 agentes**: Strategist(1) -> Architect(2) -> System Designer(3) -> Builder(4) -> Guardian(5) -> Chronicler(6)
+
+- **Todos os 5 agentes existentes integrados com @system-designer**:
+  - `strategist.md`: Delegacao para @system-designer quando NFRs envolvem escala/infra
+  - `architect.md`: Delegacao obrigatoria apos design que envolve escala/infra/reliability
+  - `builder.md`: Verificacao de SDD antes de implementar features com escala
+  - `guardian.md`: Reporta problemas de escala/performance ao @system-designer
+  - `chronicler.md`: Documenta SDDs e RFCs automaticamente
+
+- **Meta.yamls sincronizados (.claude <-> .devflow)**:
+  - `builder.meta.yaml`: position 3->4, previous_agents inclui system-designer
+  - `architect.meta.yaml`: next_agents inclui system-designer
+  - `guardian.meta.yaml`: position 4->5, should_delegate_to inclui system-designer
+  - `chronicler.meta.yaml`: position 5->6, previous_agents inclui system-designer
+  - `strategist.meta.yaml`: should_delegate_to inclui system-designer
+
+- **Commands faltantes adicionados**:
+  - `/prioritize` no strategist.meta.yaml (ambos diretorios)
+  - `/status-check` no chronicler.meta.yaml (ambos diretorios)
+
+- **EXIT CHECKLIST adicionado ao strategist.md** (era o unico agente sem)
+
+- **Token optimization (~30% reducao nos 3 maiores agentes)**:
+  - `guardian.md`: ~1535 -> ~600 linhas (exemplos de codigo inline condensados)
+  - `chronicler.md`: ~789 -> ~550 linhas (cenarios repetitivos removidos)
+  - `strategist.md`: ~535 -> ~430 linhas (sessao de exemplo removida)
+
+- **`.claude_project`**: @system-designer na lista de agentes, workflow atualizado
+- **`.devflow/project.yaml`**: system-designer agent entry, total_agents: 6
+- **`.claude/settings.local.json`**: Permissoes para system-designer skill
+- **`.claude/commands/devflow-help.md`**: 5->6 agentes, novo workflow
+
+### Fixed - Agent Consistency Issues
+
+- **Meta.yaml desync**: .claude/commands/agents/ e .devflow/agents/ tinham positions conflitantes (builder position 3 vs 4) - agora sincronizados
+- **Missing @system-designer refs**: 4 de 5 agentes existentes nao referenciavam @system-designer - corrigido em todos
+- **Guardian should_not_do incompleto**: Faltava "Projetar infraestrutura em escala" - adicionado
+- **Builder should_not_do incompleto**: Faltava "Fazer decisoes de infraestrutura ou escala" - adicionado
+
+---
+
 ## [0.6.0] - 2025-12-29
 
 ### Added - Permission Mode Configuration
@@ -162,7 +227,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **`.devflow/project.yaml`**: Metadata estruturada do projeto para parse rápido pela IA
 - **`.devflow/agents/*.meta.yaml`**: Metadata YAML para cada agente (5 arquivos)
 - **Knowledge Graph**: `.devflow/knowledge-graph.json` conectando decisões, features, agentes e documentos
-- **Snapshots Estruturados**: `docs/snapshots/2025-11-15.json` (além do .md)
+- **Snapshots Estruturados**: `.devflow/snapshots/2025-11-15.json` (além do .md)
 - **ADR com YAML Frontmatter**: Template atualizado com metadata estruturada
 - **ADR-001**: Decisão formal documentada - "5 Agentes ao invés de 19+"
 - **Build System**: `build-release.sh` para gerar releases limpas

@@ -11,7 +11,6 @@ import {
   Terminal,
   Moon,
   Sun,
-  FolderOpen,
   Save,
   X,
   Eye,
@@ -155,16 +154,6 @@ export function CommandPalette() {
     },
 
     // Panel Commands
-    {
-      id: 'show-explorer',
-      label: 'Show Explorer',
-      icon: <FolderOpen className="w-4 h-4" />,
-      category: 'Panels',
-      action: () => {
-        setActivePanel('explorer');
-        closeModal();
-      },
-    },
     {
       id: 'show-git',
       label: 'Show Source Control',

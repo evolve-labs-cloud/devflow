@@ -21,6 +21,15 @@ export const AGENTS: Agent[] = [
     shortDescription: 'Design & Arquitetura',
   },
   {
+    id: 'system-designer',
+    name: '@system-designer',
+    displayName: 'System Designer',
+    icon: '⚙️',
+    color: '#06B6D4',
+    description: 'System Design Specialist - Infraestrutura em escala',
+    shortDescription: 'System Design & Escala',
+  },
+  {
     id: 'builder',
     name: '@builder',
     displayName: 'Builder',

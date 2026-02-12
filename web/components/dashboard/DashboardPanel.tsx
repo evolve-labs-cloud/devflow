@@ -110,14 +110,14 @@ export function DashboardPanel({ projectPath }: DashboardPanelProps) {
   // Load data on mount
   useEffect(() => {
     if (projectPath) {
-      loadSpecs(projectPath);
+      loadSpecs([projectPath]);
       fetchHealth(projectPath);
     }
   }, [projectPath, loadSpecs, fetchHealth]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await Promise.all([loadSpecs(projectPath), fetchHealth(projectPath)]);
+    await Promise.all([loadSpecs([projectPath]), fetchHealth(projectPath)]);
     setIsRefreshing(false);
   };
 

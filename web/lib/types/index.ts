@@ -109,6 +109,7 @@ export interface Spec {
   createdAt: Date;
   updatedAt: Date;
   filePath?: string;
+  sourceProject?: string;
 }
 
 export interface Requirement {
@@ -121,6 +122,7 @@ export interface Requirement {
   acceptanceCriteria: string[];
   status: 'draft' | 'approved' | 'implemented';
   filePath?: string;
+  sourceProject?: string;
 }
 
 export interface DesignDecision {
@@ -133,6 +135,7 @@ export interface DesignDecision {
   alternatives?: string[];
   status: 'proposed' | 'accepted' | 'deprecated';
   filePath?: string;
+  sourceProject?: string;
 }
 
 // Task types
@@ -152,6 +155,7 @@ export interface Task {
   estimatedTokens?: number;
   createdAt: Date;
   completedAt?: Date;
+  sourceProject?: string;
 }
 
 // Model types

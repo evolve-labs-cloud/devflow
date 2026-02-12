@@ -160,8 +160,22 @@ export async function GET(request: NextRequest) {
         }
       };
 
+      // Listen for autopilot phase completion
+      const autopilotDoneHandler = ({ sessionId: sid, exitCode }: { sessionId: string; output: string; exitCode: number }) => {
+        if (sid === sessionId) {
+          try {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: 'autopilot-phase-done', exitCode })}\n\n`)
+            );
+          } catch {
+            // Stream closed
+          }
+        }
+      };
+
       ptyManager.on('data', dataHandler);
       ptyManager.on('exit', exitHandler);
+      ptyManager.on('autopilot-phase-done', autopilotDoneHandler);
 
       // Heartbeat to keep connection alive
       const heartbeat = setInterval(() => {
@@ -176,6 +190,7 @@ export async function GET(request: NextRequest) {
       request.signal.addEventListener('abort', () => {
         ptyManager.off('data', dataHandler);
         ptyManager.off('exit', exitHandler);
+        ptyManager.off('autopilot-phase-done', autopilotDoneHandler);
         clearInterval(heartbeat);
       });
     },

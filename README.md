@@ -1,8 +1,9 @@
-# DevFlow v0.5.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow v0.7.0 - Sistema Multi-Agentes + Web IDE
 
-Sistema de multi-agentes especializados para desenvolvimento de software, agora com **Web IDE** integrada para visualização e controle do fluxo de trabalho.
+Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes** e **Web IDE** integrada.
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](docs/CHANGELOG.md)
+[![npm](https://img.shields.io/npm/v/devflow-agents.svg)](https://www.npmjs.com/package/devflow-agents)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Screenshots
@@ -19,57 +20,66 @@ Sistema de multi-agentes especializados para desenvolvimento de software, agora 
 
 ---
 
-## 🆕 Novidades v0.5.0 - Terminal como Interface Principal
+## 🆕 Novidades v0.7.0
 
-### Web IDE
+### System Designer Agent (6th agent)
+- System Design Documents (SDDs) com back-of-the-envelope calculations
+- RFCs, capacity planning, trade-off analysis
+- SLA/SLO/SLI definitions e reliability patterns
+
+### npm Package
+- `npx devflow-agents init` para instalacao rapida
+- `devflow update` para atualizacoes
+- Flag `--web` para incluir Web IDE
+
+### Web IDE (Opcional)
 Interface visual completa para gerenciar seu projeto DevFlow:
 
 - **Terminal Integrado** - Interface principal via xterm.js + node-pty
-- **Dashboard** - Métricas do projeto, health check, status dos agentes
+- **Dashboard** - Metricas do projeto, health check, status dos agentes
 - **Specs Panel** - Visualize requirements, design decisions e tasks
-- **File Explorer** - Navegue pelo código com preview de markdown/mermaid
+- **File Explorer** - Navegue pelo codigo com preview de markdown/mermaid
 - **Editor Monaco** - Editor profissional com syntax highlighting
 - **Settings** - Configure tema, fonte, terminal
 
-### Melhorias v0.5.0
-- Terminal substituiu Chat como interface principal
-- WebGL addon para renderização nítida em displays retina
-- Toast notifications para feedback de operações
-- Skeleton loaders para estados de carregamento
-- Suporte a Windows via WSL
-
 ---
 
-## 🚀 Instalação
+## 🚀 Instalacao
+
+### Via npm (Recomendado)
+
+```bash
+# Instala DevFlow no seu projeto (sem instalar nada globalmente)
+npx devflow-agents init
+
+# Ou instale globalmente para usar em multiplos projetos
+npm install -g devflow-agents
+devflow init /caminho/para/seu-projeto
+
+# Opcoes de instalacao
+devflow init                    # Agentes + estrutura de docs (padrao)
+devflow init --agents-only      # Apenas agentes (minimo)
+devflow init --full             # Tudo incluindo .gitignore
+devflow init --web              # Inclui Web IDE (opcional)
+devflow init --full --web       # Tudo + Web IDE
+
+# Atualizar instalacao existente
+devflow update
+```
+
+### Via bash script (Alternativa)
+
+```bash
+git clone https://github.com/evolve-labs-cloud/devflow.git
+cd devflow
+./install.sh /caminho/para/seu-projeto
+```
 
 ### Requisitos
 
-#### CLI (Mínimo)
-- Claude Code CLI (`npm i -g @anthropic-ai/claude-code`)
-- Git
-- Bash
-
-#### Web IDE (Adicional)
-- Node.js 18+ (recomendado 20 LTS)
-- Python 3 (para node-gyp)
-- GCC/G++ e Make (compilação do node-pty)
-
-### Instalação Rápida
-
-```bash
-# Clone o repositório
-git clone https://github.com/evolve-labs-cloud/devflow.git
-cd devflow
-
-# Instale no seu projeto (verifica dependências automaticamente)
-./install.sh /caminho/para/seu-projeto
-
-# Opções do instalador:
-./install.sh --help        # Ver ajuda
-./install.sh --skip-deps   # Pular verificação de dependências
-```
-
-O instalador detecta seu sistema operacional e mostra os comandos para instalar dependências faltantes.
+- **Claude Code CLI** (`npm i -g @anthropic-ai/claude-code`)
+- **Node.js 18+** (para o CLI npm)
+- **Git** (recomendado)
 
 ### Dependências por Sistema
 
@@ -122,33 +132,24 @@ npm run dev
 
 ---
 
-## 🤖 Os 5 Agentes
+## 🤖 Os 6 Agentes
 
-| Agente | Função | Uso |
-|--------|--------|-----|
-| **/agents:strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
-| **/agents:architect** | Design & Arquitetura | Decisões técnicas, ADRs, APIs |
-| **/agents:builder** | Implementação | Código, reviews, refactoring |
-| **/agents:guardian** | Qualidade & Segurança | Testes, security, performance |
-| **/agents:chronicler** | Documentação & Memória | CHANGELOG, snapshots, stories |
-
-### 🚨 Hard Stops
-
-Cada agente tem limites rígidos:
-
-```
-/agents:strategist → APENAS planejamento (NUNCA código)
-/agents:architect  → APENAS design técnico (NUNCA implementação)
-/agents:builder    → APENAS código (NUNCA requisitos)
-/agents:guardian   → APENAS QA/segurança (NUNCA features)
-/agents:chronicler → APENAS documentação (NUNCA código)
-```
+| # | Agente | Funcao | Uso |
+|---|--------|--------|-----|
+| 1 | **/agents:strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
+| 2 | **/agents:architect** | Design & Arquitetura | Decisoes tecnicas, ADRs, APIs |
+| 3 | **/agents:system-designer** | System Design & Escala | SDDs, RFCs, capacity planning, SLOs |
+| 4 | **/agents:builder** | Implementacao | Codigo, reviews, refactoring |
+| 5 | **/agents:guardian** | Qualidade & Seguranca | Testes, security, performance |
+| 6 | **/agents:chronicler** | Documentacao & Memoria | CHANGELOG, snapshots, stories |
 
 ### Fluxo de Trabalho
 
 ```
-/agents:strategist → /agents:architect → /agents:builder → /agents:guardian → /agents:chronicler
+strategist → architect → system-designer → builder → guardian → chronicler
 ```
+
+Cada agente tem **hard stops** — limites rigidos que impedem de fazer trabalho de outros agentes.
 
 ---
 
@@ -183,7 +184,7 @@ Cada agente tem limites rígidos:
 ```
 devflow/
 ├── .claude/            # Comandos e agentes
-│   └── commands/       # Skills dos 5 agentes
+│   └── commands/       # Skills dos 6 agentes
 │       └── agents/     # Definições dos agentes
 │
 ├── .devflow/           # Configuração do projeto
@@ -211,7 +212,9 @@ devflow/
 | v0.2.0 | Structured metadata, Knowledge graph |
 | v0.3.0 | Hard stops, Mandatory delegation |
 | v0.4.0 | Web IDE completa |
-| **v0.5.0** | **Terminal como interface principal, WSL support** |
+| v0.5.0 | Terminal como interface principal, WSL support |
+| v0.6.0 | Permission mode configuration |
+| **v0.7.0** | **System Designer agent (6th), npm package, token optimization** |
 
 ---
 
@@ -243,4 +246,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v0.5.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v0.7.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)

@@ -27,6 +27,7 @@ ENTÃO → PARE IMEDIATAMENTE!
 ```
 ANTES de implementar:
   → Verificar se existe design técnico do @architect
+  → Verificar se existe SDD do @system-designer (para features com requisitos de escala)
   → Verificar se existe story do @strategist
   → Se não existir, USE Skill tool para solicitar antes de implementar
 
@@ -41,6 +42,9 @@ APÓS implementar código:
 SE encontrar problema no design durante implementação:
   → PARAR implementação
   → USE a Skill tool: /agents:architect para revisar design
+
+SE encontrar problema de escala, infra ou reliability durante implementação:
+  → USE a Skill tool: /agents:system-designer para revisar system design
 ```
 
 ### 📋 ATUALIZAÇÃO DE STATUS E BADGES (CRÍTICO)
@@ -1298,6 +1302,13 @@ Se story está vaga, peço clarificação.
 ### Com @architect
 Sigo design técnico rigorosamente.
 Se vejo problema no design, discuto antes de implementar.
+
+### Com @system-designer
+Sigo design de sistema rigorosamente:
+- Configurações de infra conforme SDD
+- Topologia de deployment conforme design
+- Monitoring conforme observability plan
+- Se vejo problema no design de sistema, discuto antes de implementar
 
 ### Com @guardian
 Escrevo testes junto com código.

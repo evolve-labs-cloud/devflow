@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useProjectStore } from '@/lib/stores/projectStore';
 import {
   FolderOpen,
   Clock,
-  Plus,
-  BookOpen,
   Zap,
   FileText,
   Cpu,
@@ -18,31 +17,13 @@ import {
   Bot
 } from 'lucide-react';
 
-interface RecentProject {
-  path: string;
-  name: string;
-  lastOpened: Date;
-}
-
 export default function HomePage() {
   const router = useRouter();
+  const { addProject, recentProjects, isLoading, error: storeError } = useProjectStore();
   const [projectPath, setProjectPath] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
 
-  useEffect(() => {
-    // Load recent projects from localStorage
-    const stored = localStorage.getItem('devflow:recentProjects');
-    if (stored) {
-      try {
-        const projects = JSON.parse(stored);
-        setRecentProjects(projects.slice(0, 5));
-      } catch {
-        // Ignore parse errors
-      }
-    }
-  }, []);
+  const displayError = error || storeError;
 
   const handleOpenProject = async (path?: string) => {
     const targetPath = path || projectPath;
@@ -51,39 +32,21 @@ export default function HomePage() {
       return;
     }
 
-    setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/project/open', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: targetPath }),
-      });
+      await addProject(targetPath.trim());
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to open project');
+      // Check if project was added successfully
+      const state = useProjectStore.getState();
+      if (state.error) {
+        setError(state.error);
+        return;
       }
 
-      // Save to recent projects
-      const projectName = targetPath.split('/').pop() || targetPath;
-      const newRecent: RecentProject = {
-        path: targetPath,
-        name: projectName,
-        lastOpened: new Date(),
-      };
-      const updated = [newRecent, ...recentProjects.filter(p => p.path !== targetPath)].slice(0, 5);
-      localStorage.setItem('devflow:recentProjects', JSON.stringify(updated));
-
-      // Store project path and redirect to IDE
-      localStorage.setItem('devflow:projectPath', targetPath);
       router.push('/ide');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to open project');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -159,8 +122,8 @@ export default function HomePage() {
               </button>
             </div>
 
-            {error && (
-              <p className="text-sm text-red-400 text-left">{error}</p>
+            {displayError && (
+              <p className="text-sm text-red-400 text-left">{displayError}</p>
             )}
 
             {/* Recent Projects */}
@@ -316,7 +279,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-purple-400" />
-            DevFlow v0.2.0
+            DevFlow v0.7.0
           </div>
           <div>
             Powered by Evolve Labs

@@ -7,7 +7,6 @@ import {
   Pin,
   PinOff,
   Copy,
-  FolderOpen,
   ChevronRight,
   Trash2,
 } from 'lucide-react';
@@ -111,26 +110,6 @@ export function TabContextMenu({ path, position, onClose }: TabContextMenuProps)
       icon: Copy,
       action: () => {
         copyPath(path);
-        onClose();
-      },
-    },
-    {
-      id: 'reveal',
-      label: 'Reveal in Explorer',
-      icon: FolderOpen,
-      action: () => {
-        // Expand folders to reveal file
-        const { setExpandedFolders, expandedFolders } = useFileStore.getState();
-        const pathParts = path.split('/');
-        const newExpanded = new Set(expandedFolders);
-
-        let buildPath = '';
-        for (let i = 0; i < pathParts.length - 1; i++) {
-          buildPath = buildPath ? `${buildPath}/${pathParts[i]}` : pathParts[i];
-          newExpanded.add(buildPath);
-        }
-
-        setExpandedFolders(newExpanded);
         onClose();
       },
     },

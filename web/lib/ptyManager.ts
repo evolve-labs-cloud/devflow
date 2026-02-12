@@ -1,5 +1,6 @@
 import * as pty from 'node-pty';
 import { EventEmitter } from 'events';
+import { PHASE_DONE_REGEX } from '@/lib/autopilotConstants';
 
 interface TerminalSession {
   id: string;
@@ -8,9 +9,17 @@ interface TerminalSession {
   createdAt: Date;
 }
 
+interface AutopilotCollector {
+  buffer: string;
+  resolve: (result: { output: string; exitCode: number }) => void;
+  reject: (error: Error) => void;
+  timeout: NodeJS.Timeout;
+}
+
 class PtyManager extends EventEmitter {
   private sessions: Map<string, TerminalSession> = new Map();
   private outputBuffers: Map<string, string[]> = new Map();
+  private autopilotCollectors: Map<string, AutopilotCollector> = new Map();
 
   createSession(id: string, cwd: string, cols: number = 80, rows: number = 24): TerminalSession {
     // Determine shell based on platform
@@ -49,11 +58,36 @@ class PtyManager extends EventEmitter {
           buffer.shift();
         }
       }
+
+      // Check autopilot collector for completion marker
+      const collector = this.autopilotCollectors.get(id);
+      if (collector) {
+        collector.buffer += data;
+        const markerMatch = collector.buffer.match(PHASE_DONE_REGEX);
+        if (markerMatch) {
+          const exitCode = parseInt(markerMatch[1], 10);
+          // Extract output before the marker
+          const output = collector.buffer.split(PHASE_DONE_REGEX)[0];
+          clearTimeout(collector.timeout);
+          this.autopilotCollectors.delete(id);
+          this.emit('autopilot-phase-done', { sessionId: id, output, exitCode });
+          collector.resolve({ output, exitCode });
+        }
+      }
+
       this.emit('data', { sessionId: id, data });
     });
 
     // Handle PTY exit
     ptyProcess.onExit(({ exitCode }) => {
+      // If there's an active collector, reject it
+      const collector = this.autopilotCollectors.get(id);
+      if (collector) {
+        clearTimeout(collector.timeout);
+        this.autopilotCollectors.delete(id);
+        collector.reject(new Error(`Terminal exited with code ${exitCode} during autopilot phase`));
+      }
+
       this.emit('exit', { sessionId: id, exitCode });
       this.sessions.delete(id);
       this.outputBuffers.delete(id);
@@ -87,6 +121,14 @@ class PtyManager extends EventEmitter {
   destroySession(id: string): boolean {
     const session = this.sessions.get(id);
     if (session) {
+      // Clean up any active collector
+      const collector = this.autopilotCollectors.get(id);
+      if (collector) {
+        clearTimeout(collector.timeout);
+        this.autopilotCollectors.delete(id);
+        collector.reject(new Error('Session destroyed'));
+      }
+
       session.pty.kill();
       this.sessions.delete(id);
       this.outputBuffers.delete(id);
@@ -108,6 +150,40 @@ class PtyManager extends EventEmitter {
 
   getActiveSessions(): string[] {
     return Array.from(this.sessions.keys());
+  }
+
+  /**
+   * Arm an autopilot collector for a terminal session.
+   * Returns a Promise that resolves when the completion marker is detected in the output.
+   */
+  armAutopilotCollector(sessionId: string, timeoutMs: number): Promise<{ output: string; exitCode: number }> {
+    // Disarm any existing collector
+    this.disarmAutopilotCollector(sessionId);
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.autopilotCollectors.delete(sessionId);
+        reject(new Error(`Autopilot phase timed out after ${Math.round(timeoutMs / 1000)}s`));
+      }, timeoutMs);
+
+      this.autopilotCollectors.set(sessionId, {
+        buffer: '',
+        resolve,
+        reject,
+        timeout,
+      });
+    });
+  }
+
+  /**
+   * Disarm (cancel) an active autopilot collector for a session.
+   */
+  disarmAutopilotCollector(sessionId: string): void {
+    const collector = this.autopilotCollectors.get(sessionId);
+    if (collector) {
+      clearTimeout(collector.timeout);
+      this.autopilotCollectors.delete(sessionId);
+    }
   }
 }
 

@@ -10,10 +10,12 @@ import {
   type AutopilotConfig,
 } from '@/lib/stores/autopilotStore';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useUIStore } from '@/lib/stores/uiStore';
 
 const AGENTS: { id: AgentId; icon: string; name: string; description: string }[] = [
   { id: 'strategist', icon: '📊', name: 'Planning', description: 'Refina requisitos e cria acceptance criteria' },
   { id: 'architect', icon: '🏗️', name: 'Design', description: 'Define arquitetura e decisões técnicas' },
+  { id: 'system-designer', icon: '⚙️', name: 'System Design', description: 'Projeta infraestrutura e escala do sistema' },
   { id: 'builder', icon: '🔨', name: 'Implementation', description: 'Implementa código e cria arquivos' },
   { id: 'guardian', icon: '🛡️', name: 'Validation', description: 'Revisa segurança e qualidade' },
   { id: 'chronicler', icon: '📝', name: 'Documentation', description: 'Atualiza documentação' },
@@ -57,7 +59,16 @@ export function AutopilotConfigModal({ projectPath }: AutopilotConfigModalProps)
 
     setIsStarting(true);
     setError(null);
+
+    // Ensure terminal is visible
+    const uiState = useUIStore.getState();
+    if (!uiState.terminalVisible) {
+      uiState.toggleTerminal();
+    }
+
     try {
+      // Small delay to let terminal mount and create session
+      await new Promise((resolve) => setTimeout(resolve, 300));
       await startRun(config, projectPath);
     } catch (err) {
       console.error('Failed to start autopilot:', err);
@@ -72,6 +83,7 @@ export function AutopilotConfigModal({ projectPath }: AutopilotConfigModalProps)
     const times: Record<AgentId, number> = {
       strategist: 2,
       architect: 5,
+      'system-designer': 5,
       builder: 10,
       guardian: 5,
       chronicler: 2,

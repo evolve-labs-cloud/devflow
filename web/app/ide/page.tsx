@@ -2,10 +2,8 @@
 
 import { useEffect, useCallback } from 'react';
 import { useProjectStore } from '@/lib/stores/projectStore';
-import { useFileStore } from '@/lib/stores/fileStore';
 import { useUIStore } from '@/lib/stores/uiStore';
 import { useSettingsStore } from '@/lib/stores/settingsStore';
-import { Sidebar } from '@/components/layout/Sidebar';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 import { SpecsPanel } from '@/components/specs/SpecsPanel';
 import { TerminalPanel } from '@/components/terminal/TerminalPanel';
@@ -20,10 +18,10 @@ import { RecentFiles } from '@/components/modals/RecentFiles';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { AutopilotPanel } from '@/components/autopilot/AutopilotPanel';
 import { AutopilotConfigModal } from '@/components/autopilot/AutopilotConfigModal';
+import { ProjectSelector } from '@/components/projects/ProjectSelector';
 import { SkipLinks } from '@/components/ui/SkipLinks';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import {
-  FolderTree,
   FileText,
   Terminal,
   LayoutDashboard,
@@ -34,9 +32,9 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function IDEPage() {
-  const { currentProject } = useProjectStore();
-  const { loadTree } = useFileStore();
+  const { currentProject, projects, activeProjectPath } = useProjectStore();
   const { openSettings } = useSettingsStore();
+  const projectPaths = projects.map(p => p.path);
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts();
@@ -61,16 +59,9 @@ export default function IDEPage() {
     setSidebarWidth(sidebarWidth + delta);
   }, [sidebarWidth, setSidebarWidth]);
 
-  useEffect(() => {
-    if (currentProject) {
-      loadTree(currentProject.path);
-    }
-  }, [currentProject, loadTree]);
-
   const sidebarItems = [
-    { id: 'explorer', icon: FolderTree, label: 'Explorer' },
-    { id: 'git', icon: GitBranch, label: 'Source Control' },
     { id: 'specs', icon: FileText, label: 'Specs' },
+    { id: 'git', icon: GitBranch, label: 'Source Control' },
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   ] as const;
 
@@ -143,20 +134,27 @@ export default function IDEPage() {
           <>
             <aside
               id="main-sidebar"
-              className="h-full bg-[#0a0a0f] flex-shrink-0 overflow-hidden"
+              className="h-full bg-[#0a0a0f] flex-shrink-0 overflow-hidden flex flex-col"
               style={{ width: sidebarWidth }}
               aria-label="Sidebar"
             >
-              {activePanel === 'explorer' && <Sidebar />}
+              {/* Project Selector */}
+              <div className="px-2 pt-2 pb-1 flex-shrink-0">
+                <ProjectSelector />
+              </div>
+
+              {/* Panel Content */}
+              <div className="flex-1 min-h-0 overflow-hidden">
               {activePanel === 'git' && currentProject && (
                 <GitPanel projectPath={currentProject.path} />
               )}
-              {activePanel === 'specs' && currentProject && (
-                <SpecsPanel projectPath={currentProject.path} />
+              {activePanel === 'specs' && projectPaths.length > 0 && (
+                <SpecsPanel projectPaths={projectPaths} activeProjectPath={activeProjectPath} />
               )}
               {activePanel === 'dashboard' && currentProject && (
                 <DashboardPanel projectPath={currentProject.path} />
               )}
+              </div>
             </aside>
             {/* Sidebar Resize Handle */}
             <ResizeHandle

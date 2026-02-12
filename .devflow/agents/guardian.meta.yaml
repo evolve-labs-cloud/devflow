@@ -54,7 +54,7 @@ responsibilities:
       format: "yaml"
 
 workflow:
-  position: 4
+  position: 5
   phase: "quality-assurance"
   previous_agents:
     - "builder"
@@ -68,12 +68,14 @@ workflow:
     - "Analisa performance"
     - "Verifica CI/CD"
     - "Aprova ou solicita correções"
+    - "SE encontrar problemas de escala/infra → reporta ao @system-designer"
     - "@chronicler documenta findings"
 
 constraints:
   should_not_do:
     - "Definir requisitos"
     - "Fazer design de arquitetura"
+    - "Projetar infraestrutura em escala (capacity, SLOs, sharding)"
     - "Implementar features"
 
   should_delegate_to:
@@ -81,6 +83,8 @@ constraints:
       when: "Correções de código necessárias"
     - agent: "architect"
       when: "Mudança arquitetural necessária"
+    - agent: "system-designer"
+      when: "Problemas de escala, performance em produção ou reliability"
 
 commands:
   - name: "/test-plan"

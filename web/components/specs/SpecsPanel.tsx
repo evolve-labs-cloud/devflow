@@ -27,7 +27,8 @@ import { cn } from '@/lib/utils';
 import { useListNavigation } from '@/hooks/useListNavigation';
 
 interface SpecsPanelProps {
-  projectPath: string;
+  projectPaths: string[];
+  activeProjectPath: string | null;
 }
 
 // Workflow phases
@@ -37,43 +38,44 @@ const PHASES: { id: SpecPhase; name: string; icon: React.ReactNode; color: strin
   { id: 'tasks', name: 'Tasks', icon: <ListTodo className="w-4 h-4" />, color: 'text-amber-400' },
 ];
 
-export function SpecsPanel({ projectPath }: SpecsPanelProps) {
+export function SpecsPanel({ projectPaths, activeProjectPath }: SpecsPanelProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const {
     specs,
-    requirements,
-    decisions,
-    tasks,
     isLoading,
     error,
     activePhase,
     selectedSpecId,
+    filterProject,
     loadSpecs,
     setActivePhase,
     setSelectedSpec,
+    setFilterProject,
+    getFilteredRequirements,
+    getFilteredDecisions,
+    getFilteredTasks,
   } = useSpecsStore();
 
   const { openFile } = useFileStore();
   const { status: autopilotStatus } = useAutopilotStore();
 
-  // Load specs when project path changes
+  // Load specs when project paths change
   useEffect(() => {
-    if (projectPath) {
-      loadSpecs(projectPath);
+    if (projectPaths.length > 0) {
+      loadSpecs(projectPaths);
     }
-  }, [projectPath, loadSpecs]);
+  }, [projectPaths.join(','), loadSpecs]);
 
   // Refresh specs when autopilot completes
   useEffect(() => {
     if (autopilotStatus === 'completed' || autopilotStatus === 'failed') {
-      // Delay refresh to allow file writes to complete
       const timer = setTimeout(() => {
-        loadSpecs(projectPath);
+        loadSpecs(projectPaths);
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [autopilotStatus, projectPath, loadSpecs]);
+  }, [autopilotStatus, projectPaths, loadSpecs]);
 
   const handleOpenSpec = (spec: Spec) => {
     if (spec.filePath) {
@@ -81,9 +83,22 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
     }
   };
 
-  // Filter by phase
-  const requirementSpecs = specs.filter(s => s.phase === 'requirements');
-  const designSpecs = specs.filter(s => s.phase === 'design');
+  // Get filtered data
+  const requirements = getFilteredRequirements();
+  const decisions = getFilteredDecisions();
+  const tasks = getFilteredTasks();
+
+  // Filter specs by phase and project
+  const requirementSpecs = specs.filter(s =>
+    s.phase === 'requirements' && (!filterProject || s.sourceProject === filterProject)
+  );
+  const designSpecs = specs.filter(s =>
+    s.phase === 'design' && (!filterProject || s.sourceProject === filterProject)
+  );
+
+  // Unique project names for filter
+  const projectNames = [...new Set(specs.map(s => s.sourceProject).filter(Boolean))] as string[];
+  const getProjectName = (p: string) => p.split('/').pop() || p;
 
   return (
     <div className="h-full flex flex-col bg-[#0a0a0f] text-white">
@@ -96,7 +111,7 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
           </h2>
           <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0" role="toolbar" aria-label="Specs actions">
             <button
-              onClick={() => loadSpecs(projectPath)}
+              onClick={() => loadSpecs(projectPaths)}
               className="p-1 sm:p-1.5 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
               title="Refresh"
               aria-label="Refresh specs"
@@ -113,6 +128,37 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
             </button>
           </div>
         </div>
+
+        {/* Project Filter - only show with multiple projects */}
+        {projectNames.length > 1 && (
+          <div className="flex gap-1 mb-2 overflow-x-auto scrollbar-hide">
+            <button
+              onClick={() => setFilterProject(null)}
+              className={cn(
+                'px-2 py-1 rounded-md text-[10px] font-medium transition-all whitespace-nowrap',
+                !filterProject
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+              )}
+            >
+              All
+            </button>
+            {projectNames.map((p) => (
+              <button
+                key={p}
+                onClick={() => setFilterProject(filterProject === p ? null : p)}
+                className={cn(
+                  'px-2 py-1 rounded-md text-[10px] font-medium transition-all whitespace-nowrap',
+                  filterProject === p
+                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10 border border-transparent'
+                )}
+              >
+                {getProjectName(p)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Phase Tabs - Responsive */}
         <div
@@ -179,9 +225,10 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
               <RequirementsView
                 requirements={requirements}
                 specs={requirementSpecs}
-                projectPath={projectPath}
+                projectPath={activeProjectPath || projectPaths[0] || ''}
                 onOpenSpec={handleOpenSpec}
                 onCreateNew={() => setShowCreateModal(true)}
+                showProjectBadge={projectPaths.length > 1}
               />
             )}
             {activePhase === 'design' && (
@@ -190,12 +237,14 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
                 specs={designSpecs}
                 onOpenSpec={handleOpenSpec}
                 onCreateNew={() => setShowCreateModal(true)}
+                showProjectBadge={projectPaths.length > 1}
               />
             )}
             {activePhase === 'tasks' && (
               <TasksView
                 tasks={tasks}
                 onCreateNew={() => setShowCreateModal(true)}
+                showProjectBadge={projectPaths.length > 1}
               />
             )}
           </>
@@ -205,7 +254,7 @@ export function SpecsPanel({ projectPath }: SpecsPanelProps) {
       {/* Create Modal */}
       {showCreateModal && (
         <CreateSpecModal
-          projectPath={projectPath}
+          projectPath={activeProjectPath || projectPaths[0] || ''}
           activePhase={activePhase}
           onClose={() => setShowCreateModal(false)}
         />
@@ -252,12 +301,14 @@ function RequirementsView({
   projectPath,
   onOpenSpec,
   onCreateNew,
+  showProjectBadge = false,
 }: {
   requirements: Requirement[];
   specs: Spec[];
   projectPath: string;
   onOpenSpec: (spec: Spec) => void;
   onCreateNew: () => void;
+  showProjectBadge?: boolean;
 }) {
   const { getSpecProgress } = useSpecsStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -309,6 +360,7 @@ function RequirementsView({
             projectPath={projectPath}
             onClick={() => spec && onOpenSpec(spec)}
             isSelected={isSelected(index)}
+            showProjectBadge={showProjectBadge}
           />
         );
       })}
@@ -323,6 +375,7 @@ function RequirementCard({
   projectPath,
   onClick,
   isSelected = false,
+  showProjectBadge = false,
 }: {
   requirement: Requirement;
   spec?: Spec;
@@ -330,6 +383,7 @@ function RequirementCard({
   projectPath: string;
   onClick: () => void;
   isSelected?: boolean;
+  showProjectBadge?: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -375,7 +429,7 @@ function RequirementCard({
     if (spec) {
       // Read spec content from the file
       const specContent = `# ${requirement.title}\n\n${requirement.description}\n\n## Acceptance Criteria\n${requirement.acceptanceCriteria.map(c => `- ${c}`).join('\n')}`;
-      openConfigModal(spec.id, requirement.title, specContent);
+      openConfigModal(spec.id, requirement.title, specContent, spec.filePath);
     }
   };
 
@@ -410,6 +464,11 @@ function RequirementCard({
             {progress.status === 'completed' && (
               <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                 DONE
+              </span>
+            )}
+            {showProjectBadge && requirement.sourceProject && (
+              <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-gray-400">
+                {requirement.sourceProject.split('/').pop()}
               </span>
             )}
           </div>
@@ -466,11 +525,13 @@ function DesignView({
   specs,
   onOpenSpec,
   onCreateNew,
+  showProjectBadge = false,
 }: {
   decisions: DesignDecision[];
   specs: Spec[];
   onOpenSpec: (spec: Spec) => void;
   onCreateNew: () => void;
+  showProjectBadge?: boolean;
 }) {
   const { getSpecProgress } = useSpecsStore();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -520,6 +581,7 @@ function DesignView({
             progress={progress}
             onClick={() => spec && onOpenSpec(spec)}
             isSelected={isSelected(index)}
+            showProjectBadge={showProjectBadge}
           />
         );
       })}
@@ -532,11 +594,13 @@ function DecisionCard({
   progress,
   onClick,
   isSelected = false,
+  showProjectBadge = false,
 }: {
   decision: DesignDecision;
   progress: SpecProgress;
   onClick: () => void;
   isSelected?: boolean;
+  showProjectBadge?: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -589,6 +653,11 @@ function DecisionCard({
                 DONE
               </span>
             )}
+            {showProjectBadge && decision.sourceProject && (
+              <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-gray-400">
+                {decision.sourceProject.split('/').pop()}
+              </span>
+            )}
           </div>
           <p className="text-xs text-gray-400 line-clamp-2 break-words">{decision.context}</p>
 
@@ -612,9 +681,11 @@ function DecisionCard({
 function TasksView({
   tasks,
   onCreateNew,
+  showProjectBadge = false,
 }: {
   tasks: Task[];
   onCreateNew: () => void;
+  showProjectBadge?: boolean;
 }) {
   const { updateTaskStatus } = useSpecsStore();
 
@@ -645,6 +716,7 @@ function TasksView({
           tasks={groupedTasks.in_progress}
           color="text-blue-400"
           onToggle={(id, current) => updateTaskStatus(id, current === 'completed' ? 'pending' : 'completed')}
+          showProjectBadge={showProjectBadge}
         />
       )}
       {groupedTasks.pending.length > 0 && (
@@ -653,6 +725,7 @@ function TasksView({
           tasks={groupedTasks.pending}
           color="text-gray-400"
           onToggle={(id, current) => updateTaskStatus(id, current === 'completed' ? 'pending' : 'completed')}
+          showProjectBadge={showProjectBadge}
         />
       )}
       {groupedTasks.blocked.length > 0 && (
@@ -661,6 +734,7 @@ function TasksView({
           tasks={groupedTasks.blocked}
           color="text-red-400"
           onToggle={(id, current) => updateTaskStatus(id, current === 'completed' ? 'pending' : 'completed')}
+          showProjectBadge={showProjectBadge}
         />
       )}
       {groupedTasks.completed.length > 0 && (
@@ -669,6 +743,7 @@ function TasksView({
           tasks={groupedTasks.completed}
           color="text-green-400"
           onToggle={(id, current) => updateTaskStatus(id, current === 'completed' ? 'pending' : 'completed')}
+          showProjectBadge={showProjectBadge}
         />
       )}
     </div>
@@ -680,11 +755,13 @@ function TaskGroup({
   tasks,
   color,
   onToggle,
+  showProjectBadge = false,
 }: {
   title: string;
   tasks: Task[];
   color: string;
   onToggle: (id: string, currentStatus: Task['status']) => void;
+  showProjectBadge?: boolean;
 }) {
   return (
     <div>
@@ -698,6 +775,7 @@ function TaskGroup({
             key={task.id}
             task={task}
             onToggle={onToggle}
+            showProjectBadge={showProjectBadge}
           />
         ))}
       </div>
@@ -708,9 +786,11 @@ function TaskGroup({
 function TaskCard({
   task,
   onToggle,
+  showProjectBadge = false,
 }: {
   task: Task;
   onToggle: (id: string, currentStatus: Task['status']) => void;
+  showProjectBadge?: boolean;
 }) {
   const priorityDots = {
     low: 'bg-gray-400',
@@ -805,6 +885,13 @@ function TaskCard({
                 agentColors[task.assignedAgent] || 'text-gray-400 bg-gray-400/10'
               )}>
                 @{task.assignedAgent}
+              </span>
+            )}
+
+            {/* Project Badge */}
+            {showProjectBadge && task.sourceProject && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-400">
+                {task.sourceProject.split('/').pop()}
               </span>
             )}
           </div>

@@ -63,11 +63,12 @@ responsibilities:
       trigger: "after_prd_created"
 
 workflow:
-  position: 5
+  position: 6
   phase: "documentation"
   previous_agents:
     - "strategist"
     - "architect"
+    - "system-designer"
     - "builder"
     - "guardian"
 
@@ -153,6 +154,8 @@ constraints:
       when: "Documentação de requisitos necessária"
     - agent: "architect"
       when: "ADR precisa ser criado"
+    - agent: "system-designer"
+      when: "SDD ou RFC precisa ser documentado"
     - agent: "builder"
       when: "Stories prontas para implementação"
 
@@ -176,6 +179,10 @@ commands:
   - name: "/analyze-context"
     description: "Analisa contexto disponível"
     output: "Relatório de contexto"
+
+  - name: "/status-check"
+    description: "Verifica status de todas as stories, epics e badges"
+    output: "Relatório de status consolidado"
 
 quality_criteria:
   - "CHANGELOG segue Keep a Changelog"

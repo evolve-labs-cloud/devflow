@@ -77,7 +77,7 @@ export function extractTasks(content: string, specId: string, filePath?: string)
     }
 
     // Try to extract assigned agent from title (e.g., @Builder or @architect)
-    const agentMatch = cleanTitle.match(/@(strategist|architect|builder|guardian|chronicler)/i);
+    const agentMatch = cleanTitle.match(/@(strategist|architect|system-designer|builder|guardian|chronicler)/i);
     let assignedAgent: string | undefined;
 
     if (agentMatch) {

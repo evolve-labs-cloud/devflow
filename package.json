@@ -1,0 +1,57 @@
+{
+  "name": "devflow-agents",
+  "version": "0.7.0",
+  "description": "Multi-agent system for software development with Claude Code. 6 specialized agents (Strategist, Architect, System Designer, Builder, Guardian, Chronicler) as slash commands.",
+  "keywords": [
+    "claude-code",
+    "ai-agents",
+    "multi-agent",
+    "devflow",
+    "claude",
+    "anthropic",
+    "software-development"
+  ],
+  "author": "Evolve Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evolve-labs-cloud/devflow.git"
+  },
+  "homepage": "https://github.com/evolve-labs-cloud/devflow",
+  "bin": {
+    "devflow": "bin/devflow.js"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    ".claude/commands/",
+    ".claude_project",
+    ".devflow/agents/",
+    ".devflow/project.yaml",
+    ".gitignore-template",
+    "docs/decisions/000-template.md",
+    "web/app/",
+    "web/components/",
+    "web/hooks/",
+    "web/lib/",
+    "web/package.json",
+    "web/next.config.js",
+    "web/tsconfig.json",
+    "web/tailwind.config.ts",
+    "web/postcss.config.js",
+    "web/README.md",
+    "web/CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "scripts": {
+    "prepublishOnly": "cp .gitignore .gitignore-template"
+  }
+}

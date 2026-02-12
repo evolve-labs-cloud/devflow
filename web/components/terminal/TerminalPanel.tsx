@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { AgentIcon } from '@/components/agents/AgentIcons';
 import { cn } from '@/lib/utils';
 import { useSettingsStore } from '@/lib/stores/settingsStore';
+import { useAutopilotStore } from '@/lib/stores/autopilotStore';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -34,6 +35,7 @@ interface TerminalTab {
 const AGENT_ACTIONS = [
   { id: 'strategist', label: 'Strategist', command: 'claude /agents:strategist', color: '#3b82f6' },
   { id: 'architect', label: 'Architect', command: 'claude /agents:architect', color: '#8b5cf6' },
+  { id: 'system-designer', label: 'Sys Designer', command: 'claude /agents:system-designer', color: '#06b6d4' },
   { id: 'builder', label: 'Builder', command: 'claude /agents:builder', color: '#22c55e' },
   { id: 'guardian', label: 'Guardian', command: 'claude /agents:guardian', color: '#ef4444' },
   { id: 'chronicler', label: 'Chronicler', command: 'claude /agents:chronicler', color: '#f59e0b' },
@@ -430,6 +432,50 @@ export function TerminalPanel({
     }, 100);
     return () => clearTimeout(timer);
   }, [isMaximized, handleResize]);
+
+  // Listen for autopilot start — create dedicated "Autopilot" tab
+  const prevAutopilotStatusRef = useRef<string>('idle');
+  useEffect(() => {
+    const unsub = useAutopilotStore.subscribe((state) => {
+      const prevStatus = prevAutopilotStatusRef.current;
+      const newStatus = state.status;
+      prevAutopilotStatusRef.current = newStatus;
+
+      // Only react to transitions to 'running'
+      if (newStatus === 'running' && prevStatus !== 'running') {
+        setTabs((prev) => {
+          const existing = prev.find((t) => t.name === 'Autopilot');
+          if (existing) {
+            // Reuse existing — activate it and pass sessionId to store
+            useAutopilotStore.getState().setTerminalSessionId(existing.sessionId);
+            return prev.map((t) => ({ ...t, isActive: t.id === existing.id }));
+          }
+
+          // Create new Autopilot tab
+          const newId = String(Date.now());
+          const newSessionId = `autopilot-${newId}`;
+          useAutopilotStore.getState().setTerminalSessionId(newSessionId);
+
+          return [
+            ...prev.map((t) => ({ ...t, isActive: false })),
+            { id: newId, name: 'Autopilot', isActive: true, sessionId: newSessionId },
+          ];
+        });
+      }
+    });
+    return unsub;
+  }, []);
+
+  // On mount, if there's already an active tab, register its sessionId with autopilotStore
+  useEffect(() => {
+    if (activeTab) {
+      // Only set if autopilot is running and no session is set yet
+      const { status, terminalSessionId } = useAutopilotStore.getState();
+      if (status === 'running' && !terminalSessionId) {
+        useAutopilotStore.getState().setTerminalSessionId(activeTab.sessionId);
+      }
+    }
+  }, [activeTab?.sessionId]);
 
   // Tab management
   const addTab = () => {

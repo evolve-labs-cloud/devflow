@@ -14,6 +14,7 @@ import {
   Maximize2,
   Minimize2,
   SkipForward,
+  StopCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -25,13 +26,14 @@ import {
 const AGENT_INFO: Record<AgentId, { icon: string; color: string; name: string }> = {
   strategist: { icon: '📊', color: 'text-blue-400', name: 'Strategist' },
   architect: { icon: '🏗️', color: 'text-purple-400', name: 'Architect' },
+  'system-designer': { icon: '⚙️', color: 'text-cyan-400', name: 'System Designer' },
   builder: { icon: '🔨', color: 'text-amber-400', name: 'Builder' },
   guardian: { icon: '🛡️', color: 'text-green-400', name: 'Guardian' },
   chronicler: { icon: '📝', color: 'text-pink-400', name: 'Chronicler' },
 };
 
 export function AutopilotPanel() {
-  const { status, phases, specTitle, error, reset, currentPhaseIndex } = useAutopilotStore();
+  const { status, phases, specTitle, error, reset, currentPhaseIndex, abortRun } = useAutopilotStore();
   const [startTime] = useState(() => Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [expandedPhase, setExpandedPhase] = useState<number | null>(null);
@@ -103,6 +105,15 @@ export function AutopilotPanel() {
           )}
         </div>
         <div className="flex items-center gap-1">
+          {isRunning && (
+            <button
+              onClick={abortRun}
+              className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300"
+              title="Abort autopilot"
+            >
+              <StopCircle className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => setIsMaximized(!isMaximized)}
             className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"
@@ -129,6 +140,9 @@ export function AutopilotPanel() {
       {/* Spec Title */}
       <div className="px-4 py-2 border-b border-white/5">
         <p className="text-xs text-gray-400 truncate">{specTitle}</p>
+        {isRunning && (
+          <p className="text-[10px] text-gray-500 mt-0.5">Output streaming in Terminal tab</p>
+        )}
       </div>
 
       {/* Error message */}
@@ -253,6 +267,19 @@ function PhaseItem({
           </div>
         )}
       </button>
+
+      {/* Tasks completed */}
+      {phase.tasksCompleted && phase.tasksCompleted.length > 0 && (
+        <div className="px-4 py-2 bg-green-500/5 border-t border-white/5">
+          <p className="text-[10px] text-green-400/70 uppercase tracking-wider mb-1">Tasks completed</p>
+          {phase.tasksCompleted.map((task, i) => (
+            <div key={i} className="flex items-center gap-1.5 text-xs text-green-400 py-0.5">
+              <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{task}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Expanded output */}
       {isExpanded && hasOutput && (

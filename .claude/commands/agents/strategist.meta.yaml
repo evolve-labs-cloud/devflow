@@ -123,6 +123,8 @@ constraints:
   should_delegate_to:
     - agent: "architect"
       when: "Decisões técnicas necessárias"
+    - agent: "system-designer"
+      when: "NFRs envolvem escala, infra ou reliability"
     - agent: "builder"
       when: "Implementação necessária"
 
@@ -138,6 +140,10 @@ commands:
   - name: "/stories"
     description: "Gera user stories para feature"
     output: "docs/planning/stories/{story-id}.md"
+
+  - name: "/prioritize"
+    description: "Prioriza lista de features usando framework RICE/MoSCoW"
+    output: "Análise de priorização"
 
 quality_criteria:
   - "Requisitos claros e sem ambiguidade"

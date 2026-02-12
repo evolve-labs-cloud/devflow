@@ -49,7 +49,7 @@ responsibilities:
       location: "docs/CHANGELOG.md"
       format: "markdown (keep-a-changelog)"
     - type: "Snapshot"
-      location: "docs/snapshots/"
+      location: ".devflow/snapshots/"
       format: "markdown + json"
     - type: "Knowledge Graph"
       location: ".devflow/knowledge-graph.json"
@@ -63,11 +63,12 @@ responsibilities:
       trigger: "after_prd_created"
 
 workflow:
-  position: 5
+  position: 6
   phase: "documentation"
   previous_agents:
     - "strategist"
     - "architect"
+    - "system-designer"
     - "builder"
     - "guardian"
 
@@ -115,6 +116,11 @@ mandatory_actions:
     - if_no: "Gerar user stories em docs/planning/stories/"
     - then: "Mencionar @builder implementar story [ID]"
 
+  after_system_designer_sdd:
+    - action: "Registrar SDD no CHANGELOG"
+    - action: "Atualizar knowledge-graph.json com novo SDD"
+    - action: "Arquivar capacity plans e trade-offs"
+
   after_builder_implementation:
     - action: "Atualizar CHANGELOG.md com mudanças"
     - action: "Atualizar knowledge-graph.json"
@@ -153,6 +159,8 @@ constraints:
       when: "Documentação de requisitos necessária"
     - agent: "architect"
       when: "ADR precisa ser criado"
+    - agent: "system-designer"
+      when: "SDD ou RFC precisa ser documentado"
     - agent: "builder"
       when: "Stories prontas para implementação"
 
@@ -163,7 +171,7 @@ commands:
 
   - name: "/snapshot"
     description: "Cria snapshot do estado atual"
-    output: "docs/snapshots/{date}.md + .json"
+    output: ".devflow/snapshots/{date}.md + .json"
 
   - name: "/sync-check"
     description: "Verifica drift de documentação"
@@ -176,6 +184,10 @@ commands:
   - name: "/analyze-context"
     description: "Analisa contexto disponível"
     output: "Relatório de contexto"
+
+  - name: "/status-check"
+    description: "Verifica status de todas as stories, epics e badges"
+    output: "Relatório de status consolidado"
 
 quality_criteria:
   - "CHANGELOG segue Keep a Changelog"

@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 /**
- * Autopilot Store - Versão simplificada
- * Execução sequencial sem streaming
+ * Autopilot Store - Terminal-based execution
+ * Agents run inside the terminal PTY with streaming output.
  */
 
-export type AgentId = 'strategist' | 'architect' | 'builder' | 'guardian' | 'chronicler';
+export type AgentId = 'strategist' | 'architect' | 'system-designer' | 'builder' | 'guardian' | 'chronicler';
 export type PhaseStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
 export type RunStatus = 'idle' | 'running' | 'completed' | 'failed';
 
@@ -17,6 +17,7 @@ export interface PhaseResult {
   output?: string;
   error?: string;
   duration?: number;
+  tasksCompleted?: string[];
 }
 
 export interface AutopilotConfig {
@@ -27,13 +28,14 @@ export interface AutopilotConfig {
 export const DEFAULT_PHASES: { id: AgentId; name: string }[] = [
   { id: 'strategist', name: 'Planning' },
   { id: 'architect', name: 'Design' },
+  { id: 'system-designer', name: 'System Design' },
   { id: 'builder', name: 'Implementation' },
   { id: 'guardian', name: 'Validation' },
   { id: 'chronicler', name: 'Documentation' },
 ];
 
 export const DEFAULT_CONFIG: AutopilotConfig = {
-  phases: ['strategist', 'architect', 'builder', 'guardian', 'chronicler'],
+  phases: ['strategist', 'architect', 'system-designer', 'builder', 'guardian', 'chronicler'],
 };
 
 interface AutopilotState {
@@ -45,16 +47,22 @@ interface AutopilotState {
   specId: string | null;
   specTitle: string | null;
 
+  // Terminal session for autopilot execution
+  terminalSessionId: string | null;
+
   // Config modal
   isConfigModalOpen: boolean;
   selectedSpecId: string | null;
   selectedSpecTitle: string | null;
   selectedSpecContent: string | null;
+  selectedSpecFilePath: string | null;
 
   // Actions
-  openConfigModal: (specId: string, specTitle: string, specContent: string) => void;
+  openConfigModal: (specId: string, specTitle: string, specContent: string, specFilePath?: string) => void;
   closeConfigModal: () => void;
+  setTerminalSessionId: (sessionId: string) => void;
   startRun: (config: AutopilotConfig, projectPath: string) => Promise<void>;
+  abortRun: () => Promise<void>;
   reset: () => void;
 }
 
@@ -67,17 +75,20 @@ export const useAutopilotStore = create<AutopilotState>()(
       error: null,
       specId: null,
       specTitle: null,
+      terminalSessionId: null,
       isConfigModalOpen: false,
       selectedSpecId: null,
       selectedSpecTitle: null,
       selectedSpecContent: null,
+      selectedSpecFilePath: null,
 
-      openConfigModal: (specId, specTitle, specContent) => {
+      openConfigModal: (specId, specTitle, specContent, specFilePath) => {
         set({
           isConfigModalOpen: true,
           selectedSpecId: specId,
           selectedSpecTitle: specTitle,
           selectedSpecContent: specContent,
+          selectedSpecFilePath: specFilePath || null,
         });
       },
 
@@ -87,14 +98,23 @@ export const useAutopilotStore = create<AutopilotState>()(
           selectedSpecId: null,
           selectedSpecTitle: null,
           selectedSpecContent: null,
+          selectedSpecFilePath: null,
         });
       },
 
+      setTerminalSessionId: (sessionId) => {
+        set({ terminalSessionId: sessionId });
+      },
+
       startRun: async (config, projectPath) => {
-        const { selectedSpecId, selectedSpecTitle, selectedSpecContent } = get();
+        const { selectedSpecId, selectedSpecTitle, selectedSpecContent, selectedSpecFilePath, terminalSessionId } = get();
 
         if (!selectedSpecId || !selectedSpecTitle || !selectedSpecContent) {
           throw new Error('No spec selected');
+        }
+
+        if (!terminalSessionId) {
+          throw new Error('No terminal session available. Open the terminal first.');
         }
 
         // Initialize phases
@@ -117,10 +137,13 @@ export const useAutopilotStore = create<AutopilotState>()(
           isConfigModalOpen: false,
         });
 
-        // Execute phases sequentially
+        // Execute phases sequentially via terminal
         let previousOutputs: string[] = [];
 
         for (let i = 0; i < config.phases.length; i++) {
+          // Check if aborted
+          if (get().status !== 'running') return;
+
           const agentId = config.phases[i];
 
           // Update current phase to running
@@ -134,12 +157,14 @@ export const useAutopilotStore = create<AutopilotState>()(
           const startTime = Date.now();
 
           try {
-            const response = await fetch('/api/autopilot/execute', {
+            const response = await fetch('/api/autopilot/terminal-execute', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                sessionId: terminalSessionId,
                 agent: agentId,
                 specContent: selectedSpecContent,
+                specFilePath: selectedSpecFilePath,
                 previousOutputs,
                 projectPath,
               }),
@@ -153,13 +178,23 @@ export const useAutopilotStore = create<AutopilotState>()(
             const result = await response.json();
             const duration = Date.now() - startTime;
 
+            if (!result.success) {
+              throw new Error(result.error || `Phase ${agentId} failed`);
+            }
+
             previousOutputs.push(result.output || '');
 
             // Update phase as completed
             set((state) => ({
               phases: state.phases.map((p, idx) =>
                 idx === i
-                  ? { ...p, status: 'completed', output: result.output, duration }
+                  ? {
+                      ...p,
+                      status: 'completed',
+                      output: result.output,
+                      duration,
+                      tasksCompleted: result.tasksCompleted || [],
+                    }
                   : p
               ),
             }));
@@ -189,6 +224,40 @@ export const useAutopilotStore = create<AutopilotState>()(
         set({ status: 'completed' });
       },
 
+      abortRun: async () => {
+        const { terminalSessionId, currentPhaseIndex } = get();
+
+        // Send Ctrl+C to the terminal to interrupt the current command
+        if (terminalSessionId) {
+          try {
+            await fetch('/api/terminal', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'write',
+                sessionId: terminalSessionId,
+                data: '\x03', // Ctrl+C
+              }),
+            });
+          } catch {
+            // Ignore errors
+          }
+        }
+
+        // Mark current phase as failed, remaining as skipped
+        set((state) => ({
+          status: 'failed',
+          error: 'Aborted by user',
+          phases: state.phases.map((p, idx) =>
+            idx === currentPhaseIndex
+              ? { ...p, status: 'failed', error: 'Aborted' }
+              : idx > currentPhaseIndex
+              ? { ...p, status: 'skipped' }
+              : p
+          ),
+        }));
+      },
+
       reset: () => {
         set({
           status: 'idle',
@@ -197,10 +266,12 @@ export const useAutopilotStore = create<AutopilotState>()(
           error: null,
           specId: null,
           specTitle: null,
+          terminalSessionId: null,
           isConfigModalOpen: false,
           selectedSpecId: null,
           selectedSpecTitle: null,
           selectedSpecContent: null,
+          selectedSpecFilePath: null,
         });
       },
     }),

@@ -20,18 +20,23 @@ interface SpecsState {
   error: string | null;
   selectedSpecId: string | null;
   activePhase: SpecPhase;
+  filterProject: string | null; // null = show all
 
   // Actions
-  loadSpecs: (projectPath: string) => Promise<void>;
+  loadSpecs: (projectPaths: string[]) => Promise<void>;
   createSpec: (projectPath: string, data: CreateSpecData) => Promise<string | null>;
   setSelectedSpec: (id: string | null) => void;
   setActivePhase: (phase: SpecPhase) => void;
+  setFilterProject: (projectPath: string | null) => void;
   updateTaskStatus: (taskId: string, status: Task['status']) => Promise<void>;
   getSpecsByPhase: (phase: SpecPhase) => Spec[];
   getRequirementsBySpec: (specId: string) => Requirement[];
   getTasksBySpec: (specId: string) => Task[];
   getDecisionsBySpec: (specId: string) => DesignDecision[];
   getSpecProgress: (specId: string) => SpecProgress;
+  getFilteredRequirements: () => Requirement[];
+  getFilteredDecisions: () => DesignDecision[];
+  getFilteredTasks: () => Task[];
 }
 
 interface CreateSpecData {
@@ -40,6 +45,10 @@ interface CreateSpecData {
   description?: string;
   priority?: string;
   phase?: SpecPhase;
+}
+
+function basename(p: string): string {
+  return p.split('/').pop() || p;
 }
 
 export const useSpecsStore = create<SpecsState>((set, get) => ({
@@ -51,26 +60,62 @@ export const useSpecsStore = create<SpecsState>((set, get) => ({
   error: null,
   selectedSpecId: null,
   activePhase: 'requirements',
+  filterProject: null,
 
-  loadSpecs: async (projectPath: string) => {
+  loadSpecs: async (projectPaths: string[]) => {
+    if (projectPaths.length === 0) return;
+
     set({ isLoading: true, error: null });
 
     try {
-      const response = await fetch(
-        `/api/specs?projectPath=${encodeURIComponent(projectPath)}`
+      // Fetch specs from all projects in parallel
+      const results = await Promise.all(
+        projectPaths.map(async (projectPath) => {
+          const response = await fetch(
+            `/api/specs?projectPath=${encodeURIComponent(projectPath)}`
+          );
+
+          if (!response.ok) {
+            console.error(`Failed to load specs from ${basename(projectPath)}`);
+            return null;
+          }
+
+          const data = await response.json();
+          const projectName = basename(projectPath);
+
+          // Tag each item with sourceProject
+          return {
+            specs: (data.specs || []).map((s: Spec) => ({ ...s, sourceProject: projectPath })),
+            requirements: (data.requirements || []).map((r: Requirement) => ({ ...r, sourceProject: projectPath })),
+            decisions: (data.decisions || []).map((d: DesignDecision) => ({ ...d, sourceProject: projectPath })),
+            tasks: (data.tasks || []).map((t: Task) => ({ ...t, sourceProject: projectPath })),
+          };
+        })
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to load specs');
+      // Merge results from all projects
+      const allSpecs: Spec[] = [];
+      const allRequirements: Requirement[] = [];
+      const allDecisions: DesignDecision[] = [];
+      const allTasks: Task[] = [];
+
+      for (const result of results) {
+        if (!result) continue;
+        allSpecs.push(...result.specs);
+        allRequirements.push(...result.requirements);
+        allDecisions.push(...result.decisions);
+        allTasks.push(...result.tasks);
       }
 
-      const data = await response.json();
+      // Deduplicate by composite key (sourceProject + id)
+      const dedup = <T extends { id: string; sourceProject?: string }>(items: T[]) =>
+        [...new Map(items.map(i => [`${i.sourceProject || ''}:${i.id}`, i])).values()];
 
       set({
-        specs: data.specs || [],
-        requirements: data.requirements || [],
-        decisions: data.decisions || [],
-        tasks: data.tasks || [],
+        specs: dedup(allSpecs),
+        requirements: dedup(allRequirements),
+        decisions: dedup(allDecisions),
+        tasks: dedup(allTasks),
         isLoading: false,
       });
     } catch (error) {
@@ -99,8 +144,12 @@ export const useSpecsStore = create<SpecsState>((set, get) => ({
 
       const result = await response.json();
 
-      // Reload specs to get the new one
-      await get().loadSpecs(projectPath);
+      // Reload specs from all projects that were previously loaded
+      const currentPaths = [...new Set(get().specs.map(s => s.sourceProject).filter(Boolean))] as string[];
+      if (!currentPaths.includes(projectPath)) {
+        currentPaths.push(projectPath);
+      }
+      await get().loadSpecs(currentPaths);
 
       return result.id;
     } catch (error) {
@@ -118,6 +167,10 @@ export const useSpecsStore = create<SpecsState>((set, get) => ({
 
   setActivePhase: (phase: SpecPhase) => {
     set({ activePhase: phase });
+  },
+
+  setFilterProject: (projectPath: string | null) => {
+    set({ filterProject: projectPath });
   },
 
   updateTaskStatus: async (taskId: string, status: Task['status']) => {
@@ -174,8 +227,10 @@ export const useSpecsStore = create<SpecsState>((set, get) => ({
   },
 
   getSpecsByPhase: (phase: SpecPhase) => {
-    const { specs } = get();
-    return specs.filter((spec) => spec.phase === phase);
+    const { specs, filterProject } = get();
+    return specs.filter((spec) =>
+      spec.phase === phase && (!filterProject || spec.sourceProject === filterProject)
+    );
   },
 
   getRequirementsBySpec: (specId: string) => {
@@ -220,5 +275,23 @@ export const useSpecsStore = create<SpecsState>((set, get) => ({
     }
 
     return { total, completed, inProgress, percentage, status };
+  },
+
+  getFilteredRequirements: () => {
+    const { requirements, filterProject } = get();
+    if (!filterProject) return requirements;
+    return requirements.filter(r => r.sourceProject === filterProject);
+  },
+
+  getFilteredDecisions: () => {
+    const { decisions, filterProject } = get();
+    if (!filterProject) return decisions;
+    return decisions.filter(d => d.sourceProject === filterProject);
+  },
+
+  getFilteredTasks: () => {
+    const { tasks, filterProject } = get();
+    if (!filterProject) return tasks;
+    return tasks.filter(t => t.sourceProject === filterProject);
   },
 }));

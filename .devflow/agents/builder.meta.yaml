@@ -51,16 +51,17 @@ responsibilities:
       format: "markdown"
 
 workflow:
-  position: 3
+  position: 4
   phase: "implementation"
   previous_agents:
     - "architect"
+    - "system-designer"
   next_agents:
     - "guardian"
     - "chronicler"
 
   typical_flow:
-    - "Recebe design do @architect"
+    - "Recebe design do @architect e/ou SDD do @system-designer"
     - "Implementa código"
     - "Escreve testes"
     - "Auto-review"
@@ -77,6 +78,8 @@ constraints:
   should_delegate_to:
     - agent: "architect"
       when: "Decisão arquitetural necessária"
+    - agent: "system-designer"
+      when: "Questões de escala, infra ou reliability"
     - agent: "guardian"
       when: "Review de segurança/performance"
     - agent: "chronicler"

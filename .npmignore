@@ -1,0 +1,16 @@
+# Exclude from npm publish (safety net alongside "files" whitelist in package.json)
+# Note: "files" in package.json is the primary whitelist. This is a safety net.
+docs/images/
+docs/CHANGELOG.md
+docs/ARCHITECTURE.md
+docs/INSTALLATION.md
+docs/QUICKSTART.md
+docs/snapshots/
+.DS_Store
+.devflow/memory/
+.devflow/sessions/
+.devflow/snapshots/
+.devflow/knowledge-graph.json
+.claude/settings.local.json
+*.sh
+!bin/*.js

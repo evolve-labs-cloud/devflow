@@ -53,6 +53,7 @@ workflow:
   previous_agents:
     - "strategist"
   next_agents:
+    - "system-designer"
     - "builder"
 
   typical_flow:
@@ -73,6 +74,8 @@ constraints:
   should_delegate_to:
     - agent: "strategist"
       when: "Requisitos não claros"
+    - agent: "system-designer"
+      when: "Design envolve escala, infra, reliability ou capacity planning"
     - agent: "builder"
       when: "Implementação necessária"
     - agent: "guardian"

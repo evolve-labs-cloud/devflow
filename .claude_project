@@ -12,18 +12,21 @@ Always load these files for context:
 CRITICAL: Agents must follow hard stops and mandatory delegation.
 
 1. @strategist → Planning ONLY (never code)
-2. @architect → Design ONLY (never implementation)
-3. @builder → Code ONLY (never requirements)
-4. @guardian → QA ONLY (never features)
-5. @chronicler → Documentation ONLY (never code)
+2. @architect → Software Design ONLY (never implementation, never infra at scale)
+3. @system-designer → System Design ONLY (never code, never software patterns)
+4. @builder → Code ONLY (never requirements)
+5. @guardian → QA ONLY (never features)
+6. @chronicler → Documentation ONLY (never code)
 
 ## Workflow
 
-Linear flow: @strategist → @architect → @builder → @guardian → @chronicler
+Linear flow: @strategist → @architect → @system-designer → @builder → @guardian → @chronicler
 
 Feedback loops allowed:
 - @guardian can send issues back to @builder
 - @architect can clarify with @strategist
+- @system-designer can clarify with @architect
+- @builder can escalate infra issues to @system-designer
 
 ## Documentation Automation
 
@@ -46,3 +49,4 @@ Feedback loops allowed:
 - /new-feature - Guided feature creation
 - /create-adr - Guided ADR creation
 - /security-check - Quick security audit
+- /system-design - Guided system design creation

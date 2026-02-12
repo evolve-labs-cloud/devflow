@@ -10,36 +10,59 @@ interface RecentProject {
 
 interface ProjectState {
   // State
-  currentProject: ProjectInfo | null;
+  projects: ProjectInfo[];
+  activeProjectPath: string | null;
+  currentProject: ProjectInfo | null; // Derived from projects + activeProjectPath
   recentProjects: RecentProject[];
   health: HealthStatus | null;
   isLoading: boolean;
   error: string | null;
 
   // Actions
+  addProject: (path: string) => Promise<void>;
+  removeProject: (path: string) => void;
+  setActiveProject: (path: string) => void;
   openProject: (path: string) => Promise<void>;
+  restoreProjects: () => Promise<void>;
   closeProject: () => void;
   refreshHealth: () => Promise<void>;
   setError: (error: string | null) => void;
 }
 
+function deriveCurrentProject(projects: ProjectInfo[], activeProjectPath: string | null): ProjectInfo | null {
+  if (!activeProjectPath) return projects[0] || null;
+  return projects.find(p => p.path === activeProjectPath) || projects[0] || null;
+}
+
 export const useProjectStore = create<ProjectState>()(
   persist(
     (set, get) => ({
+      projects: [],
+      activeProjectPath: null,
       currentProject: null,
       recentProjects: [],
       health: null,
       isLoading: false,
       error: null,
 
-      openProject: async (path: string) => {
+      addProject: async (projectPath: string) => {
+        const existing = get().projects;
+        // If already added, just activate it
+        if (existing.some(p => p.path === projectPath)) {
+          set({
+            activeProjectPath: projectPath,
+            currentProject: deriveCurrentProject(existing, projectPath),
+          });
+          return;
+        }
+
         set({ isLoading: true, error: null });
 
         try {
           const response = await fetch('/api/project/open', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path }),
+            body: JSON.stringify({ path: projectPath }),
           });
 
           const data = await response.json();
@@ -52,26 +75,27 @@ export const useProjectStore = create<ProjectState>()(
 
           // Update recent projects
           const recentProjects = get().recentProjects.filter(
-            (p) => p.path !== path
+            (p) => p.path !== projectPath
           );
           recentProjects.unshift({
-            path,
+            path: projectPath,
             name: project.name,
             lastOpened: new Date(),
           });
-
-          // Keep only last 10
           if (recentProjects.length > 10) {
             recentProjects.pop();
           }
 
+          const newProjects = [...get().projects, project];
+
           set({
-            currentProject: project,
+            projects: newProjects,
+            activeProjectPath: projectPath,
+            currentProject: deriveCurrentProject(newProjects, projectPath),
             recentProjects,
             isLoading: false,
           });
 
-          // Refresh health status
           get().refreshHealth();
         } catch (error) {
           set({
@@ -81,8 +105,60 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      removeProject: (projectPath: string) => {
+        const newProjects = get().projects.filter(p => p.path !== projectPath);
+        const newActive = get().activeProjectPath === projectPath
+          ? (newProjects[0]?.path || null)
+          : get().activeProjectPath;
+
+        set({
+          projects: newProjects,
+          activeProjectPath: newActive,
+          currentProject: deriveCurrentProject(newProjects, newActive),
+        });
+      },
+
+      setActiveProject: (projectPath: string) => {
+        set({
+          activeProjectPath: projectPath,
+          currentProject: deriveCurrentProject(get().projects, projectPath),
+        });
+      },
+
+      // Backward-compatible alias
+      openProject: async (path: string) => {
+        await get().addProject(path);
+      },
+
+      restoreProjects: async () => {
+        // Read persisted paths from localStorage (saved by partialize)
+        try {
+          const raw = localStorage.getItem('devflow-project-store');
+          if (!raw) return;
+          const stored = JSON.parse(raw);
+          const paths: string[] = stored.state?.projectPaths || [];
+          const savedActive: string | null = stored.state?.activeProjectPath || null;
+
+          if (paths.length === 0) return;
+
+          // Restore each project sequentially to avoid race conditions
+          for (const p of paths) {
+            await get().addProject(p);
+          }
+
+          // Restore the active project (addProject sets it to the last added)
+          if (savedActive && get().projects.some(proj => proj.path === savedActive)) {
+            get().setActiveProject(savedActive);
+          }
+        } catch {
+          // Ignore restoration errors
+        }
+      },
+
       closeProject: () => {
         set({
+          projects: [],
+          activeProjectPath: null,
           currentProject: null,
           health: null,
           error: null,
@@ -112,6 +188,8 @@ export const useProjectStore = create<ProjectState>()(
       name: 'devflow-project-store',
       partialize: (state) => ({
         recentProjects: state.recentProjects,
+        projectPaths: state.projects.map(p => p.path),
+        activeProjectPath: state.activeProjectPath,
       }),
     }
   )

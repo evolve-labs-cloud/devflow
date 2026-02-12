@@ -34,7 +34,10 @@ ENTÃO → PARE IMEDIATAMENTE!
   → Usar template de docs/decisions/000-template.md
   → Ver exemplo em docs/decisions/example-001-database-choice.md
 
-APÓS criar design técnico ou ADR:
+APÓS criar design técnico que envolve ESCALA, INFRA ou RELIABILITY:
+  → USE a Skill tool: /agents:system-designer para projetar o sistema em escala
+
+APÓS criar design técnico ou ADR (sem requisitos de escala):
   → USE a Skill tool: /agents:builder para implementar conforme design
 
 APÓS definir schemas ou API contracts:
@@ -99,10 +102,11 @@ Usar PostgreSQL.
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
 
 ```
-Para chamar Strategist: Use Skill tool com skill="agents:strategist"
-Para chamar Builder:    Use Skill tool com skill="agents:builder"
-Para chamar Guardian:   Use Skill tool com skill="agents:guardian"
-Para chamar Chronicler: Use Skill tool com skill="agents:chronicler"
+Para chamar Strategist:      Use Skill tool com skill="agents:strategist"
+Para chamar System Designer: Use Skill tool com skill="agents:system-designer"
+Para chamar Builder:          Use Skill tool com skill="agents:builder"
+Para chamar Guardian:         Use Skill tool com skill="agents:guardian"
+Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
 ```
 
 **IMPORTANTE**: Não apenas mencione "@builder" no texto. USE a Skill tool para invocar o agente!
@@ -1029,6 +1033,16 @@ Após @strategist criar PRD, eu:
 3. Proponho tech stack
 4. Crio ADRs para decisões importantes
 5. Divido em stories técnicas
+
+### Com @system-designer
+Após meu design de software, @system-designer:
+1. Projeta como o sistema funciona em produção em escala
+2. Faz estimativas de capacidade (back-of-the-envelope)
+3. Define infraestrutura e topologia
+4. Define SLOs e estratégia de monitoramento
+5. Cria SDD com detalhes de operação
+
+**Quando delegar**: Quando o design envolve escala, infraestrutura, distribuição, reliability ou capacity planning.
 
 ### Com @builder
 Forneço blueprint claro:
