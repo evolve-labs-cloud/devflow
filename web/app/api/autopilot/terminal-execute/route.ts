@@ -42,6 +42,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
+  // Sanitize sessionId to prevent path traversal
+  const safeSessionId = sessionId.replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!safeSessionId || safeSessionId !== sessionId) {
+    return NextResponse.json({ error: 'Invalid sessionId format' }, { status: 400 });
+  }
+
   if (!isValidAgent(agent)) {
     return NextResponse.json({ error: `Unknown agent: ${agent}` }, { status: 400 });
   }
@@ -66,10 +72,10 @@ export async function POST(req: NextRequest) {
 
   // Write prompt to temp file (avoid shell escaping issues)
   const tmpDir = os.tmpdir();
-  const tmpFile = path.join(tmpDir, `devflow-autopilot-${sessionId}-${agent}-${Date.now()}.md`);
+  const tmpFile = path.join(tmpDir, `devflow-autopilot-${safeSessionId}-${agent}-${Date.now()}.md`);
 
   try {
-    await fs.writeFile(tmpFile, fullPrompt, 'utf-8');
+    await fs.writeFile(tmpFile, fullPrompt, { encoding: 'utf-8', mode: 0o600 });
 
     // Arm the collector before writing the command
     const collectorPromise = ptyManager.armAutopilotCollector(sessionId, timeoutMs + 5000);
