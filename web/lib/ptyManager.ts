@@ -1,5 +1,6 @@
 import * as pty from 'node-pty';
 import { EventEmitter } from 'events';
+import { existsSync } from 'fs';
 import { PHASE_DONE_REGEX } from '@/lib/autopilotConstants';
 
 interface TerminalSession {
@@ -16,21 +17,42 @@ interface AutopilotCollector {
   timeout: NodeJS.Timeout;
 }
 
+/**
+ * Detect the best available shell for the current platform.
+ */
+function detectShell(): string {
+  if (process.platform === 'win32') return 'powershell.exe';
+
+  // Try SHELL env var first
+  const envShell = process.env.SHELL;
+  if (envShell && existsSync(envShell)) return envShell;
+
+  // Fallback chain for Unix-like systems
+  const candidates = ['/bin/zsh', '/bin/bash', '/bin/sh'];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+
+  return '/bin/sh';
+}
+
 class PtyManager extends EventEmitter {
   private sessions: Map<string, TerminalSession> = new Map();
   private outputBuffers: Map<string, string[]> = new Map();
   private autopilotCollectors: Map<string, AutopilotCollector> = new Map();
 
   createSession(id: string, cwd: string, cols: number = 80, rows: number = 24): TerminalSession {
-    // Determine shell based on platform
-    const shell = process.platform === 'win32' ? 'powershell.exe' : process.env.SHELL || '/bin/zsh';
+    const shell = detectShell();
     const shellArgs = process.platform === 'win32' ? [] : ['-l'];
+
+    // Validate cwd exists, fallback to home directory
+    const safeCwd = existsSync(cwd) ? cwd : process.env.HOME || '/tmp';
 
     const ptyProcess = pty.spawn(shell, shellArgs, {
       name: 'xterm-256color',
       cols,
       rows,
-      cwd,
+      cwd: safeCwd,
       env: {
         ...process.env,
         TERM: 'xterm-256color',
