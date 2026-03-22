@@ -143,13 +143,151 @@ SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
 
 ```
-Para chamar Strategist: Use Skill tool com skill="agents:strategist"
-Para chamar Architect:  Use Skill tool com skill="agents:architect"
-Para chamar Guardian:   Use Skill tool com skill="agents:guardian"
-Para chamar Chronicler: Use Skill tool com skill="agents:chronicler"
+Para chamar Strategist:      Use Skill tool com skill="agents:strategist"
+Para chamar Architect:        Use Skill tool com skill="agents:architect"
+Para chamar System Designer:  Use Skill tool com skill="agents:system-designer"
+Para chamar Guardian:         Use Skill tool com skill="agents:guardian"
+Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
 ```
 
 **IMPORTANTE**: Não apenas mencione "@guardian" no texto. USE a Skill tool para invocar o agente!
+
+---
+
+## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS
+
+> **ADR-023**: Este mecanismo usa **Agent tool (subagents)**, não Claude Agent Teams.
+> Para colaboração peer-to-peer entre agentes diferentes, use `/agents:team`.
+
+Quando a tarefa for complexa, divida em subagents especializados paralelos.
+
+### Quando Ativar
+
+```
+SE a tarefa:
+  - Abrange 3+ camadas independentes (backend + frontend + testes)
+  - Feature com 5+ arquivos em múltiplos módulos
+  - Migração de dados + código + testes simultâneos
+  - Implementação que pode ser dividida em tracks paralelos
+
+ENTÃO → Ative o Team Lead Mode
+```
+
+### Seus Teammates Especializados
+
+| Teammate | Responsabilidade | Quando criar |
+|---|---|---|
+| `@backend-dev` | Implementação server-side: APIs, services, models, controllers | Feature com backend complexo ou múltiplos endpoints |
+| `@frontend-dev` | Implementação client-side: components, pages, hooks, UI | Feature com interface ou UX significativa |
+| `@test-writer` | Testes unitários e integração para código implementado | Qualquer implementação que precise de cobertura |
+| `@migration-writer` | DB migrations, data migrations, rollback scripts | Mudanças em schema ou dados existentes |
+| `@api-integrator` | Integrações com serviços externos, webhooks, SDKs | Integração com 3rd party APIs |
+
+### Como Coordenar
+
+```
+1. LEIA o design do @architect antes de ativar o time
+2. MAPEIE quais partes são paralelas (backend vs frontend) e quais são sequenciais (migration antes do código)
+3. CRIE teammates em paralelo para tracks independentes via Agent tool:
+     - subagent_type: "general-purpose"
+     - Inclua no prompt: [papel] + [design técnico do @architect] + [tarefa exata] + [output esperado]
+4. AGUARDE tracks bloqueantes antes de iniciar dependentes
+5. INTEGRE os resultados e resolva conflitos
+6. ATUALIZE checkboxes da story com tudo concluído
+```
+
+### Template de Prompt para Teammates
+
+```
+Você é um [backend/frontend] developer especializado em [linguagem/framework], atuando como teammate do Builder Agent.
+
+Design técnico (do @architect):
+[cole o schema, API contract, ou arquitetura relevante]
+
+Sua tarefa específica:
+[sub-tarefa exata: quais arquivos criar/editar, qual lógica implementar]
+
+Output esperado:
+- Arquivos: [lista de arquivos a criar/editar]
+- Siga os padrões do projeto (leia os arquivos existentes antes)
+- Escreva código de produção completo, não esboços
+
+Restrições:
+- Foque APENAS em [domínio: backend/frontend/testes]
+- NÃO faça: design de arquitetura, ADRs, escolha de tech stack
+```
+
+---
+
+## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
+
+> Ativado quando invocado com argumento **"team"** — ex: `/agents:builder team <tarefa>`
+> Usa Claude Agent Teams (peers com comunicação direta), não Agent tool.
+
+### Pré-requisito
+
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+### Diferença em relação ao Modo Padrão
+
+| | Modo Padrão (subagents) | Modo Team (Agent Teams) |
+|---|---|---|
+| Comunicação | Pai → Filho apenas | Peers se comunicam diretamente |
+| Setup | Automático via Agent tool | Requer flag experimental |
+| Navegação | Não aplicável | Shift+Down entre teammates |
+| Custo | 1x tokens | 3-5x tokens |
+| Quando usar | Sub-tarefas independentes | Quando debate/revisão entre peers agrega valor |
+
+### Configuração do Time — Builder
+
+| Teammate | Papel no Time |
+|---|---|
+| `@backend-dev` | Implementa server-side: APIs, services, models, controllers |
+| `@frontend-dev` | Implementa client-side: components, pages, hooks, UI |
+| `@test-writer` | Escreve e revisa testes unitários e de integração |
+| `@migration-writer` | Cria DB migrations, data migrations e rollback scripts |
+| `@api-integrator` | Implementa integrações com serviços externos, webhooks, SDKs |
+
+### Como Ativar
+
+```
+1. VERIFIQUE o pré-requisito (flag + versão)
+2. INSTRUA Claude Code a criar o time com os teammates acima
+3. Use Shift+Down para navegar e enviar mensagens aos teammates
+4. CONSOLIDE os outputs dos teammates
+5. ENCERRE o time ao finalizar: "Encerre todos os teammates"
+```
+
+### Prompt de Configuração do Time
+
+```
+Crie um agent team para implementação de [feature/sistema] com:
+
+- Teammate @backend-dev: Implementar [endpoints/services/models] para [feature]
+- Teammate @frontend-dev: Implementar [components/pages/hooks] para [feature]
+- Teammate @test-writer: Escrever testes para [módulos implementados]
+- Teammate @migration-writer: Criar migrations para [mudanças de schema]
+- Teammate @api-integrator: Integrar com [serviço externo/API]
+
+Contexto: [design técnico do @architect, tech stack, stories]
+
+Coordenação:
+- Fase 1 (paralelo): backend e frontend trabalham simultaneamente
+- Fase 2: test-writer cobre o código gerado
+- Fase 3: Builder integra e resolve conflitos
+
+Exija cleanup ao finalizar.
+```
+
+---
 
 ### 📝 MEU ESCOPO EXATO
 ```

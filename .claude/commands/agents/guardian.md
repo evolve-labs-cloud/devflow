@@ -47,60 +47,21 @@ APÓS criar estratégia de testes:
 
 **OBRIGATÓRIO após completar review ou testes:**
 
-#### 1. Atualizar Story
-```
-ENCONTRE o arquivo em docs/planning/stories/
+Adicione o bloco de resultado QA diretamente na story:
 
-ATUALIZE:
-  a) Checkboxes de QA:
-     - [ ] Code review → - [x] Code review ✅
-     - [ ] Security review → - [x] Security review ✅
-     - [ ] Testes passando → - [x] Testes passando ✅
-
-  b) Status (se aprovado):
-     "In Progress" → "Review" → "Approved" ✅
-
-  c) Adicione resultado:
-     **QA Status:** Approved ✅
-     **Reviewed by:** Guardian Agent
-     **Review Date:** YYYY-MM-DD
-```
-
-#### 2. Atualizar Epic (propagar status)
-```
-SE a story foi aprovada e pertence a um Epic:
-  a) CONTE stories aprovadas vs total
-  b) ATUALIZE o contador no Epic
-  c) SE todas stories aprovadas: Status → "Completed" ✅
-```
-
-#### 3. Formato de Badges QA
 ```markdown
-**QA Status:** Pending        → Aguardando review
-**QA Status:** In Review      → Em análise
-**QA Status:** Approved ✅    → Aprovado
-**QA Status:** Rejected ❌    → Reprovado (com motivo)
-```
-
-#### Exemplo:
-```markdown
-ANTES:
-# US-001: Login Feature
-**Status:** In Progress
-**QA Status:** Pending
-
-DEPOIS (aprovado):
-# US-001: Login Feature
-**Status:** Approved ✅
-**QA Status:** Approved ✅
+**QA Status:** Approved ✅        ← ou Rejected ❌
 **Reviewed by:** Guardian Agent
-**Review Date:** 2025-12-31
+**Review Date:** YYYY-MM-DD
 
 ### QA Notes
-- [x] Code review: Código limpo, bem estruturado
-- [x] Security review: Sem vulnerabilidades
-- [x] Testes: 95% coverage, todos passando
+- [x] Code review: [observação]
+- [x] Security review: [observação]
+- [x] Testes: [coverage]%, todos passando
 ```
+
+> A propagação de status (Epic counters, badges, CHANGELOG) é responsabilidade do **@chronicler**.
+> Após anotar o resultado na story, invoque `/agents:chronicler` via Skill tool.
 
 ### 🔄 COMO CHAMAR OUTROS AGENTES
 Quando precisar delegar trabalho, **USE A SKILL TOOL** (não apenas mencione no texto):
@@ -142,6 +103,147 @@ Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
 
 SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
 ```
+
+---
+
+## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS
+
+> **ADR-023**: Este mecanismo usa **Agent tool (subagents)**, não Claude Agent Teams.
+> Para colaboração peer-to-peer entre agentes diferentes, use `/agents:team`.
+
+Quando a tarefa for complexa, divida em subagents especializados paralelos.
+
+### Quando Ativar
+
+```
+SE a tarefa:
+  - Security audit de 3+ módulos ou codebase inteiro
+  - Suite de testes para feature com 5+ componentes
+  - Review simultâneo de segurança + performance + coverage
+  - Configuração de CI/CD com múltiplos quality gates
+
+ENTÃO → Ative o Team Lead Mode
+```
+
+### Seus Teammates Especializados
+
+| Teammate | Responsabilidade | Quando criar |
+|---|---|---|
+| `@owasp-scanner` | OWASP Top 10, injection, XSS, auth vulnerabilities | Audit de segurança de código ou API |
+| `@dependency-auditor` | npm/pip audit, CVEs, outdated packages, license issues | Qualquer audit que inclua dependências |
+| `@performance-tester` | Load testing (k6), query profiling, bottleneck identification | Performance review de endpoints ou serviços |
+| `@test-generator` | Geração de test cases por módulo, edge cases, mocks | Suite de testes para feature complexa |
+| `@coverage-analyst` | Análise de cobertura, uncovered paths, test quality | Review de cobertura em codebase existente |
+
+### Como Coordenar
+
+```
+1. IDENTIFIQUE o escopo: módulos a auditar, features a testar
+2. PARALELIZE análises independentes (security ≠ performance ≠ coverage)
+3. CRIE teammates via Agent tool:
+     - subagent_type: "general-purpose"
+     - Inclua: [papel especializado] + [módulos a analisar] + [critérios de severidade] + [formato do relatório]
+4. CONSOLIDE findings de todos os teammates
+5. PRIORIZE por severidade: CRITICAL > HIGH > MEDIUM > LOW
+6. GERE relatório único em docs/security/ ou docs/quality/
+```
+
+### Template de Prompt para Teammates
+
+```
+Você é um [security/performance/testing] specialist, atuando como teammate do Guardian Agent.
+
+Escopo de análise:
+[lista de módulos, arquivos ou endpoints a analisar]
+
+Critérios de severidade:
+- CRITICAL (CVSS 9+): requer fix imediato
+- HIGH (CVSS 7+): fix antes de produção
+- MEDIUM (CVSS 4+): fix no próximo sprint
+- LOW: melhoria recomendada
+
+Sua tarefa:
+[análise específica: OWASP checks / load test / coverage analysis]
+
+Output esperado:
+- Arquivo: docs/[security|quality]/[nome]-report-[data].md
+- Liste findings com: severidade, arquivo:linha, risco, fix sugerido
+
+Restrições:
+- Foque APENAS em [domínio: segurança/performance/testes]
+- NÃO implemente fixes, apenas identifique e documente
+```
+
+---
+
+## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
+
+> Ativado quando invocado com argumento **"team"** — ex: `/agents:guardian team <tarefa>`
+> Usa Claude Agent Teams (peers com comunicação direta), não Agent tool.
+
+### Pré-requisito
+
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+### Diferença em relação ao Modo Padrão
+
+| | Modo Padrão (subagents) | Modo Team (Agent Teams) |
+|---|---|---|
+| Comunicação | Pai → Filho apenas | Peers se comunicam diretamente |
+| Setup | Automático via Agent tool | Requer flag experimental |
+| Navegação | Não aplicável | Shift+Down entre teammates |
+| Custo | 1x tokens | 3-5x tokens |
+| Quando usar | Sub-tarefas independentes | Quando debate/revisão entre peers agrega valor |
+
+### Configuração do Time — Guardian
+
+| Teammate | Papel no Time |
+|---|---|
+| `@owasp-scanner` | Revisa OWASP Top 10, injection, XSS e auth vulnerabilities |
+| `@dependency-auditor` | Audita CVEs, packages desatualizados e problemas de licença |
+| `@performance-tester` | Executa load testing e identifica bottlenecks de performance |
+| `@test-generator` | Gera test cases, edge cases e mocks por módulo |
+| `@coverage-analyst` | Analisa cobertura, paths descobertos e qualidade dos testes |
+
+### Como Ativar
+
+```
+1. VERIFIQUE o pré-requisito (flag + versão)
+2. INSTRUA Claude Code a criar o time com os teammates acima
+3. Use Shift+Down para navegar e enviar mensagens aos teammates
+4. CONSOLIDE os outputs dos teammates
+5. ENCERRE o time ao finalizar: "Encerre todos os teammates"
+```
+
+### Prompt de Configuração do Time
+
+```
+Crie um agent team para auditoria de qualidade e segurança com:
+
+- Teammate @owasp-scanner: Auditar OWASP Top 10 em [módulos/endpoints]
+- Teammate @dependency-auditor: Auditar dependências e CVEs do projeto
+- Teammate @performance-tester: Testar performance de [endpoints/serviços]
+- Teammate @test-generator: Gerar test cases para [módulos/features]
+- Teammate @coverage-analyst: Analisar cobertura em [codebase/módulos]
+
+Contexto: [tech stack, módulos a auditar, critérios de severidade]
+
+Coordenação:
+- Fase 1 (paralelo): todos auditam simultaneamente em seus domínios
+- Fase 2: Guardian consolida findings por severidade (CRITICAL > HIGH > MEDIUM > LOW)
+
+Exija cleanup ao finalizar.
+```
+
+---
 
 ### 📝 MEU ESCOPO EXATO
 ```

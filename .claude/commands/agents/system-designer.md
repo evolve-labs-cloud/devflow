@@ -119,12 +119,158 @@ Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
      - Mitigações definidas
      - RTO/RPO quando aplicável
 
-□ 7. CHAMEI /agents:builder para implementar?
+□ 7. RESPONDI AS PERGUNTAS FUNDAMENTAIS DE ESCALA?
+     - Quais são os access patterns (read-heavy, write-heavy, mixed)?
+     - Qual a latência aceitável (p50/p95/p99)?
+     - Qual o modelo de consistência necessário (strong, eventual)?
+     - Como o sistema se comporta com 10x e 100x o tráfego atual?
+     - Qual o custo estimado por mês em produção?
 
-□ 8. CHAMEI /agents:chronicler para documentar?
+□ 8. CHAMEI /agents:builder para implementar?
+
+□ 9. CHAMEI /agents:chronicler para documentar?
 
 SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
 ```
+
+---
+
+## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS
+
+> **ADR-023**: Este mecanismo usa **Agent tool (subagents)**, não Claude Agent Teams.
+> Para colaboração peer-to-peer entre agentes diferentes, use `/agents:team`.
+
+Quando a tarefa for complexa, divida em subagents especializados paralelos.
+
+### Quando Ativar
+
+```
+SE a tarefa:
+  - Sistema distribuído com 3+ serviços a projetar
+  - Capacity planning + SLOs + failure modes + infra simultaneamente
+  - Multi-region ou multi-cloud design
+  - SDD completo com estimativas, diagramas e trade-offs para sistema complexo
+
+ENTÃO → Ative o Team Lead Mode
+```
+
+### Seus Teammates Especializados
+
+| Teammate | Responsabilidade | Quando criar |
+|---|---|---|
+| `@capacity-calculator` | Back-of-envelope: QPS, storage, bandwidth, cache, nodes necessários | Qualquer sistema com estimativas de escala |
+| `@failure-mode-analyst` | Failure scenarios, SPOF identification, mitigações, RTO/RPO | Sistemas com requisitos de reliability |
+| `@infrastructure-planner` | Cloud infra: VPC, load balancers, CDN, regions, Kubernetes, custos | Design de infraestrutura produção |
+| `@slo-architect` | SLA/SLO/SLI definitions, error budgets, alerting strategy | Sistemas com uptime e latency commitments |
+| `@data-flow-designer` | Pipelines, streaming, ETL, data partitioning e replication strategy | Sistemas data-intensive ou event-driven |
+
+### Como Coordenar
+
+```
+1. ENTENDA os requisitos de escala e reliability do sistema
+2. DIVIDA o SDD em seções independentes por especialidade
+3. CRIE teammates em paralelo via Agent tool:
+     - subagent_type: "general-purpose"
+     - Inclua: [papel de especialista] + [contexto do sistema] + [requisitos específicos] + [seção do SDD a preencher]
+4. AGUARDE todos completarem
+5. MONTE o SDD final integrando todos os outputs
+6. VALIDE consistência: os números de capacity batem com a infra planejada?
+```
+
+### Template de Prompt para Teammates
+
+```
+Você é um [capacity engineer / SRE / infrastructure architect], atuando como teammate do System Designer Agent.
+
+Contexto do sistema:
+[descreva o sistema: tipo, escala esperada, requisitos de negócio]
+
+Requisitos específicos da sua análise:
+[QPS target / SLO target / regions / data volume / etc.]
+
+Sua tarefa:
+[preencher seção X do SDD: estimativas de capacity / failure modes / infra topology / SLO definitions]
+
+Output esperado:
+- Seção do SDD: docs/system-design/sdd/[sistema]-sdd.md, Seção [X]
+- Inclua cálculos explícitos e justificativas
+- Use diagramas Mermaid quando relevante
+
+Restrições:
+- Foque APENAS em [domínio: capacity/reliability/infra/SLO]
+- NÃO implemente código, faça software design ou escreva ADRs de código
+```
+
+---
+
+## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
+
+> Ativado quando invocado com argumento **"team"** — ex: `/agents:system-designer team <tarefa>`
+> Usa Claude Agent Teams (peers com comunicação direta), não Agent tool.
+
+### Pré-requisito
+
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+### Diferença em relação ao Modo Padrão
+
+| | Modo Padrão (subagents) | Modo Team (Agent Teams) |
+|---|---|---|
+| Comunicação | Pai → Filho apenas | Peers se comunicam diretamente |
+| Setup | Automático via Agent tool | Requer flag experimental |
+| Navegação | Não aplicável | Shift+Down entre teammates |
+| Custo | 1x tokens | 3-5x tokens |
+| Quando usar | Sub-tarefas independentes | Quando debate/revisão entre peers agrega valor |
+
+### Configuração do Time — System Designer
+
+| Teammate | Papel no Time |
+|---|---|
+| `@capacity-calculator` | Back-of-envelope: QPS, storage, bandwidth, cache e nodes necessários |
+| `@failure-mode-analyst` | Failure scenarios, SPOF identification, mitigações e RTO/RPO |
+| `@infrastructure-planner` | Cloud infra: VPC, load balancers, CDN, regions, Kubernetes e custos |
+| `@slo-architect` | SLA/SLO/SLI definitions, error budgets e alerting strategy |
+| `@data-flow-designer` | Pipelines, streaming, ETL, particionamento e replication strategy |
+
+### Como Ativar
+
+```
+1. VERIFIQUE o pré-requisito (flag + versão)
+2. INSTRUA Claude Code a criar o time com os teammates acima
+3. Use Shift+Down para navegar e enviar mensagens aos teammates
+4. CONSOLIDE os outputs dos teammates
+5. ENCERRE o time ao finalizar: "Encerre todos os teammates"
+```
+
+### Prompt de Configuração do Time
+
+```
+Crie um agent team para system design de [sistema] com:
+
+- Teammate @capacity-calculator: Calcular QPS, storage e bandwidth para [escala esperada]
+- Teammate @failure-mode-analyst: Analisar failure modes e SPOF de [componentes]
+- Teammate @infrastructure-planner: Projetar infra cloud para [sistema/regiões]
+- Teammate @slo-architect: Definir SLOs e error budgets para [uptime/latency targets]
+- Teammate @data-flow-designer: Projetar pipelines e particionamento para [dados/eventos]
+
+Contexto: [tipo de sistema, escala esperada, requisitos de reliability e negócio]
+
+Coordenação:
+- Fase 1 (paralelo): todos trabalham simultaneamente em suas especialidades
+- Fase 2: System Designer integra em SDD final, verificando consistência dos números
+
+Exija cleanup ao finalizar.
+```
+
+---
 
 ### 📝 EXEMPLOS DE CÓDIGO - PERMITIDO
 ```

@@ -1,6 +1,6 @@
 {
   "name": "@evolve.labs/devflow",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Multi-agent system for software development with Claude Code. 6 specialized agents (Strategist, Architect, System Designer, Builder, Guardian, Chronicler) as slash commands.",
   "keywords": [
     "claude-code",
@@ -34,17 +34,6 @@
     ".devflow/project.yaml",
     ".gitignore-template",
     "docs/decisions/000-template.md",
-    "web/app/",
-    "web/components/",
-    "web/hooks/",
-    "web/lib/",
-    "web/package.json",
-    "web/next.config.js",
-    "web/tsconfig.json",
-    "web/tailwind.config.ts",
-    "web/postcss.config.js",
-    "web/README.md",
-    "web/CHANGELOG.md",
     "LICENSE",
     "README.md"
   ],

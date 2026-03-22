@@ -5,6 +5,62 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-22
+
+### Removed
+
+- **Web IDE removida** — `devflow web` command removido; Web IDE (Next.js, xterm.js, node-pty) não faz mais parte do pacote npm
+- `--web` flag removida do `devflow init`
+- `lib/web.js` descontinuado; arquivos `web/` não são mais publicados no npm
+- Dependências implícitas de Next.js, Monaco Editor, Zustand eliminadas do bundle
+
+### Added
+
+- **Persistent Memory** — cada execução do autopilot registrada em `.devflow/memory.json`: sessões, decisões técnicas, artifacts por agente
+- **Adaptive Autopilot** (`--adaptive`) — LLM classifica complexidade (TRIVIAL/SIMPLE/MODERATE/COMPLEX) e decide quais fases rodar; mostra plano e pede confirmação
+- **Context Isolation** — por padrão cada agente recebe apenas o output do agente anterior (N-1), reduzindo ~87% dos tokens; `--full-context` restaura comportamento anterior
+- **Challenger** (`--challenger`) — review adversarial com OpenAI após o guardian; auto-save em `docs/security/`; gaps críticos registrados no memory
+- **`devflow challenge`** — challenger standalone sem precisar do autopilot completo
+- `lib/challengers/openai.js`, `lib/autopilot/planner.js`, `lib/context/isolation.js`, `lib/memory/` adicionados
+- `quick/codex-review.md` — novo quick command para code review com OpenAI
+
+### Changed
+
+- `lib/autopilot.js` — atualizado com suporte a memory, adaptive planning, context isolation e challenger
+- `lib/constants.js` — `VERSION` agora lido dinamicamente de `package.json` (sem hardcode)
+- README reescrito — foco em CLI + agentes, sem seção Web IDE; documentadas todas as features
+
+---
+
+## [1.1.1] - 2026-03-22
+
+### Added
+
+- **Dual Scaling Modes por Agente** — cada um dos 6 agentes agora suporta dois modos de scaling:
+  - **Modo Padrão** (sem argumento): Parallel Subagents via Agent tool — isolado, automático, 1x tokens
+  - **Modo Team** (argumento `team`): Claude Agent Teams — peers com comunicação direta, 3-5x tokens
+  - Trigger: `/agents:<nome> team <tarefa>` ativa o Modo Team
+  - Backward compatible: sem `team`, comportamento anterior inalterado
+  - Pré-requisito Modo Team: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` em `.claude/settings.json` + Claude Code v2.1.32+
+
+- **Teammates por agente:**
+  - `@strategist team`: @user-story-writer, @competitive-analyst, @acceptance-criteria-expert, @roadmap-planner
+  - `@architect team`: @schema-specialist, @api-contract-designer, @adr-researcher, @diagram-builder
+  - `@system-designer team`: @capacity-calculator, @failure-mode-analyst, @infrastructure-planner, @slo-architect, @data-flow-designer
+  - `@builder team`: @backend-dev, @frontend-dev, @test-writer, @migration-writer, @api-integrator
+  - `@guardian team`: @owasp-scanner, @dependency-auditor, @performance-tester, @test-generator, @coverage-analyst
+  - `@chronicler team`: @changelog-writer, @docs-synchronizer, @snapshot-creator, @adr-linker, @status-auditor
+
+- **`/agents:team`** — novo comando de orquestração cross-domain: coordena todos os 6 agentes em paralelo via Claude Agent Teams com templates para feature development, code review, debug e system design colaborativo
+
+- **ADR-023** — "Agent Scaling Mechanism: Parallel Subagents vs Claude Agent Teams" — decisão arquitetural documentando os dois mecanismos e quando usar cada um
+
+### Changed
+
+- Todos os 6 arquivos de agentes atualizados com seção `## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS` + `## 🤝 MODO TEAM — CLAUDE AGENT TEAMS`
+
+---
+
 ## [1.0.0] - 2026-02-11
 
 ### Security Hardening

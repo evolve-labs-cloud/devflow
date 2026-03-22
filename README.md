@@ -1,43 +1,10 @@
-# DevFlow v1.0.0 - Sistema Multi-Agentes + Web IDE
+# DevFlow v1.2.0 - Sistema Multi-Agentes para Desenvolvimento de Software
 
-Sistema de multi-agentes especializados para desenvolvimento de software, com **6 agentes**, **Web IDE** integrada e **Autopilot** para execução automatizada.
+Sistema de **7 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-## Screenshots
-
-![DevFlow Hero](docs/images/hero.png)
-
-![Dashboard](docs/images/dashboard.png)
-
-![Editor](docs/images/editor.png)
-
-![Terminal](docs/images/terminal.png)
-
-![Specs Panel](docs/images/specs.png)
-
----
-
-## Novidades v0.9.x
-
-### Autopilot
-- **Terminal-based**: Agents rodam no terminal com output streaming em tempo real
-- **CLI headless**: `devflow autopilot <spec-file>` para rodar sem Web IDE
-- **Auto-task tracking**: Tasks na spec sao marcadas automaticamente como concluidas
-- **Abort**: Cancele a qualquer momento
-
-### Web IDE
-- Removido File Explorer (navegacao por projeto)
-- Multi-project support com ProjectSelector
-- Agent completion tracking com badges visuais
-- Layout simplificado sem sidebar
-
-### System Designer Agent (6th agent)
-- System Design Documents (SDDs) com back-of-the-envelope calculations
-- RFCs, capacity planning, trade-off analysis
-- SLA/SLO/SLI definitions e reliability patterns
 
 ---
 
@@ -62,8 +29,6 @@ npx @evolve.labs/devflow init
 devflow init                    # Agentes + estrutura de docs (padrao)
 devflow init --agents-only      # Apenas agentes (minimo)
 devflow init --full             # Tudo incluindo .gitignore
-devflow init --web              # Inclui Web IDE (opcional)
-devflow init --full --web       # Tudo + Web IDE
 ```
 
 ### Comandos
@@ -71,40 +36,8 @@ devflow init --full --web       # Tudo + Web IDE
 ```bash
 devflow init [path]             # Inicializar DevFlow num projeto
 devflow update [path]           # Atualizar instalacao existente
-devflow web                     # Iniciar Web IDE (http://localhost:3000)
 devflow autopilot <spec-file>   # Rodar autopilot nos agentes
-```
-
-### Autopilot
-
-```bash
-# Rodar todas as fases
-devflow autopilot docs/specs/minha-spec.md
-
-# Escolher fases especificas
-devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builder"
-
-# Apontar para outro projeto
-devflow autopilot docs/specs/minha-spec.md --project /path/to/project
-
-# Sem auto-update de tasks
-devflow autopilot docs/specs/minha-spec.md --no-update
-```
-
-### Web IDE
-
-```bash
-# Iniciar (abre browser automaticamente)
-devflow web
-
-# Porta customizada
-devflow web --port 8080
-
-# Apontar para projeto especifico
-devflow web --project /path/to/project
-
-# Modo desenvolvimento
-devflow web --dev
+devflow challenge [review-file] # Review adversarial com OpenAI (standalone)
 ```
 
 ### Requisitos
@@ -113,147 +46,160 @@ devflow web --dev
 - **Node.js 18+**
 - **Git** (recomendado)
 
-### Dependencias por Sistema
-
-#### macOS
-```bash
-xcode-select --install
-brew install node
-npm install -g @anthropic-ai/claude-code
-```
-
-#### Debian/Ubuntu
-```bash
-sudo apt-get update
-sudo apt-get install -y build-essential python3 git
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-npm install -g @anthropic-ai/claude-code
-```
-
-#### Fedora
-```bash
-sudo dnf groupinstall -y "Development Tools"
-sudo dnf install -y python3 git nodejs npm
-npm install -g @anthropic-ai/claude-code
-```
-
-#### Windows (WSL)
-```powershell
-wsl --install
-```
-Depois siga as instrucoes de Debian/Ubuntu no terminal WSL.
-
 ---
 
-## Os 6 Agentes
+## Os 7 Agentes
 
-| # | Agente | Funcao | Uso |
-|---|--------|--------|-----|
-| 1 | **/agents:strategist** | Planejamento & Produto | Requisitos, PRDs, user stories |
-| 2 | **/agents:architect** | Design & Arquitetura | Decisoes tecnicas, ADRs, APIs |
-| 3 | **/agents:system-designer** | System Design & Escala | SDDs, RFCs, capacity planning, SLOs |
-| 4 | **/agents:builder** | Implementacao | Codigo, reviews, refactoring |
-| 5 | **/agents:guardian** | Qualidade & Seguranca | Testes, security, performance |
-| 6 | **/agents:chronicler** | Documentacao & Memoria | CHANGELOG, snapshots, stories |
+| #   | Agente                      | Funcao                        | Uso                                         |
+| --- | --------------------------- | ----------------------------- | ------------------------------------------- |
+| 1   | **/agents:strategist**      | Planejamento & Produto        | Requisitos, PRDs, user stories              |
+| 2   | **/agents:architect**       | Design & Arquitetura          | Decisoes tecnicas, ADRs, APIs               |
+| 3   | **/agents:system-designer** | System Design & Escala        | SDDs, RFCs, capacity planning, SLOs         |
+| 4   | **/agents:builder**         | Implementacao                 | Codigo, reviews, refactoring                |
+| 5   | **/agents:guardian**        | Qualidade & Seguranca         | Testes, security, performance               |
+| 6   | **/agents:challenger**      | Review Adversarial (OpenAI)   | Desafia o Guardian, encontra blind spots    |
+| 7   | **/agents:chronicler**      | Documentacao & Memoria        | CHANGELOG, snapshots, stories               |
+
+Cada agente tem **hard stops** — limites rigidos que impedem de fazer trabalho de outros agentes.
+
+> **Challenger requer** `OPENAI_API_KEY` — usa OpenAI o3 como perspectiva independente do Guardian.
 
 ### Fluxo de Trabalho
 
 ```
-strategist → architect → system-designer → builder → guardian → chronicler
-```
-
-Cada agente tem **hard stops** — limites rigidos que impedem de fazer trabalho de outros agentes.
-
-### Autopilot
-
-O autopilot executa os agentes em sequencia automaticamente. Cada fase recebe o output da anterior como contexto:
-
-```
-1. Strategist analisa a spec e refina requisitos
-2. Architect define a arquitetura baseado na analise
-3. System Designer projeta o sistema em escala
-4. Builder implementa conforme design
-5. Guardian revisa seguranca e qualidade
-6. Chronicler documenta tudo
+strategist → architect → system-designer → builder → guardian → challenger → chronicler
 ```
 
 ---
 
-## Web IDE Features
+## Dois Modos de Scaling por Agente
 
-### Dashboard
-- Metricas do projeto (specs, decisoes, tasks)
-- Health check (Claude CLI, .devflow, git)
-- Status em tempo real
+### Modo Padrao — Parallel Subagents
 
-### Specs Panel
-- **Requirements** - User stories com acceptance criteria
-- **Design** - Architecture Decision Records (ADRs)
-- **Tasks** - Tarefas de implementacao
+Ativado automaticamente (sem argumento extra). Usa o `Agent tool` do Claude para criar workers isolados em paralelo.
 
-### Terminal + Autopilot
-- Terminal integrado via xterm.js + node-pty
-- Autopilot roda direto no terminal com streaming
-- Tab dedicada "Autopilot" criada automaticamente
-- Botao Abort para cancelar execucao
+```bash
+/agents:builder implemente autenticacao JWT
+```
 
-### Editor
-- Monaco Editor (VS Code engine)
-- Syntax highlighting para 50+ linguagens
-- Preview de Markdown com Mermaid diagrams
-- Multiplas tabs com indicador de dirty state
+### Modo Team — Claude Agent Teams
 
-### Multi-Project
-- ProjectSelector para alternar entre projetos
-- Cada projeto com seus proprios specs e agents
+Ativado com o argumento `team`. Usa Claude Agent Teams (peers que se comunicam diretamente entre si).
+
+```bash
+/agents:builder team implemente autenticacao JWT
+```
+
+> **Pre-requisito:** Claude Code v2.1.32+ com `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` em `.claude/settings.json`
+
+|             | Modo Padrao               | Modo Team                  |
+| ----------- | ------------------------- | -------------------------- |
+| Trigger     | sem argumento             | argumento `team`           |
+| Comunicacao | Pai → Filho               | Peers direto               |
+| Setup       | Automatico                | Flag experimental          |
+| Custo       | 1x tokens                 | 3-5x tokens                |
+| Quando usar | Sub-tarefas independentes | Debate/revisao entre peers |
+
+Use `/agents:team` para orquestracao cross-domain com todos os 6 agentes em paralelo.
 
 ---
 
-## Estrutura do Projeto
+## Autopilot
+
+O autopilot executa os agentes em sequencia automaticamente com **Persistent Memory**, **Adaptive Planning** e **Context Isolation**.
+
+```bash
+# Rodar todas as fases
+devflow autopilot docs/specs/minha-spec.md
+
+# Adaptive: LLM decide quais fases rodar (TRIVIAL/SIMPLE/MODERATE/COMPLEX)
+devflow autopilot docs/specs/minha-spec.md --adaptive
+
+# Com Challenger (review adversarial OpenAI apos guardian)
+devflow autopilot docs/specs/minha-spec.md --challenger
+
+# Fases especificas
+devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builder"
+
+# Desativar context isolation (usa todo o historico)
+devflow autopilot docs/specs/minha-spec.md --full-context
+```
+
+### Flags do autopilot
+
+```bash
+--phases <list>             # Fases especificas (default: todos os 6 agentes)
+--adaptive                  # LLM escolhe fases por complexidade
+--full-context              # Desativa context isolation (N-1 output por padrao)
+--challenger                # Review OpenAI apos guardian (requer OPENAI_API_KEY)
+--challenger-model <model>  # gpt-5.4 (default), o3-mini, o3
+--no-update                 # Nao marcar tasks como concluidas automaticamente
+--verbose                   # Tokens por fase + memory stats
+--project <path>            # Projeto alvo (default: cwd)
+```
+
+### Challenge Standalone
+
+```bash
+# Review adversarial do guardian output (requer OPENAI_API_KEY)
+devflow challenge
+
+# Passando arquivo especifico
+devflow challenge docs/security/guardian-review.md
+
+# Com spec para contexto
+devflow challenge docs/security/guardian-review.md --spec docs/specs/feature.md
+
+# Modelo (gpt-5.4 padrao, o3 para casos criticos)
+devflow challenge --model o3
+```
+
+| Modelo | Custo/review | Quando usar |
+|--------|-------------|-------------|
+| `gpt-5.4` | ~$0.01 | Padrao — rapido, code-focused |
+| `o3-mini` | ~$0.03 | Reasoning alternativo |
+| `o3` | ~$0.28 | Seguranca critica, compliance, pagamentos |
+
+---
+
+## Estrutura gerada no projeto
 
 ```
 seu-projeto/
-├── .claude/            # Comandos e agentes
+├── .claude/
 │   └── commands/
-│       ├── agents/     # Definicoes dos 6 agentes
+│       ├── agents/     # Definicoes dos 6 agentes + team
 │       └── quick/      # Quick start commands
 │
-├── .devflow/           # Configuracao do projeto
+├── .devflow/
 │   ├── agents/         # Metadata dos agentes
-│   └── project.yaml    # Estado do projeto
+│   └── project.yaml    # Estado + versao do projeto
 │
-├── docs/               # Documentacao
-│   ├── decisions/      # ADRs
-│   ├── planning/       # Stories e specs
-│   ├── snapshots/      # Historico do projeto
-│   └── system-design/  # SDDs, RFCs, capacity plans
-│       ├── sdd/
-│       ├── rfc/
-│       ├── capacity/
-│       └── trade-offs/
-│
-└── web/                # Web IDE (opcional, com --web)
-    ├── app/            # Next.js pages + API routes
-    ├── components/     # React components
-    └── lib/            # Stores, utils, types
+└── docs/
+    ├── decisions/      # ADRs
+    ├── planning/       # Stories e specs
+    ├── snapshots/      # Historico do projeto
+    └── system-design/  # SDDs, RFCs, capacity plans
+        ├── sdd/
+        ├── rfc/
+        ├── capacity/
+        └── trade-offs/
 ```
 
 ---
 
 ## Versoes
 
-| Versao | Features |
-|--------|----------|
-| v0.1.0 | Multi-agent system, Documentation automation |
-| v0.2.0 | Structured metadata, Knowledge graph |
-| v0.3.0 | Hard stops, Mandatory delegation |
-| v0.4.0 | Web IDE completa |
-| v0.5.0 | Terminal como interface principal, WSL support |
-| v0.6.0 | Permission mode configuration |
-| v0.7.0 | System Designer agent (6th), npm package |
-| v0.8.0 | Autopilot terminal-based, CLI commands, Multi-project, Web IDE refactoring |
-| **v1.0.0** | **Security hardening, npm global install fix, node-pty reliability** |
+| Versao        | Features                                                    |
+| ------------- | ----------------------------------------------------------- |
+| v0.1.0        | Multi-agent system, Documentation automation                |
+| v0.2.0        | Structured metadata, Knowledge graph                        |
+| v0.3.0        | Hard stops, Mandatory delegation                            |
+| v0.4.0–v0.7.0 | Web IDE, System Designer agent, npm package                 |
+| v0.8.0        | Autopilot terminal-based, CLI commands                      |
+| v1.0.0        | Security hardening, npm global install fix                  |
+| v1.1.1        | Dual Scaling Modes: Parallel Subagents + Claude Agent Teams |
+| **v1.2.0**    | **Remocao da Web IDE — foco em CLI + agentes**              |
 
 ---
 
@@ -266,23 +212,10 @@ seu-projeto/
 
 ---
 
-## Tech Stack (Web IDE)
-
-- **Next.js 16** - Framework React
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Monaco Editor** - Code editing
-- **xterm.js** - Terminal emulator
-- **node-pty** - PTY para terminal real
-- **Zustand** - State management
-- **Lucide Icons** - Iconografia
-
----
-
 ## Licenca
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v1.0.0** - Desenvolvido por [Evolve Labs](https://evolvelabs.cloud)
+**DevFlow v1.2.0** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)

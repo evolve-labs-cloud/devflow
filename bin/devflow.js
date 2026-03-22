@@ -4,8 +4,8 @@ const { Command } = require('commander');
 const { VERSION } = require('../lib/constants');
 const { initCommand } = require('../lib/init');
 const { updateCommand } = require('../lib/update');
-const { webCommand } = require('../lib/web');
 const { autopilotCommand } = require('../lib/autopilot');
+const { challengeCommand } = require('../lib/challenge');
 
 const program = new Command();
 
@@ -20,7 +20,6 @@ program
   .argument('[path]', 'target project directory', '.')
   .option('--agents-only', 'install only agents (minimal setup)')
   .option('--full', 'full installation including .gitignore')
-  .option('--web', 'include Web IDE source files')
   .option('-f, --force', 'overwrite existing installation without asking')
   .option('--skip-deps', 'skip dependency checking')
   .action(initCommand);
@@ -33,22 +32,29 @@ program
   .action(updateCommand);
 
 program
-  .command('web')
-  .description('Start the DevFlow Web Dashboard')
-  .option('-p, --port <port>', 'port number', '3000')
-  .option('--project <path>', 'initial project path (defaults to current directory)')
-  .option('--dev', 'run in development mode')
-  .option('--no-open', 'do not open browser automatically')
-  .action(webCommand);
-
-program
   .command('autopilot')
   .description('Run autopilot agents on a spec file')
   .argument('<spec-file>', 'path to the spec markdown file')
   .option('--phases <list>', 'comma-separated agent IDs to run', 'strategist,architect,system-designer,builder,guardian,chronicler')
   .option('--project <path>', 'project directory (default: current directory)')
   .option('--no-update', 'do not auto-update tasks in spec file')
+  .option('--adaptive', 'use LLM to decide which phases to run (skips unnecessary phases)')
+  .option('--full-context', 'pass all previous outputs to each agent (disables context isolation)')
+  .option('--challenger', 'run OpenAI adversarial review after guardian (requires OPENAI_API_KEY)')
+  .option('--challenger-model <model>', 'model for challenger: gpt-5.4 (default), o3-mini, o3', 'gpt-5.4')
   .option('--verbose', 'show detailed output')
   .action(autopilotCommand);
+
+program
+  .command('challenge')
+  .description('Run OpenAI adversarial review (standalone, without autopilot)')
+  .argument('[review-file]', 'Guardian review file to challenge (.md)')
+  .option('--project <path>', 'project directory (default: current directory)')
+  .option('--spec <file>', 'spec file for additional context')
+  .option('--input <file>', 'input file to review, e.g. builder-output.md')
+  .option('--output <file>', 'write challenger review to this file (.md)')
+  .option('--model <model>', 'model to use: gpt-5.4 (default), o3-mini, o3', 'gpt-5.4')
+  .option('--timeout <seconds>', 'timeout in seconds', '300')
+  .action(challengeCommand);
 
 program.parse();

@@ -1,6 +1,6 @@
 # DevFlow - Guia Completo dos Agentes
 
-Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimento.
+Você está usando **DevFlow v1.1.1** - Sistema multi-agentes para desenvolvimento.
 
 ## 🤖 Os 6 Agentes
 
@@ -51,6 +51,58 @@ Você está usando **DevFlow v0.3.0** - Sistema multi-agentes para desenvolvimen
 
 ---
 
+## 🚀 Dois Modos de Scaling por Agente
+
+Cada agente pode operar em dois modos:
+
+### Modo Padrão — Parallel Subagents
+Ativado automaticamente. O agente spawna workers isolados para sub-tarefas independentes.
+```
+/agents:strategist Criar PRD para sistema de pagamentos
+```
+
+### Modo Team — Claude Agent Teams *(experimental)*
+Ativado com o argumento **`team`**. O agente coordena peers que se comunicam diretamente.
+```
+/agents:strategist team Criar PRD para sistema de pagamentos
+/agents:architect team Design de microservices para e-commerce
+/agents:builder team Implementar autenticação JWT completa
+/agents:guardian team Audit completo de segurança e qualidade
+/agents:chronicler team Documentar release v2.0
+/agents:system-designer team Design de sistema para 50M usuários
+```
+
+**Pré-requisito para Modo Team:**
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+**Quando usar cada modo:**
+
+| | Modo Padrão | Modo Team |
+|---|---|---|
+| **Comunicação** | Pai → Filho | Peers direto |
+| **Custo** | 1x tokens | 3-5x tokens |
+| **Uso ideal** | Sub-tarefas independentes | Debate/revisão entre especialistas |
+| **Setup** | Automático | Requer flag experimental |
+
+**Teammates de cada agente no Modo Team:**
+- `@strategist team`: @user-story-writer, @competitive-analyst, @acceptance-criteria-expert, @roadmap-planner
+- `@architect team`: @schema-specialist, @api-contract-designer, @adr-researcher, @diagram-builder
+- `@builder team`: @backend-dev, @frontend-dev, @test-writer, @migration-writer, @api-integrator
+- `@guardian team`: @owasp-scanner, @dependency-auditor, @performance-tester, @test-generator, @coverage-analyst
+- `@chronicler team`: @changelog-writer, @docs-synchronizer, @snapshot-creator, @adr-linker, @status-auditor
+- `@system-designer team`: @capacity-calculator, @failure-mode-analyst, @infrastructure-planner, @slo-architect, @data-flow-designer
+
+> Referência completa: ADR-023 em `docs/decisions/ADR-023-agent-scaling-mechanism.md`
+
+---
+
 ## ⚡ Slash Commands Rápidos
 
 - `/devflow-status` - Ver estado atual do projeto
@@ -85,9 +137,13 @@ docs/
 - **Hard Stops**: Cada agente tem limites rígidos - não pode fazer trabalho de outro
 - **Delegação Obrigatória**: Sempre seguir o fluxo correto
 - **Memória Automática**: @chronicler mantém tudo documentado
-- **Zero Config**: Funciona sem configuração adicional
+- **Dual Scaling**: Use Modo Team (`team`) para tarefas que exigem debate real entre especialistas
+- **Zero Config**: Modo Padrão funciona sem configuração adicional
 
 ---
 
 **Pronto para começar?**
 `@strategist Olá! Quero criar [sua feature]`
+
+**Com Modo Team:**
+`/agents:strategist team Criar PRD completo para [sua feature]`

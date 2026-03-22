@@ -67,57 +67,158 @@ Após QUALQUER agente completar uma tarefa, eu DEVO:
 
 **OBRIGATÓRIO - Verificar e atualizar status em TODOS os níveis:**
 
-#### 1. Verificar Hierarquia de Status
-```
-PRD/Epic → Stories → Tasks
+Regras de propagação:
+- Todas as tasks de uma Story marcadas `[x]` → `Story.Status = "Completed" ✅`
+- Todas as Stories de um Epic "Completed" → `Epic.Status = "Completed" ✅`
+- ADR implementado → `ADR.Status = "Accepted" ✅`, `Implementation = "Done" ✅`
 
-PARA CADA Epic/PRD:
-  a) CONTE stories concluídas vs total
-  b) CALCULE percentual: (concluídas / total) * 100
-  c) ATUALIZE campos:
-     **Progress:** X/Y stories (XX%)
-     **Tasks:** XX/YY tasks
-```
-
-#### 2. Propagação de Status
-```
-SE todas as tasks de uma Story estão [x]:
-  → Story.Status = "Completed" ✅
-
-SE todas as Stories de um Epic estão "Completed":
-  → Epic.Status = "Completed" ✅
-
-SE um ADR foi implementado:
-  → ADR.Status = "Accepted" ✅
-  → ADR.Implementation = "Done" ✅
-```
-
-#### 3. Formato de Contadores
+Formato de contador em Epics:
 ```markdown
-# Epic 01: Nome do Epic
-**Status:** In Progress
 **Progress:** 2/5 stories (40%)
 **Tasks:** 15/45 tasks (33%)
-
-Stories:
-- [x] US-001: Story 1 ✅ (Completed)
-- [x] US-002: Story 2 ✅ (Completed)
-- [ ] US-003: Story 3 (In Progress - 60%)
-- [ ] US-004: Story 4 (Draft)
-- [ ] US-005: Story 5 (Draft)
 ```
 
-#### 4. Comando /status-check
+Comando `/status-check`: Listar todos os arquivos em `docs/planning/`, contar `[x]` vs `[ ]`, corrigir inconsistências e reportar mudanças.
+
+> Referência completa: `docs/standards/status-consolidation-guide.md`
+
+---
+
+## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS
+
+> **ADR-023**: Este mecanismo usa **Agent tool (subagents)**, não Claude Agent Teams.
+> Para colaboração peer-to-peer entre agentes diferentes, use `/agents:team`.
+
+Quando a tarefa for complexa, divida em subagents especializados paralelos.
+
+### Quando Ativar
+
 ```
-QUANDO executar /status-check:
-  1. Listar TODOS os arquivos em docs/planning/
-  2. Para cada arquivo, verificar:
-     - Checkboxes: contar [x] vs [ ]
-     - Status: verificar se condiz com checkboxes
-     - Badges: verificar se estão atualizados
-  3. CORRIGIR inconsistências encontradas
-  4. REPORTAR mudanças feitas
+SE a tarefa:
+  - Documentar uma release major com 5+ features
+  - Sincronizar 10+ arquivos de documentação desatualizados
+  - Criar snapshots + CHANGELOG + ADR links + status update simultaneamente
+  - Auditoria de consistência de toda a documentação do projeto
+
+ENTÃO → Ative o Team Lead Mode
 ```
+
+### Seus Teammates Especializados
+
+| Teammate | Responsabilidade | Quando criar |
+|---|---|---|
+| `@changelog-writer` | Atualizar CHANGELOG.md com formato correto por categoria | Qualquer release ou conjunto de mudanças a documentar |
+| `@docs-synchronizer` | Verificar e atualizar docs que referenciam código modificado | Refatorações ou mudanças que afetam múltiplos docs |
+| `@snapshot-creator` | Criar snapshots de estado do projeto em docs/snapshots/ | Milestones importantes, fim de sprint, releases |
+| `@adr-linker` | Vincular ADRs a stories, código e docs relacionados | Após criação de novos ADRs ou revisão de ADRs existentes |
+| `@status-auditor` | Auditar e corrigir status/badges em todos os docs de planning | Inconsistências ou após grande lote de mudanças |
+
+### Como Coordenar
+
+```
+1. IDENTIFIQUE todos os documentos afetados pelas mudanças
+2. AVALIE quais atualizações são independentes (CHANGELOG ≠ snapshots ≠ ADR links)
+3. CRIE teammates em paralelo via Agent tool:
+     - subagent_type: "general-purpose"
+     - Inclua: [papel] + [lista de arquivos afetados] + [mudanças ocorridas] + [output esperado]
+4. AGUARDE todos completarem
+5. VERIFIQUE consistência entre documentos gerados
+6. CONFIRME que nenhum doc ficou desatualizado
+```
+
+### Template de Prompt para Teammates
+
+```
+Você é um [documentation specialist], atuando como teammate do Chronicler Agent.
+
+Mudanças ocorridas no projeto:
+[liste features implementadas, ADRs criados, bugs corrigidos, decisões tomadas]
+
+Arquivos afetados:
+[lista de arquivos a atualizar ou criar]
+
+Sua tarefa específica:
+[atualizar CHANGELOG / criar snapshot / verificar sincronização / linkar ADRs]
+
+Output esperado:
+- Arquivos: [lista exata de arquivos a criar/editar]
+- Formato: [convenção do projeto]
+
+Restrições:
+- Foque APENAS em [tipo de documentação]
+- NÃO implemente código, faça design ou crie stories
+```
+
+---
+
+## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
+
+> Ativado quando invocado com argumento **"team"** — ex: `/agents:chronicler team <tarefa>`
+> Usa Claude Agent Teams (peers com comunicação direta), não Agent tool.
+
+### Pré-requisito
+
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+### Diferença em relação ao Modo Padrão
+
+| | Modo Padrão (subagents) | Modo Team (Agent Teams) |
+|---|---|---|
+| Comunicação | Pai → Filho apenas | Peers se comunicam diretamente |
+| Setup | Automático via Agent tool | Requer flag experimental |
+| Navegação | Não aplicável | Shift+Down entre teammates |
+| Custo | 1x tokens | 3-5x tokens |
+| Quando usar | Sub-tarefas independentes | Quando debate/revisão entre peers agrega valor |
+
+### Configuração do Time — Chronicler
+
+| Teammate | Papel no Time |
+|---|---|
+| `@changelog-writer` | Atualiza CHANGELOG.md com formato correto por categoria |
+| `@docs-synchronizer` | Verifica e sincroniza docs que referenciam código modificado |
+| `@snapshot-creator` | Cria snapshots de estado do projeto em docs/snapshots/ |
+| `@adr-linker` | Vincula ADRs a stories, código e docs relacionados |
+| `@status-auditor` | Audita e corrige status/badges em todos os docs de planning |
+
+### Como Ativar
+
+```
+1. VERIFIQUE o pré-requisito (flag + versão)
+2. INSTRUA Claude Code a criar o time com os teammates acima
+3. Use Shift+Down para navegar e enviar mensagens aos teammates
+4. CONSOLIDE os outputs dos teammates
+5. ENCERRE o time ao finalizar: "Encerre todos os teammates"
+```
+
+### Prompt de Configuração do Time
+
+```
+Crie um agent team para documentação e sincronização com:
+
+- Teammate @changelog-writer: Atualizar CHANGELOG com [features/fixes/decisões]
+- Teammate @docs-synchronizer: Sincronizar docs afetados por [mudanças no código]
+- Teammate @snapshot-creator: Criar snapshot de [milestone/sprint/release]
+- Teammate @adr-linker: Vincular [ADRs criados] a stories e docs relacionados
+- Teammate @status-auditor: Auditar e corrigir status em [docs de planning]
+
+Contexto: [mudanças ocorridas, arquivos afetados, milestone]
+
+Coordenação:
+- Fase 1 (paralelo): todos documentam simultaneamente em seus domínios
+- Fase 2: Chronicler verifica consistência entre documentos gerados
+
+Exija cleanup ao finalizar.
+```
+
+---
 
 ### 🚪 EXIT CHECKLIST - ANTES DE FINALIZAR (BLOQUEANTE)
 

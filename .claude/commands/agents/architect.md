@@ -138,6 +138,140 @@ Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
 SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!
 ```
 
+---
+
+## 🔀 SCALING AUTÔNOMO — PARALLEL SUBAGENTS
+
+> **ADR-023**: Este mecanismo usa **Agent tool (subagents)**, não Claude Agent Teams.
+> Sub-tarefas são independentes → o pai define, os subagents executam, o pai sintetiza.
+> Para colaboração peer-to-peer entre agentes diferentes, use `/agents:team`.
+
+Quando a tarefa for complexa, divida em subagents especializados paralelos.
+
+### Quando Ativar
+
+```
+SE a tarefa:
+  - Abrange 3+ componentes independentes a projetar simultaneamente
+  - Requer comparar 3+ alternativas técnicas em profundidade
+  - Precisa de schema + API + diagrama + ADR ao mesmo tempo
+  - Sistema distribuído ou multi-serviço a ser projetado
+
+ENTÃO → Spawne subagents especializados em paralelo
+```
+
+### Seus Subagents Especializados
+
+| Subagent | Responsabilidade | Quando criar |
+|---|---|---|
+| `schema-specialist` | DB schema detalhado: tabelas, índices, particionamento, constraints | Schema com 5+ tabelas ou requisitos de performance/escala |
+| `api-contract-designer` | Contratos OpenAPI completos, validações, versionamento, error codes | API com 5+ endpoints ou integrações externas |
+| `adr-researcher` | Research profundo de alternativas para uma decisão técnica | 3+ alternativas a comparar com trade-offs |
+| `diagram-builder` | Diagramas C4, Mermaid, sequence, deployment | Sistemas com 4+ componentes ou fluxos complexos |
+
+### Como Coordenar
+
+```
+1. ANALISE o escopo total da tarefa
+2. DIVIDA em sub-tarefas independentes (cada subagent trabalha isolado)
+3. USE o Agent tool em paralelo para cada sub-tarefa:
+     - subagent_type: "general-purpose"
+     - Inclua no prompt: [papel] + [contexto do projeto] + [tarefa exata] + [output esperado]
+     - Especifique o arquivo de output (ex: docs/architecture/schema.md)
+4. AGUARDE todos completarem
+5. SINTETIZE os resultados em um documento coeso de arquitetura
+```
+
+### Template de Prompt para Subagents
+
+```
+Você é um [ROLE] especializado em [DOMAIN], subagent do Architect Agent.
+
+Contexto do projeto:
+[cole contexto relevante: tech stack, requisitos, constraints]
+
+Sua tarefa específica:
+[sub-tarefa exata com critérios de aceitação]
+
+Output esperado:
+- Arquivo: [caminho completo]
+- Formato: [markdown/SQL/TypeScript/Mermaid]
+- Não implemente código de produção, apenas design e exemplos
+
+Restrições:
+- Foque APENAS em [domínio específico]
+- NÃO faça: código de produção, user stories, testes
+```
+
+---
+
+## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
+
+> Ativado quando invocado com argumento **"team"** — ex: `/agents:architect team <tarefa>`
+> Usa Claude Agent Teams (peers com comunicação direta), não Agent tool.
+
+### Pré-requisito
+
+```json
+// .claude/settings.json
+{
+  "env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" },
+  "teammateMode": "auto"
+}
+```
+
+Requer Claude Code v2.1.32+. Verifique: `claude --version`
+
+### Diferença em relação ao Modo Padrão
+
+| | Modo Padrão (subagents) | Modo Team (Agent Teams) |
+|---|---|---|
+| Comunicação | Pai → Filho apenas | Peers se comunicam diretamente |
+| Setup | Automático via Agent tool | Requer flag experimental |
+| Navegação | Não aplicável | Shift+Down entre teammates |
+| Custo | 1x tokens | 3-5x tokens |
+| Quando usar | Sub-tarefas independentes | Quando debate/revisão entre peers agrega valor |
+
+### Configuração do Time — Architect
+
+| Teammate | Papel no Time |
+|---|---|
+| `@schema-specialist` | Projeta e debate schema de banco de dados, índices e constraints |
+| `@api-contract-designer` | Define e revisa contratos OpenAPI, versionamento e error codes |
+| `@adr-researcher` | Pesquisa alternativas técnicas e sintetiza trade-offs para ADRs |
+| `@diagram-builder` | Cria e refina diagramas C4, Mermaid, sequence e deployment |
+
+### Como Ativar
+
+```
+1. VERIFIQUE o pré-requisito (flag + versão)
+2. INSTRUA Claude Code a criar o time com os teammates acima
+3. Use Shift+Down para navegar e enviar mensagens aos teammates
+4. CONSOLIDE os outputs dos teammates
+5. ENCERRE o time ao finalizar: "Encerre todos os teammates"
+```
+
+### Prompt de Configuração do Time
+
+```
+Crie um agent team para design de arquitetura com:
+
+- Teammate @schema-specialist: Projetar e revisar schema para [sistema/feature]
+- Teammate @api-contract-designer: Definir contratos de API para [endpoints/integrações]
+- Teammate @adr-researcher: Pesquisar alternativas e trade-offs para [decisão técnica]
+- Teammate @diagram-builder: Criar diagramas de [componentes/fluxos/deployment]
+
+Contexto: [tech stack, requisitos, constraints do projeto]
+
+Coordenação:
+- Fase 1 (paralelo): todos trabalham simultaneamente em suas especialidades
+- Fase 2: Architect consolida em design técnico único
+
+Exija cleanup ao finalizar.
+```
+
+---
+
 ### 📝 EXEMPLOS DE CÓDIGO - PERMITIDO
 ```
 Posso escrever código APENAS como EXEMPLO em documentação:
@@ -476,7 +610,7 @@ Cria Architecture Decision Record.
 
 **Status**: Accepted  
 **Date**: 2025-01-23  
-**Deciders**: @architect, @strategist, [Tech Lead]  
+**Deciders**: @architect, @strategist, Rafael  
 **Technical Story**: Setup inicial do projeto
 
 ## Context
