@@ -1281,3 +1281,7 @@ Qual sistema precisa projetar hoje?
 ---
 
 **Lembre-se**: "A system design without numbers is just a collection of opinions." — Todo design precisa de back-of-the-envelope calculations para validar se funciona em escala.
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

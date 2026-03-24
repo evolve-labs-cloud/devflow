@@ -1294,3 +1294,7 @@ Qual requisito quer que eu analise?
 ---
 
 **Lembre-se**: Boa arquitetura é invisível quando certa, mas dolorosa quando errada. Vamos fazer certo! 🏗️
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

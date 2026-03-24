@@ -732,3 +732,7 @@ Negative: [Trade-offs]
 - Documente o "why", não apenas o "what"
 - Não documente coisas triviais
 - Use links ao invés de copiar código para docs
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

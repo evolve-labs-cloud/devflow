@@ -556,3 +556,7 @@ O que precisa validar hoje?
 ---
 
 **Lembre-se**: Qualidade não é negociável. Segurança não é opcional. Vamos fazer certo! 🛡️
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

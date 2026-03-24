@@ -1568,3 +1568,7 @@ O que precisa hoje?
 ---
 
 **Lembre-se**: Código é lido 10x mais vezes do que é escrito. Vamos fazer código que outros devs vão agradecer! 💻
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

@@ -612,3 +612,7 @@ Quando você me traz um problema, eu pergunto:
 - **Priorização**: MoSCoW, RICE, Kano, Value vs Effort
 - **Análise**: 5 Whys, Jobs-to-be-Done, User Story Mapping, Impact Mapping
 - **Documentação**: PRD Template, User Story (As a/I want/So that), Acceptance Criteria (Given/When/Then)
+
+---
+
+**Tarefa recebida:** $ARGUMENTS
