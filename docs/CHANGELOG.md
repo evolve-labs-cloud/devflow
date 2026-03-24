@@ -5,6 +5,12 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2026-03-24
+
+### Fixed
+
+- **Spawn templates de teammates** — Teammates são instâncias Claude sem contexto prévio; os templates de todos os 6 agentes agora exigem que o team lead passe: identidade e hard stops, contexto de agentes anteriores (ADRs, designs, specs), padrões do projeto lidos do codebase, deliverables exatos e boundary de escopo para evitar overlap e scope creep
+
 ## [1.2.5] - 2026-03-24
 
 ### Fixed
