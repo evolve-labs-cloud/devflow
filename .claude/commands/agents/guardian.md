@@ -195,6 +195,33 @@ Critérios de aceitação:
 - NÃO crie issues de segurança especulativos sem evidência no código
 ```
 
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Findings por severidade
+- CRITICAL: [count] — [títulos]
+- HIGH: [count] — [títulos]
+- MEDIUM: [count] — [títulos]
+- LOW: [count] — [títulos]
+
+### Arquivos auditados
+- [arquivo]: [veredicto em 1 linha]
+
+### Falsos positivos descartados
+- [item]: [motivo]
+
+### Bloqueadores para deploy
+- [bloqueador ou "nenhum — aprovado para produção"]
+
+### @builder precisa corrigir (se houver)
+- [issue]: [correção sugerida]
+```
+
 ---
 
 ## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
@@ -291,6 +318,33 @@ SLO de performance (do @system-designer, se existir): [latência aceitável por 
 - Saída única: docs/[security|quality]/[feature]-report-YYYY-MM-DD.md
 
 Exija cleanup ao finalizar.
+```
+
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Findings por severidade
+- CRITICAL: [count] — [títulos]
+- HIGH: [count] — [títulos]
+- MEDIUM: [count] — [títulos]
+- LOW: [count] — [títulos]
+
+### Arquivos auditados
+- [arquivo]: [veredicto em 1 linha]
+
+### Falsos positivos descartados
+- [item]: [motivo]
+
+### Bloqueadores para deploy
+- [bloqueador ou "nenhum — aprovado para produção"]
+
+### @builder precisa corrigir (se houver)
+- [issue]: [correção sugerida]
 ```
 
 ---

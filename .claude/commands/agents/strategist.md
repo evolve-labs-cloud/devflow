@@ -158,6 +158,30 @@ Critérios de aceitação desta tarefa:
 - NÃO refaça trabalho já concluído listado em "Decisões já tomadas"
 ```
 
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Decisões tomadas
+- [decisão]: [rationale em 1 linha]
+
+### Artefatos gerados
+- [arquivo/doc]: [propósito em 1 linha]
+
+### Assumpções feitas
+- [assunção]: [risco se estiver errada]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+
+### Próximo agente precisa saber
+- [informação crítica para @architect ou @builder]
+```
+
 ---
 
 ## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
@@ -247,6 +271,30 @@ Docs existentes relevantes: [paths de PRDs/specs já criados]
 - Fase 2: Strategist consolida em PRD único coeso
 
 Exija cleanup ao finalizar.
+```
+
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Decisões tomadas
+- [decisão]: [rationale em 1 linha]
+
+### Artefatos gerados
+- [arquivo/doc]: [propósito em 1 linha]
+
+### Assumpções feitas
+- [assunção]: [risco se estiver errada]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+
+### Próximo agente precisa saber
+- [informação crítica para @architect ou @builder]
 ```
 
 ---

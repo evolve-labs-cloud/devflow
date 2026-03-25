@@ -225,6 +225,33 @@ Critérios de aceitação:
 - NÃO questione decisões de tech stack já tomadas pelo @architect (listadas acima)
 ```
 
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Design decisions
+- [decisão]: [rationale em 1 linha]
+- SDDs/RFCs criados: [lista ou "nenhum"]
+
+### Artefatos gerados
+- [arquivo]: [propósito em 1 linha]
+
+### Assumpções feitas
+- [assunção]: [risco se estiver errada]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+
+### @builder precisa saber
+- Constraints de infra: [lista]
+- SLOs/limites: [lista]
+- O que NÃO implementar: [lista]
+```
+
 ---
 
 ## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
@@ -320,6 +347,33 @@ Compliance/constraints: [LGPD, PCI, retenção de dados, etc.]
 - Verificação crítica: os números de @capacity-calculator são viáveis na infra do @infrastructure-planner?
 
 Exija cleanup ao finalizar.
+```
+
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Design decisions
+- [decisão]: [rationale em 1 linha]
+- SDDs/RFCs criados: [lista ou "nenhum"]
+
+### Artefatos gerados
+- [arquivo]: [propósito em 1 linha]
+
+### Assumpções feitas
+- [assunção]: [risco se estiver errada]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+
+### @builder precisa saber
+- Constraints de infra: [lista]
+- SLOs/limites: [lista]
+- O que NÃO implementar: [lista]
 ```
 
 ---

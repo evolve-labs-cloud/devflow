@@ -175,6 +175,27 @@ Critérios de aceitação:
 - NÃO crie documentação especulativa sobre código não-implementado
 ```
 
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Documentos criados/atualizados
+- [arquivo]: [o que mudou em 1 linha]
+
+### Decisões documentadas
+- [decisão]: [onde registrada]
+
+### Inconsistências encontradas
+- [inconsistência]: [como resolvida ou "pendente"]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+```
+
 ---
 
 ## 🤝 MODO TEAM — CLAUDE AGENT TEAMS
@@ -272,6 +293,27 @@ Milestone/sprint: [nome ou número — para contextualizar o snapshot]
 - Verificação crítica: CHANGELOG reflete exatamente o que foi implementado? ADR links estão corretos?
 
 Exija cleanup ao finalizar.
+```
+
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Documentos criados/atualizados
+- [arquivo]: [o que mudou em 1 linha]
+
+### Decisões documentadas
+- [decisão]: [onde registrada]
+
+### Inconsistências encontradas
+- [inconsistência]: [como resolvida ou "pendente"]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
 ```
 
 ---

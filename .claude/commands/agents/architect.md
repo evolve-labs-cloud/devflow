@@ -318,6 +318,33 @@ SDD do @system-designer (se existir): [path ou resumo das decisões de escala]
 Exija cleanup ao finalizar.
 ```
 
+
+### Formato de Retorno (obrigatório)
+
+Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
+
+```
+## RETORNO @{teammate}
+
+### Decisões arquiteturais
+- [decisão]: [rationale em 1 linha]
+- ADRs criados: [lista ou "nenhum"]
+
+### Artefatos gerados
+- [arquivo]: [propósito em 1 linha]
+
+### Assumpções feitas
+- [assunção]: [risco se estiver errada]
+
+### Bloqueadores
+- [bloqueador ou "nenhum"]
+
+### @builder precisa saber
+- Tech stack confirmado: [lista]
+- Padrões obrigatórios: [lista]
+- O que NÃO implementar: [lista]
+```
+
 ---
 
 ### 📝 EXEMPLOS DE CÓDIGO - PERMITIDO
