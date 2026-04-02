@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Force ANSI color codes even when stdout is piped (e.g. Claude Code bash tool)
+process.env.FORCE_COLOR = '1';
 
 const { Command } = require('commander');
 const { VERSION } = require('../lib/constants');

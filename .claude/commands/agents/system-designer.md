@@ -217,6 +217,11 @@ Critérios de aceitação:
 - Seção do SDD: docs/system-design/sdd/[sistema]-sdd.md, Seção [X: nome exato]
 - Inclua: cálculos explícitos, justificativas de escolha, alternativas rejeitadas
 - Use diagramas Mermaid quando relevante
+- Use Write/Edit para criar ou atualizar o arquivo — NÃO retorne conteúdo inline
+
+## REGRA DE ARTEFATOS (OBRIGATÓRIO)
+Qualquer seção do SDD ou diagrama DEVE ser escrito em arquivo via Write/Edit.
+No retorno estruturado, referencie o path e seção — NÃO copie o conteúdo do arquivo.
 
 ## BOUNDARY — O QUE VOCÊ NÃO DEVE FAZER
 - NÃO cubra [seções sendo feitas por outros teammates] — evite overlap

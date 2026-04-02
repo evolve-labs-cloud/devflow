@@ -1,128 +1,71 @@
+---
+trigger: "codex review|code review|revisar código|segunda opinião|pre-merge review|review antes do merge"
+category: quality
+priority: high
+---
+
 # Codex Review
 
-Use este comando quando quiser uma segunda opiniao tecnica do Codex no mesmo workspace, sem API e sem mudar o fluxo do Claude Code.
+Solicita review técnico independente do escopo descrito em `$ARGUMENTS`.
 
-## Objetivo
+## O que fazer
 
-Pedir ao Codex um review de codigo focado em:
+1. Leia `$ARGUMENTS` como o escopo do review (diff atual, arquivos específicos ou "pre-merge").
+2. Se `$ARGUMENTS` estiver vazio, use o diff atual do projeto.
+3. Execute o review diretamente — não peça confirmação.
 
-1. Bugs e regressions
-2. Riscos de arquitetura ou comportamento
-3. Falhas de seguranca relevantes
-4. Lacunas de testes
+## Como executar o review
 
-## Modos de uso
+**Passo 1 — Identificar o escopo:**
+- Sem argumento ou "diff": rode `git diff` para capturar mudanças locais
+- Arquivos específicos: leia os arquivos listados em `$ARGUMENTS`
+- "pre-merge": rode `git diff main...HEAD` para ver tudo na branch atual
 
-### 1. Diff atual
+**Passo 2 — Analisar com mindset de code reviewer adversarial:**
 
-Use quando o usuario quer revisar as mudancas locais em andamento.
+Priorize nesta ordem:
+1. **Bugs e regressions** — lógica incorreta, edge cases não tratados, condições de corrida
+2. **Segurança** — injection, XSS, auth bypass, secrets expostos, input não sanitizado
+3. **Comportamento inesperado** — side effects, mutação de estado global, dependências implícitas
+4. **Testes faltantes** — paths críticos sem cobertura, mocks que mascaram bugs reais
+5. **Riscos arquiteturais** — acoplamento excessivo, violação de contratos de interface
 
-Exemplo:
+**Passo 3 — Formato obrigatório de resposta:**
 
-```text
-/codex-review
-Revise o diff atual deste projeto.
+```
+## Code Review
+
+### Findings (ordenados por severidade)
+
+🔴 CRITICAL: [título]
+- Arquivo: path/to/file.ts:linha
+- Problema: [descrição direta do bug/risco]
+- Fix: [como corrigir]
+
+🟠 HIGH: [título]
+...
+
+🟡 MEDIUM / 🟢 LOW: [título]
+...
+
+### Testes faltantes
+- [path crítico sem cobertura]: [por que importa]
+
+### Riscos residuais
+- [risco aceito]: [mitigação sugerida]
+
+### Veredito
+APPROVE / REQUEST_CHANGES — [1 frase justificando]
 ```
 
-### 2. Arquivos especificos
+Se não houver findings, diga explicitamente: "Nenhum finding encontrado. APPROVE."
 
-Use quando o usuario quer revisar apenas uma area delimitada.
+## Uso direto
 
-Exemplo:
-
-```text
-/codex-review
-Revise apenas:
-- src/auth/service.ts
-- src/auth/controller.ts
-- tests/auth.spec.ts
+```
+/quick:codex-review
+/quick:codex-review src/auth/service.ts src/auth/controller.ts
+/quick:codex-review pre-merge
 ```
 
-### 3. Pre-merge
-
-Use quando o usuario quer um parecer final antes de merge ou deploy.
-
-Exemplo:
-
-```text
-/codex-review
-Faca um review pre-merge das mudancas desta branch, com foco em regressions, seguranca e testes faltantes.
-```
-
-## Como o Claude deve agir
-
-1. Identificar o escopo do review:
-   - diff atual
-   - arquivos especificos
-   - branch/commit/PR local, se o usuario informar
-
-2. Montar um handoff curto para o Codex com:
-   - objetivo do review
-   - contexto funcional
-   - caminhos/arquivos relevantes
-   - instrucoes para priorizar findings reais
-
-3. Pedir explicitamente ao Codex:
-   - mindset de code review
-   - findings primeiro, ordenados por severidade
-   - referencias de arquivo/linha
-   - perguntas abertas apenas se necessario
-   - resumo curto no final
-
-4. Consolidar a resposta do Codex para o usuario sem perder:
-   - severidade
-   - impacto
-   - referencias tecnicas
-
-## Template de handoff
-
-Use este template e preencha apenas o necessario:
-
-```text
-Revise este escopo como code review.
-
-Escopo:
-- [diff atual | arquivos especificos | pre-merge]
-
-Contexto:
-- [feature, bugfix, refactor, hotfix]
-- [impacto funcional esperado]
-
-Arquivos relevantes:
-- [caminhos]
-
-Foco:
-- bugs
-- regressions
-- riscos comportamentais
-- seguranca
-- testes faltantes
-
-Formato esperado:
-- findings primeiro
-- ordenados por severidade
-- com referencias de arquivo/linha
-- perguntas abertas so se forem necessarias
-- se nao houver findings, diga isso explicitamente
-```
-
-## Prompt sugerido para o Codex
-
-```text
-Revise este projeto/escopo como code review. Priorize bugs, regressions, riscos comportamentais, seguranca e testes faltantes. Nao faca resumo longo. Traga findings primeiro, ordenados por severidade, com referencias de arquivo/linha. Se nao houver findings, diga isso explicitamente e cite riscos residuais.
-```
-
-## Quando usar
-
-- Antes de merge
-- Depois de uma implementacao relevante
-- Para validar uma mudanca sensivel em auth, pagamentos, dados ou infraestrutura
-- Quando quiser uma segunda opiniao tecnica independente
-
-## Resultado esperado
-
-O Claude deve devolver ao usuario:
-
-1. Findings do Codex, sem diluir severidade
-2. Perguntas abertas, se existirem
-3. Um resumo curto do risco geral da mudanca
+**Escopo:** $ARGUMENTS

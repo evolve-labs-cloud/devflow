@@ -1,82 +1,45 @@
-# Quick ADR: Architecture Decision Record
-
-Vou te ajudar a criar um ADR (Architecture Decision Record).
-
-## O que é um ADR?
-
-Documento que registra uma decisão arquitetural importante, incluindo:
-- Contexto e problema
-- Decisão tomada
-- Alternativas consideradas
-- Consequências e trade-offs
-
+---
+trigger: "criar adr|create adr|decisão técnica|architecture decision|registrar decisão|adr"
+category: architecture
+priority: medium
 ---
 
-## Template Guiado
+# Criar ADR
 
-### 1. Qual decisão técnica você precisa tomar?
+Cria um Architecture Decision Record (ADR) para a decisão descrita em `$ARGUMENTS`.
 
-Exemplos:
-- Escolher banco de dados (PostgreSQL vs MongoDB)
-- Framework frontend (React vs Vue)
-- Arquitetura (Monolith vs Microservices)
-- Autenticação (JWT vs Session)
+## O que fazer
 
-**Sua decisão:** [descreva aqui]
+1. Leia `$ARGUMENTS` como a decisão técnica a documentar.
+2. Se `$ARGUMENTS` estiver vazio, peça: "Qual decisão técnica você quer documentar?"
+3. Invoque imediatamente o `@architect` com as instruções abaixo.
 
----
+## Instruções para o @architect
 
-### 2. Qual é o contexto?
+Crie um ADR formal para a seguinte decisão: **$ARGUMENTS**
 
-- Qual problema você está resolvendo?
-- Quais são os requisitos?
-- Quais constraints existem?
+Antes de criar:
+- Liste os ADRs existentes em `docs/decisions/` para escolher o próximo número sequencial
+- Leia o template em `docs/decisions/000-template.md` se existir
 
-**Contexto:** [descreva aqui]
+O ADR deve conter obrigatoriamente:
+- **Status**: Proposed | Accepted | Deprecated
+- **Contexto**: problema que motivou a decisão e constraints existentes
+- **Decisão**: o que foi decidido, em linguagem direta
+- **Alternativas consideradas**: pelo menos 2 opções com prós/contras
+- **Consequências**: benefícios esperados e trade-offs aceitos
+- **Notas de implementação**: orientações para o @builder executar
 
----
+Salve em `docs/decisions/ADR-{NNN}-{titulo-kebab-case}.md`.
 
-### 3. Quais alternativas você considerou?
+Após criar, atualize o status do ADR para `Accepted` se a decisão já foi tomada.
 
-Liste pelo menos 2-3 opções:
-
-**Opção A:** [nome]
-- Pros: [lista]
-- Cons: [lista]
-
-**Opção B:** [nome]
-- Pros: [lista]
-- Cons: [lista]
-
----
-
-### 4. Qual decisão você tomou e por quê?
-
-**Decisão:** [escolha]
-
-**Justificativa:** [por que esta opção é melhor?]
-
----
-
-## Próximo Passo
-
-Após preencher acima, vou invocar:
+## Uso direto
 
 ```
-@architect
-
-Por favor, criar ADR formal em docs/decisions/ com as seguintes informações:
-
-Decisão: [decisão]
-Contexto: [contexto]
-Alternativas: [alternativas]
-Escolha: [escolha]
-Justificativa: [justificativa]
-
-Use o template de docs/decisions/000-template.md
-Ver exemplo em docs/decisions/example-001-database-choice.md
+/quick:create-adr Usar PostgreSQL ao invés de MongoDB para persistência principal
+/quick:create-adr Adotar JWT com refresh token rotation para autenticação
+/quick:create-adr Migrar de REST para GraphQL no gateway público
 ```
 
----
-
-**Preencha as informações acima para eu gerar o ADR!**
+**Decisão:** $ARGUMENTS

@@ -187,12 +187,16 @@ ENTÃO → Ative o Team Lead Mode
 
 ```
 1. LEIA o design do @architect antes de ativar o time
-2. MAPEIE quais partes são paralelas (backend vs frontend) e quais são sequenciais (migration antes do código)
-3. CRIE teammates em paralelo para tracks independentes via Agent tool:
+2. CLASSIFIQUE cada sub-tarefa:
+   [PARALELO]    — tracks independentes, sem dependência entre si
+                   ex: backend API + frontend UI + testes unitários
+   [SEQUENCIAL]  — bloqueante, próxima etapa só começa após esta concluir
+                   ex: migration de banco ANTES do código que usa o novo schema
+3. LANCE em paralelo todos os teammates [PARALELO] via Agent tool simultaneamente:
      - subagent_type: "general-purpose"
      - Inclua no prompt: [papel] + [design técnico do @architect] + [tarefa exata] + [output esperado]
-4. AGUARDE tracks bloqueantes antes de iniciar dependentes
-5. INTEGRE os resultados e resolva conflitos
+4. AGUARDE os teammates [SEQUENCIAL] concluírem antes de lançar os que dependem deles
+5. INTEGRE os resultados e resolva conflitos de merge
 6. ATUALIZE checkboxes da story com tudo concluído
 ```
 
@@ -240,6 +244,13 @@ Arquivos a criar/editar (lista exata):
 - Código de produção completo e funcional (não esboços, não TODOs)
 - Seguir 100% os padrões do projeto listados acima
 - Atualizar checkboxes da story ao finalizar
+- Use Write/Edit para escrever código — NÃO retorne código inline na sua resposta
+- Se criar documentação ou relatório: escreva em arquivo e retorne apenas o path
+
+## REGRA DE ARTEFATOS (OBRIGATÓRIO)
+Qualquer output grande (código, documentação, relatório) DEVE ser escrito em arquivo via Write/Edit.
+No seu retorno estruturado, referencie os paths — NÃO copie o conteúdo dos arquivos.
+Exceção: snippets curtos (< 20 linhas) para contextualizar uma decisão.
 
 ## BOUNDARY — O QUE VOCÊ NÃO DEVE FAZER
 - NÃO implemente [domínio coberto por outro teammate] — evite overlap
@@ -256,8 +267,11 @@ Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
 ```
 ## RETORNO @{teammate}
 
+### Artefatos gerados
+- [path/to/file.ts] — [o que faz em 1 linha]
+
 ### Implementado
-- [arquivo criado/modificado]: [o que faz em 1 linha]
+- [funcionalidade]: [descrição em 1 linha]
 
 ### Decisões de implementação
 - [decisão]: [rationale — especialmente desvios do design]

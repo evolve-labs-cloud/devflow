@@ -5,6 +5,23 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.9] - 2026-04-01
+
+### Added
+
+- **Cores por agente no autopilot** — cada agente tem sua cor única durante o streaming: strategist=azul, architect=magenta, system-designer=cyan, builder=amarelo, guardian=verde, challenger=vermelho, chronicler=cinza; cor aplicada desde o primeiro byte do stream e reset ao finalizar
+- **Complexidade adaptativa injetada nos agentes** — quando `--adaptive` é usado, `buildPrompt` recebe o resultado do planner (nível TRIVIAL/SIMPLE/MODERATE/COMPLEX + rationale) e injeta como bloco de calibração no prompt de cada agente; agentes ajustam profundidade de análise e número de subagents
+- **Sistema de artefatos** — outputs de cada fase persistidos em `.devflow/artifacts/{sessionId}/{agentId}.md` para rastreabilidade e referência cross-session; paths registrados no memory
+- **Challenger: scores estruturados** — prompt do challenger agora exige tabela de scores 0–100 por categoria (Security, Completeness, Correctness, Test Coverage + Overall); `parseChallengerOutput` extrai e registra no memory; exibido em modo `--verbose`
+
+### Fixed
+
+- **FORCE_COLOR=1 no CLI** — `bin/devflow.js` agora define `FORCE_COLOR=1` no processo; ANSI codes são emitidos mesmo quando stdout não é TTY (ex: pipe, CI, bash tool)
+
+### Changed
+
+- **Builder spawn template** — adicionada seção `## REGRA DE ARTEFATOS (OBRIGATÓRIO)`: teammates devem escrever outputs grandes em arquivo via Write/Edit e retornar apenas o path no bloco de retorno; `### Formato de Retorno` agora inclui campo `### Artefatos gerados`
+
 ## [1.2.6] - 2026-03-24
 
 ### Fixed

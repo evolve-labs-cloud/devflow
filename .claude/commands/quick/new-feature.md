@@ -1,57 +1,32 @@
-# Quick Start: Nova Feature
-
-Vou te guiar para iniciar uma nova feature usando DevFlow.
-
-## Passo 1: Coleta de Informações
-
-Por favor, me forneça as seguintes informações:
-
-1. **Nome da Feature**: [Um nome curto e descritivo]
-2. **Descrição**: [O que esta feature faz?]
-3. **Problema que Resolve**: [Qual dor/necessidade isso resolve?]
-4. **Prioridade**: [Alta / Média / Baixa]
-5. **Usuários Impactados**: [Quem vai usar isso?]
-
+---
+trigger: "nova feature|new feature|implementar feature|criar feature|quero implementar|preciso de uma feature"
+category: planning
+priority: high
 ---
 
-## Passo 2: Geração Automática
+# Nova Feature
 
-Com base nas suas respostas, vou:
+Invoca o pipeline completo de planejamento para a feature descrita em `$ARGUMENTS`.
 
-1. Gerar um PRD (Product Requirements Document)
-2. Criar user stories iniciais
-3. Sugerir próximos passos com @architect
+## O que fazer
 
----
+1. Leia `$ARGUMENTS` como a descrição da feature a implementar.
+2. Se `$ARGUMENTS` estiver vazio, peça ao usuário: "Descreva a feature em 1-2 frases."
+3. Invoque imediatamente o `@strategist` passando a descrição como tarefa.
 
-## Passo 3: Invocação do @strategist
+O `@strategist` irá:
+- Criar `docs/planning/stories/{feature}-story.md` com acceptance criteria mensuráveis
+- Mapear escopo IN/OUT, dependências e riscos
+- Classificar complexidade (TRIVIAL/SIMPLE/MODERATE/COMPLEX)
+- Indicar quais agentes são necessários
 
-Após coletar as informações, vou formatar e invocar:
+Após o `@strategist` concluir, o fluxo natural continua com `@architect` (design técnico) → `@builder` (implementação) → `@guardian` (review).
+
+## Uso direto
 
 ```
-@strategist
-
-Feature: [nome]
-
-Descrição: [descrição fornecida]
-
-Problema: [problema que resolve]
-
-Prioridade: [prioridade]
-
-Usuários: [usuários impactados]
-
-Por favor, criar:
-1. PRD completo em docs/planning/
-2. User stories em docs/planning/stories/
-3. Breakdown de tarefas
-4. Recomendações de tech stack para @architect
+/quick:new-feature Adicionar autenticação JWT com refresh token rotation
+/quick:new-feature Exportar relatórios em PDF no painel de eventos
 ```
 
----
-
-**Pronto!** Após @strategist processar, você pode continuar com @architect para design técnico.
-
----
-
-**Agora, me forneça as informações acima para começarmos!**
+**Tarefa recebida:** $ARGUMENTS

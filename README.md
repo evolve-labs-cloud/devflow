@@ -1,8 +1,8 @@
-# DevFlow v1.2.8 - Sistema Multi-Agentes para Desenvolvimento de Software
+# DevFlow v1.2.9 - Sistema Multi-Agentes para Desenvolvimento de Software
 
 Sistema de **7 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
 
-[![Version](https://img.shields.io/badge/version-1.2.7-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.9-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -202,7 +202,8 @@ seu-projeto/
 | v1.1.1        | Dual Scaling Modes: Parallel Subagents + Claude Agent Teams                              |
 | v1.2.0        | Remocao da Web IDE, Persistent Memory, Adaptive Autopilot, Context Isolation, Challenger |
 | v1.2.5        | Agent Teams habilitado por padrao no init/update                                         |
-| **v1.2.8**    | **Spawn templates com contexto obrigatorio para teammates**                              |
+| v1.2.8        | Spawn templates com contexto obrigatorio para teammates                                  |
+| **v1.2.9**    | **Cores por agente, scores do challenger, artefatos persistidos, complexidade adaptativa** |
 
 ---
 
@@ -221,4 +222,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v1.2.7** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)
+**DevFlow v1.2.9** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)

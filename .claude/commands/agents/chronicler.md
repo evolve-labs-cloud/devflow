@@ -167,6 +167,11 @@ Critérios de aceitação:
   - [caminho/arquivo1] — [o que atualizar]
   - [caminho/arquivo2] — [o que atualizar]
 - Formato: [convenção do projeto — ex: Keep a Changelog para CHANGELOG.md]
+- Use Write/Edit para todos os arquivos — NÃO retorne conteúdo inline
+
+## REGRA DE ARTEFATOS (OBRIGATÓRIO)
+Toda documentação DEVE ser escrita em arquivo via Write/Edit.
+No retorno estruturado, liste os paths criados/editados — NÃO copie o conteúdo.
 
 ## BOUNDARY — O QUE VOCÊ NÃO DEVE FAZER
 - NÃO cubra [tipo de documentação sendo feito por outro teammate] — evite overlap

@@ -219,6 +219,11 @@ Critérios de aceitação:
 - Arquivo: [caminho completo exato]
 - Formato: [markdown / SQL ilustrativo / TypeScript interface / Mermaid]
 - Seções obrigatórias: [liste as seções exatas]
+- Use Write para criar o arquivo — NÃO retorne o conteúdo inline na resposta
+
+## REGRA DE ARTEFATOS (OBRIGATÓRIO)
+Qualquer ADR, schema ou diagrama DEVE ser escrito em arquivo via Write.
+No retorno estruturado, referencie o path — NÃO copie o conteúdo do arquivo.
 
 ## BOUNDARY — O QUE VOCÊ NÃO DEVE FAZER
 - NÃO projete [domínio coberto por outro subagent] — isso está sendo feito em paralelo

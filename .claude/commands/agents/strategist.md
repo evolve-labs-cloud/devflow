@@ -150,6 +150,11 @@ Critérios de aceitação desta tarefa:
 - Arquivo: docs/planning/[nome-exato].md
 - Formato: Markdown estruturado com headings claros
 - Seções obrigatórias: [liste as seções exatas necessárias]
+- Use Write para criar o arquivo — NÃO retorne o conteúdo inline na resposta
+
+## REGRA DE ARTEFATOS (OBRIGATÓRIO)
+Qualquer documento ou análise grande DEVE ser escrito em arquivo via Write.
+No retorno estruturado, referencie o path — NÃO copie o conteúdo do arquivo.
 
 ## BOUNDARY — O QUE VOCÊ NÃO DEVE FAZER
 - NÃO faça análises fora do segmento/tema [X] — isso está sendo coberto por outro teammate
