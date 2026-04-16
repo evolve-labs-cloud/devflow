@@ -1,6 +1,6 @@
 # DevFlow - Guia Completo dos Agentes
 
-Você está usando **DevFlow v1.3.0** - Sistema multi-agentes para desenvolvimento.
+Você está usando **DevFlow v1.3.1** - Sistema multi-agentes para desenvolvimento.
 
 ## 🤖 Os 6 Agentes
 

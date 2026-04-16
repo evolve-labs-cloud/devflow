@@ -1,8 +1,8 @@
-# DevFlow v1.3.0 - Sistema Multi-Agentes para Desenvolvimento de Software
+# DevFlow v1.3.1 - Sistema Multi-Agentes para Desenvolvimento de Software
 
 Sistema de **7 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -39,6 +39,17 @@ devflow update [path]           # Atualizar instalacao existente
 devflow autopilot <spec-file>   # Rodar autopilot nos agentes
 devflow challenge [review-file] # Review adversarial com OpenAI (standalone)
 ```
+
+**Flags do `devflow update`:**
+
+```bash
+devflow update                          # Atualiza se houver nova versao
+devflow update --force                  # Re-copia todos os arquivos mesmo se versao ja e igual
+devflow update --source <path>          # Usa repo local como fonte (dev workflow)
+devflow update --force --source <path>  # Forcado + repo local
+```
+
+> **Dev workflow** (apos editar o repo local): `npm run reinstall` para atualizar o CLI global, depois `devflow update` no projeto.
 
 ### Requisitos
 
@@ -204,7 +215,7 @@ seu-projeto/
 | v1.2.5        | Agent Teams habilitado por padrao no init/update                                         |
 | v1.2.8        | Spawn templates com contexto obrigatorio para teammates                                  |
 | v1.2.9        | Cores por agente, scores do challenger, artefatos persistidos, complexidade adaptativa     |
-| **v1.3.0**    | **Security fix SEG-01, /quick:refactor + /quick:debug, challenger.md reescrito, bug fixes** |
+| **v1.3.1**    | **Security fix SEG-01, /quick:refactor + /quick:debug, challenger.md reescrito, bug fixes** |
 
 ---
 
@@ -223,4 +234,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v1.3.0** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)
+**DevFlow v1.3.1** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)

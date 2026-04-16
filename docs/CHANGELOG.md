@@ -5,6 +5,16 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-04-16
+
+### Fixed
+
+- **`devflow update` não pegava versão mais recente** — versão igual entre projeto e CLI causava early exit mesmo quando arquivos tinham mudado; `--force` agora bypassa o check de versão (antes só bypassa a confirmação)
+- **`devflow update --source <path>`** — novo flag para usar repo local como fonte em vez do pacote npm instalado; útil em dev workflow sem precisar reinstalar o pacote global
+- **`npm run reinstall`** — script adicionado em `package.json` (`npm install -g .`) para atualizar o CLI global com mudanças do repo local
+
+---
+
 ## [1.3.0] - 2026-04-16
 
 ### Security

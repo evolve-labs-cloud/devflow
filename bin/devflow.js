@@ -30,7 +30,8 @@ program
   .command('update')
   .description('Update an existing DevFlow installation')
   .argument('[path]', 'target project directory', '.')
-  .option('-f, --force', 'update without confirmation')
+  .option('-f, --force', 'update without confirmation (also re-copies when version already matches)')
+  .option('--source <path>', 'use a local devflow source directory instead of the installed package')
   .action(updateCommand);
 
 program
