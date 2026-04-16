@@ -120,37 +120,6 @@ devflow autopilot docs/specs/minha-spec.md --phases "strategist,architect,builde
 devflow autopilot docs/specs/minha-spec.md --project /path/to/project
 ```
 
-### Via Web IDE
-
-```bash
-devflow web
-```
-
-1. Abrir Specs Panel → selecionar spec
-2. Clicar "Start Autopilot"
-3. Output streaming no terminal integrado
-4. Tasks marcadas automaticamente como concluidas
-
----
-
-## Web IDE
-
-Interface web completa para gerenciar projetos DevFlow.
-
-```bash
-devflow web                     # http://localhost:3000
-devflow web --port 8080         # Porta customizada
-devflow web --project /path     # Projeto especifico
-```
-
-**Features:**
-- Dashboard com metricas e health check
-- Specs Panel (requirements, design, tasks)
-- Monaco Editor com Markdown preview + Mermaid
-- Terminal integrado com multiplas tabs
-- Autopilot com output streaming
-- Multi-project support
-
 ---
 
 ## Comandos por Agente
@@ -265,7 +234,7 @@ seu-projeto/
 │   ├── snapshots/                  # Historico
 │   └── CHANGELOG.md
 │
-└── web/                            # Web IDE (opcional)
+└── .devflow/                       # DevFlow state (memory, artifacts)
 ```
 
 ---
@@ -303,11 +272,11 @@ seu-projeto/
 /agents:chronicler Criar snapshot do estado atual
 ```
 
-### Terminal nao conecta na Web IDE?
+### Sessao travada no meio do pipeline?
 
 ```bash
-# Reiniciar Web IDE
-devflow web
+# Verificar a sessao atual
+cat .devflow/memory.json | grep -A5 '"sessions"'
 ```
 
 ---

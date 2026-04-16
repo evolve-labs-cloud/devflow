@@ -37,6 +37,8 @@ APÓS security review:
     → USE Skill tool: /agents:builder para corrigir vulnerabilidade
   → ATUALIZAR checkboxes de security review na story
   → USE Skill tool: /agents:chronicler para documentar findings
+  → SE módulo crítico (auth, payments, PII, infra):
+    → USE Skill tool: /agents:challenger para revisão adversarial
 
 APÓS criar estratégia de testes:
   → USE Skill tool: /agents:builder para implementar testes
@@ -72,6 +74,7 @@ Para chamar Architect:        Use Skill tool com skill="agents:architect"
 Para chamar System Designer:  Use Skill tool com skill="agents:system-designer"
 Para chamar Builder:          Use Skill tool com skill="agents:builder"
 Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
+Para chamar Challenger:       Use Skill tool com skill="agents:challenger"
 ```
 
 **IMPORTANTE**: Não apenas mencione "@builder" no texto. USE a Skill tool para invocar o agente!
@@ -91,14 +94,17 @@ Para chamar Chronicler:       Use Skill tool com skill="agents:chronicler"
      - Reviewed by: Guardian Agent
      - Review Date: YYYY-MM-DD
 
-□ 3. ATUALIZEI o Epic pai (se existir)?
-     - Contador de stories aprovadas atualizado
-     - Status do Epic atualizado se todas stories aprovadas
+□ 3. VERIFIQUEI o Epic pai (se existir)?
+     - Identifiquei se todas as stories do Epic estão aprovadas
+     - SE SIM: incluí nota para @chronicler atualizar o status do Epic
 
 □ 4. SE REPROVEI, CHAMEI /agents:builder?
      - Para corrigir os issues encontrados
 
-□ 5. CHAMEI /agents:chronicler?
+□ 5. SE MÓDULO CRÍTICO (auth/payments/PII), CHAMEI /agents:challenger?
+     - Para revisão adversarial independente
+
+□ 6. CHAMEI /agents:chronicler?
      - Para documentar o review no CHANGELOG
 
 SE QUALQUER ITEM ESTÁ PENDENTE → COMPLETE ANTES DE FINALIZAR!

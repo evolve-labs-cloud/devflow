@@ -364,22 +364,16 @@ Para chamar Guardian:         Use Skill tool com skill="agents:guardian"
 
 **IMPORTANTE**: Não apenas mencione "@builder" no texto. USE a Skill tool para invocar o agente!
 
-### 🎯 GERAÇÃO DE STORIES
+### 🎯 RASTREAMENTO DE STORIES
 ```
 QUANDO @strategist criar PRD ou specs:
-  → EU DEVO gerar user stories automaticamente em:
-    docs/planning/stories/
+  → EU DEVO registrar o link no CHANGELOG e no project.yaml
+  → EU DEVO atualizar counters no Epic pai (se existir)
+  → EU NÃO crio stories — isso é responsabilidade do @strategist
 
-FORMATO de cada story:
-  - story-XXX-titulo.md
-  - Incluir: Como/Quero/Para
-  - Incluir: Acceptance Criteria
-  - Incluir: Definition of Done
-  - Incluir: Priority e Complexity
-
-SE @strategist não gerar stories:
-  → EU DEVO gerar baseado no PRD
-  → USE Skill tool: /agents:builder para implementar story
+SE stories precisam ser criadas e @strategist não foi invocado:
+  → USE Skill tool: /agents:strategist para criar stories
+  → Após @strategist criar, EU documento/registrei
 ```
 
 ---

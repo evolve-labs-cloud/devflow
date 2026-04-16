@@ -207,3 +207,7 @@ O lead verifica se não há teammates ativos antes de executar o cleanup.
 - Máximo 1 time por sessão (clean up antes de criar outro)
 - Teammates não podem spawnar sub-times (apenas o lead gerencia o time)
 - Split-pane não funciona em VS Code terminal, Windows Terminal ou Ghostty
+
+---
+
+**Tarefa recebida:** $ARGUMENTS

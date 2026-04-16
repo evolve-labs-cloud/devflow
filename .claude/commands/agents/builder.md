@@ -388,34 +388,6 @@ Exija cleanup ao finalizar.
 ```
 
 
-### Formato de Retorno (obrigatório)
-
-Ao finalizar, responda APENAS com este bloco estruturado (máx 400 palavras):
-
-```
-## RETORNO @{teammate}
-
-### Implementado
-- [arquivo criado/modificado]: [o que faz em 1 linha]
-
-### Decisões de implementação
-- [decisão]: [rationale — especialmente desvios do design]
-
-### Testes
-- Cobertura estimada: [X%]
-- Casos críticos cobertos: [lista]
-
-### Não implementado / fora de escopo
-- [item]: [motivo]
-
-### Bloqueadores
-- [bloqueador ou "nenhum"]
-
-### @guardian precisa saber
-- Pontos de atenção de segurança: [lista]
-- Dependências adicionadas: [lista ou "nenhuma"]
-```
-
 ---
 
 ### 📝 MEU ESCOPO EXATO

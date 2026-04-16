@@ -5,6 +5,33 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-04-16
+
+### Security
+
+- **SEG-01**: `.env` e todas as variantes (`.env.local`, `.env.production`, `.env.staging`, `.env.development`, `.env.test`) adicionados a `SKIP_EXTENSIONS` e `SKIP_FILENAMES` em `autopilotConstants.js` — impede que conteúdo sensível de env files seja injetado nos prompts enviados à API OpenAI via `extractMentionedFiles`
+
+### Fixed
+
+- **Double Promise rejection no timeout** — `autopilot.js:executePhase` adicionado flag `settled` com wrapper `settle(fn, val)`; `reject` não é mais chamado duas vezes quando o processo é morto por timeout (timeout dispara, processo fecha com código não-zero, ambos chamavam `reject`)
+- **In-place sort mutation em MemoryManager** — `getRecentDecisions` e `getRecentSessions` agora usam `[...array].sort()` em vez de `.sort()` direto; a array original `this.memory.decisions` / `this.memory.sessions` não é mais mutada em cada leitura
+- **`$ARGUMENTS` ausente em `team.md`** — `/agents:team <tarefa>` descartava silenciosamente o argumento; adicionado `$ARGUMENTS` ao final do arquivo
+- **Guardian EXIT CHECKLIST item 3** — não pede mais que o guardian atualize o Epic diretamente (isso é responsabilidade do chronicler); agora pede verificar se todas as stories estão aprovadas e incluir nota para o @chronicler
+- **Chronicler criando stories** — seção `GERAÇÃO DE STORIES` renomeada e reescrita para `RASTREAMENTO DE STORIES`; chronicler agora delega criação de stories ao @strategist em vez de gerar ele mesmo
+- **Builder formato de retorno duplicado** — bloco `### Formato de Retorno` duplicado (sem `### Artefatos gerados`) removido de `builder.md`; apenas o formato completo permanece
+
+### Added
+
+- **`/quick:refactor`** — novo quick command: aciona `@architect` para planejar + `@builder` para implementar refactor; triggers: "refactor", "refatorar", "clean up", "limpar código", etc.
+- **`/quick:debug`** — novo quick command: aciona `@builder` com investigação estruturada em 4 fases (reprodução → root cause → fix → prevenção); triggers: "debug", "debugar", "investigar bug", "error", "crash", etc.
+- **`@challenger` wired no guardian** — `SEMPRE FAÇA` e EXIT CHECKLIST (item 5) agora exigem chamar `/agents:challenger` após security review de módulos críticos (auth/payments/PII)
+- **`challenger.md` reescrito** — estrutura padrão completa: HARD STOP, SEMPRE FAÇA, EXIT CHECKLIST, output format com tabela de scores, PARALLEL SUBAGENTS, MODO TEAM, REGRA DE ARTEFATOS, `$ARGUMENTS`
+
+### Changed
+
+- **Eval system**: adicionado `docs/evals/` com 5 evals cobrindo TRIVIAL → COMPLEX; inclui `spec.md` + `expected.md` para cada caso; README com metodologia de execução
+- **QUICKSTART.md** — removidas referências ao comando `devflow web` (removido em v1.2.0); substituída seção "Web IDE" e troubleshooting correspondente
+
 ## [1.2.9] - 2026-04-01
 
 ### Added
@@ -22,13 +49,19 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 - **Builder spawn template** — adicionada seção `## REGRA DE ARTEFATOS (OBRIGATÓRIO)`: teammates devem escrever outputs grandes em arquivo via Write/Edit e retornar apenas o path no bloco de retorno; `### Formato de Retorno` agora inclui campo `### Artefatos gerados`
 
-## [1.2.6] - 2026-03-24
+## [1.2.8] - 2026-03-26
 
 ### Fixed
 
-- **Spawn templates de teammates** — Teammates são instâncias Claude sem contexto prévio; os templates de todos os 6 agentes agora exigem que o team lead passe: identidade e hard stops, contexto de agentes anteriores (ADRs, designs, specs), padrões do projeto lidos do codebase, deliverables exatos e boundary de escopo para evitar overlap e scope creep
+- **Quick commands reescritos** — todos os 5 quick commands (`/quick:new-feature`, `/quick:security-check`, `/quick:system-design`, `/quick:create-adr`, `/quick:codex-review`) reescritos com frontmatter YAML `trigger:` para matching automático no Claude Code e acionam agentes diretamente sem wizard interativo
 
 ## [1.2.7] - 2026-03-25
+
+### Fixed
+
+- **Spawn templates de teammates** — adicionado marcador `[PARALELO]` / `[SEQUENCIAL]` explícito em cada sub-tarefa dos templates; plan mode (`mode: "plan"`) escrito em `.claude/settings.json` por `devflow init` e `devflow update` para aprovação única do pipeline inteiro
+
+## [1.2.6] - 2026-03-24
 
 ### Fixed
 
