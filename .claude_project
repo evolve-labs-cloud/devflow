@@ -15,15 +15,17 @@ CRITICAL: Agents must follow hard stops and mandatory delegation.
 2. @architect → Software Design ONLY (never implementation, never infra at scale)
 3. @system-designer → System Design ONLY (never code, never software patterns)
 4. @builder → Code ONLY (never requirements)
-5. @guardian → QA ONLY (never features)
-6. @chronicler → Documentation ONLY (never code)
+5. @guardian → Quality & Tests ONLY (never security audits → @sentinel)
+6. @sentinel → Security Audit ONLY (defensive posture, never exploits)
+7. @chronicler → Documentation ONLY (never code)
 
 ## Workflow
 
-Linear flow: @strategist → @architect → @system-designer → @builder → @guardian → @chronicler
+Linear flow: @strategist → @architect → @system-designer → @builder → @guardian → @sentinel → @challenger → @chronicler
 
 Feedback loops allowed:
 - @guardian can send issues back to @builder
+- @sentinel can send CRITICAL/HIGH findings back to @builder
 - @architect can clarify with @strategist
 - @system-designer can clarify with @architect
 - @builder can escalate infra issues to @system-designer

@@ -1,8 +1,8 @@
 # DevFlow - Guia Completo dos Agentes
 
-Você está usando **DevFlow v1.3.1** - Sistema multi-agentes para desenvolvimento.
+Você está usando **DevFlow v1.4.0** - Sistema multi-agentes para desenvolvimento.
 
-## 🤖 Os 6 Agentes
+## 🤖 Os 8 Agentes
 
 ### @strategist - Planejamento & Produto
 **Use quando:** Iniciar nova feature, criar requisitos, definir prioridades
@@ -24,10 +24,15 @@ Você está usando **DevFlow v1.3.1** - Sistema multi-agentes para desenvolvimen
 **Output:** Código, testes unitários, reviews
 **Exemplo:** `@builder Implementar login com JWT`
 
-### @guardian - Qualidade & Segurança
-**Use quando:** Testes, security audit, performance review
-**Output:** Testes E2E, security reports, performance audits
-**Exemplo:** `@guardian Revisar segurança da API`
+### @guardian - Qualidade & Testes
+**Use quando:** Testes, regressão, performance, coverage
+**Output:** Test plans, Regression Map, performance reports
+**Exemplo:** `@guardian Revisar qualidade e testes da feature`
+
+### @sentinel - Segurança & Vulnerabilidades
+**Use quando:** Audit de segurança, CVEs, OWASP, secrets, threat modeling
+**Output:** Security reports com CVSS scores, findings detalhados, fix sugerido
+**Exemplo:** `@sentinel Auditar segurança da API de pagamentos`
 
 ### @chronicler - Documentação & Memória
 **Use quando:** Documentar feature, criar changelog, snapshots
@@ -39,15 +44,17 @@ Você está usando **DevFlow v1.3.1** - Sistema multi-agentes para desenvolvimen
 ## 🔄 Fluxo de Trabalho
 
 ```
-@strategist → @architect → @system-designer → @builder → @guardian → @chronicler
+@strategist → @architect → @system-designer → @builder → @guardian → @sentinel → @challenger → @chronicler
 ```
 
 1. **Planejamento** (@strategist): Define o QUÊ fazer
 2. **Design** (@architect): Define COMO fazer tecnicamente (patterns, ADRs)
 3. **System Design** (@system-designer): Projeta COMO funciona em escala/produção
 4. **Implementação** (@builder): Faz acontecer
-5. **Qualidade** (@guardian): Garante que está correto
-6. **Documentação** (@chronicler): Registra para sempre
+5. **Qualidade** (@guardian): Garante que os testes passam e nada regrediu
+6. **Segurança** (@sentinel): Audita vulnerabilidades (OWASP, CVEs, secrets)
+7. **Adversarial Review** (@challenger): Perspectiva externa independente (OpenAI o3)
+8. **Documentação** (@chronicler): Registra para sempre
 
 ---
 
@@ -67,7 +74,8 @@ Ativado com o argumento **`team`**. O agente coordena peers que se comunicam dir
 /agents:strategist team Criar PRD para sistema de pagamentos
 /agents:architect team Design de microservices para e-commerce
 /agents:builder team Implementar autenticação JWT completa
-/agents:guardian team Audit completo de segurança e qualidade
+/agents:guardian team Audit completo de qualidade e testes
+/agents:sentinel team Audit de segurança completo com red/blue team
 /agents:chronicler team Documentar release v2.0
 /agents:system-designer team Design de sistema para 50M usuários
 ```
@@ -95,7 +103,8 @@ Requer Claude Code v2.1.32+. Verifique: `claude --version`
 - `@strategist team`: @user-story-writer, @competitive-analyst, @acceptance-criteria-expert, @roadmap-planner
 - `@architect team`: @schema-specialist, @api-contract-designer, @adr-researcher, @diagram-builder
 - `@builder team`: @backend-dev, @frontend-dev, @test-writer, @migration-writer, @api-integrator
-- `@guardian team`: @owasp-scanner, @dependency-auditor, @performance-tester, @test-generator, @coverage-analyst
+- `@guardian team`: @regression-analyst, @performance-tester, @test-generator, @coverage-analyst
+- `@sentinel team`: @red-teamer, @blue-teamer, @compliance-analyst, @pentest-strategist
 - `@chronicler team`: @changelog-writer, @docs-synchronizer, @snapshot-creator, @adr-linker, @status-auditor
 - `@system-designer team`: @capacity-calculator, @failure-mode-analyst, @infrastructure-planner, @slo-architect, @data-flow-designer
 

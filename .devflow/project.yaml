@@ -4,10 +4,10 @@
 
 project:
   name: "DevFlow"
-  version: "1.2.3"
-  description: "Sistema multi-agentes para desenvolvimento de software"
+  version: "1.4.0"
+  description: "Sistema multi-agentes para desenvolvimento de software com 8 agentes especializados"
   created: "2025-11-15"
-  last_updated: "2026-03-24"
+  last_updated: "2026-05-02"
 
   # Estado atual
   status: "active"
@@ -88,16 +88,35 @@ agents:
   - id: "guardian"
     name: "Guardian"
     role: "quality"
-    focus: "Qualidade & Segurança"
+    focus: "Qualidade & Testes"
     triggers:
       - "@guardian"
       - "test"
-      - "security"
+      - "regression"
       - "performance"
+      - "coverage"
     outputs:
       - "Estratégia de testes"
-      - "Security audits"
+      - "Regression Map"
       - "Performance reports"
+      - "Coverage reports"
+
+  - id: "sentinel"
+    name: "Sentinel"
+    role: "security"
+    focus: "Segurança & Vulnerabilidades"
+    triggers:
+      - "@sentinel"
+      - "security"
+      - "owasp"
+      - "cve"
+      - "vulnerabilidade"
+      - "audit"
+    outputs:
+      - "Sentinel Security Report"
+      - "docs/security/"
+      - "CVSS scores"
+      - "STRIDE threat model"
 
   - id: "chronicler"
     name: "Chronicler"
@@ -230,6 +249,12 @@ features:
     version: "1.2.3"
     description: "devflow init and devflow update write CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 to .claude/settings.json automatically, activating team mode for all 7 agents without manual setup."
 
+  - id: "sentinel-security-agent"
+    name: "Sentinel Security Agent"
+    status: "implemented"
+    version: "1.4.0"
+    description: "8th agent specializing in security audits — OWASP Top 10, CWE Top 25, CVSS v3.1/v4.0, STRIDE, 0-day mindset. Runs by default after @guardian in the pipeline. @guardian refocused on tests only with mandatory Regression Map output."
+
 # Decisões arquiteturais (resumo - detalhes em ADRs)
 decisions:
   - id: "ADR-001"
@@ -252,15 +277,15 @@ decisions:
 
 # Métricas (atualizadas pelo Chronicler)
 metrics:
-  total_agents: 7
-  total_features: 15
-  total_decisions: 3
+  total_agents: 8
+  total_features: 16
+  total_decisions: 4
   npm_package: "@evolve.labs/devflow"
-  npm_version: "1.2.3"
+  npm_version: "1.4.0"
   documentation_coverage: "excellent"
   metadata_coverage: "excellent"
   orchestration_coverage: "complete"
-  last_snapshot: "2026-03-24"
+  last_snapshot: "2026-05-02"
 
 # Configurações
 config:

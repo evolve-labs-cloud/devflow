@@ -5,6 +5,34 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-05-02
+
+### Added
+
+- **`@sentinel`**: novo agente especializado em segurança (OWASP Top 10, CWE Top 25, CVSS v3.1/v4.0, STRIDE, 0-day mindset)
+- **`@sentinel` no pipeline padrão**: roda automaticamente após `@guardian` em toda pipeline (`builder → guardian → sentinel → challenger → chronicler`)
+- **Parallel subagents do `@sentinel`**: `@vuln-scanner`, `@dependency-auditor`, `@secrets-detector`, `@threat-modeler`, `@crypto-reviewer`
+- **Modo Team do `@sentinel`**: `@red-teamer`, `@blue-teamer`, `@compliance-analyst`, `@pentest-strategist`
+- **`sentinel.meta.yaml`**: metadata do agente em `.devflow/agents/`
+- **ADR-024**: separação de responsabilidades guardian/sentinel em `docs/decisions/ADR-024-sentinel-guardian-separation.md`
+- **PRD**: `docs/planning/prd-sentinel-agent.md`
+
+### Changed
+
+- **`@guardian` refocado** em qualidade e testes — remove responsabilidades de security audit (→ `@sentinel`)
+- **`@guardian` Regression Map** obrigatório em todo output: lista explícita do que existia antes e continua funcionando
+- **`@guardian` HARD STOP** atualizado: proibido fazer security audit, CVE/OWASP scanning, dependency security audit, threat modeling STRIDE
+- **`@guardian` teammates** atualizados: remove `@owasp-scanner` e `@dependency-auditor` (→ `@sentinel`), adiciona `@regression-analyst`
+- **Pipeline**: 7 agentes → 8 agentes
+- **`autopilotConstants.js`**: `VALID_AGENTS`, `DEFAULT_PHASES`, `AGENT_PROMPTS`, `AGENT_TIMEOUTS`, `AGENT_CONTRACTS`, `AGENT_SKILLS` atualizados
+- **`autopilot.js`**: `AGENT_COLORS` atualizado com `sentinel: red`
+- **`devflow-help.md`**: v1.4.0, 8 agentes, pipeline atualizado
+- **`README.md`**: v1.4.0, tabela de 7→8 agentes, pipeline
+- **`.claude_project`**: pipeline e regras de delegação atualizados
+- **`package.json`**: version 1.4.0, description atualizada
+
+---
+
 ## [1.3.1] - 2026-04-16
 
 ### Fixed

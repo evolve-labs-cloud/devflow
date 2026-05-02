@@ -1,8 +1,8 @@
-# DevFlow v1.3.1 - Sistema Multi-Agentes para Desenvolvimento de Software
+# DevFlow v1.4.0 - Sistema Multi-Agentes para Desenvolvimento de Software
 
-Sistema de **7 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
+Sistema de **8 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
 
-[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -59,7 +59,7 @@ devflow update --force --source <path>  # Forcado + repo local
 
 ---
 
-## Os 7 Agentes
+## Os 8 Agentes
 
 | #   | Agente                      | Funcao                      | Uso                                      |
 | --- | --------------------------- | --------------------------- | ---------------------------------------- |
@@ -67,18 +67,19 @@ devflow update --force --source <path>  # Forcado + repo local
 | 2   | **/agents:architect**       | Design & Arquitetura        | Decisoes tecnicas, ADRs, APIs            |
 | 3   | **/agents:system-designer** | System Design & Escala      | SDDs, RFCs, capacity planning, SLOs      |
 | 4   | **/agents:builder**         | Implementacao               | Codigo, reviews, refactoring             |
-| 5   | **/agents:guardian**        | Qualidade & Seguranca       | Testes, security, performance            |
-| 6   | **/agents:challenger**      | Review Adversarial (OpenAI) | Desafia o Guardian, encontra blind spots |
-| 7   | **/agents:chronicler**      | Documentacao & Memoria      | CHANGELOG, snapshots, stories            |
+| 5   | **/agents:guardian**        | Qualidade & Testes          | Testes, regressao, performance, coverage |
+| 6   | **/agents:sentinel**        | Seguranca & Vulnerabilidades| OWASP, CVEs, CVSS, STRIDE, secrets       |
+| 7   | **/agents:challenger**      | Review Adversarial (OpenAI) | Perspectiva externa independente (o3)    |
+| 8   | **/agents:chronicler**      | Documentacao & Memoria      | CHANGELOG, snapshots, stories            |
 
 Cada agente tem **hard stops** — limites rigidos que impedem de fazer trabalho de outros agentes.
 
-> **Challenger requer** `OPENAI_API_KEY` — usa OpenAI o3 como perspectiva independente do Guardian.
+> **Challenger requer** `OPENAI_API_KEY` — usa OpenAI o3 como perspectiva independente do Sentinel.
 
 ### Fluxo de Trabalho
 
 ```
-strategist → architect → system-designer → builder → guardian → challenger → chronicler
+strategist → architect → system-designer → builder → guardian → sentinel → challenger → chronicler
 ```
 
 ---
@@ -215,7 +216,8 @@ seu-projeto/
 | v1.2.5        | Agent Teams habilitado por padrao no init/update                                         |
 | v1.2.8        | Spawn templates com contexto obrigatorio para teammates                                  |
 | v1.2.9        | Cores por agente, scores do challenger, artefatos persistidos, complexidade adaptativa     |
-| **v1.3.1**    | **Security fix SEG-01, /quick:refactor + /quick:debug, challenger.md reescrito, bug fixes** |
+| v1.3.1        | Security fix SEG-01, /quick:refactor + /quick:debug, challenger.md reescrito, bug fixes    |
+| **v1.4.0**    | **@sentinel: agente de segurança dedicado, @guardian refocado em testes + Regression Map** |
 
 ---
 
@@ -234,4 +236,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v1.3.1** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)
+**DevFlow v1.4.0** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)
