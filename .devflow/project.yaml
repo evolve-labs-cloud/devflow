@@ -4,7 +4,7 @@
 
 project:
   name: "DevFlow"
-  version: "1.4.0"
+  version: "1.5.0"
   description: "Sistema multi-agentes para desenvolvimento de software com 8 agentes especializados"
   created: "2025-11-15"
   last_updated: "2026-07-06"
@@ -271,6 +271,24 @@ features:
     version: "1.4.0"
     description: "8th agent specializing in security audits — OWASP Top 10, CWE Top 25, CVSS v3.1/v4.0, STRIDE, 0-day mindset. Runs by default after @guardian in the pipeline. @guardian refocused on tests only with mandatory Regression Map output."
 
+  - id: "repo-wiki"
+    name: "Repo Wiki"
+    status: "implemented"
+    version: "1.5.0"
+    description: "@chronicler generates/maintains docs/wiki/ — a navigable, agent-optimized wiki grounded in real source files. /quick:wiki (init/update) with incremental state in .devflow/wiki-state.json. Inspired by OpenWiki conventions (no dependency)."
+
+  - id: "knowledge-graph-grounded"
+    name: "Grounded & Regenerable Knowledge Graph"
+    status: "implemented"
+    version: "1.5.0"
+    description: "knowledge-graph.json regenerated deterministically from sources (project.yaml, docs/decisions/, .claude/commands/agents/); every node cites a real file; reconcile check flags graph-vs-source drift. /quick:graph (check/regenerate)."
+
+  - id: "guardian-diff-impact"
+    name: "Guardian Diff-Impact"
+    status: "implemented"
+    version: "1.5.0"
+    description: "@guardian uses the knowledge graph to compute the ripple of a change (reverse edge traversal) and feed the mandatory Regression Map before merge; hands off to @sentinel if a changed node touches a security-tagged node."
+
 # Decisões arquiteturais (resumo - detalhes em ADRs)
 decisions:
   - id: "ADR-001"
@@ -294,10 +312,10 @@ decisions:
 # Métricas (atualizadas pelo Chronicler)
 metrics:
   total_agents: 8
-  total_features: 15
+  total_features: 18
   total_decisions: 11   # 3 resumidos no bloco `decisions` + 8 ADRs em docs/decisions/ (ver knowledge-graph.json)
   npm_package: "@evolve.labs/devflow"
-  npm_version: "1.4.0"
+  npm_version: "1.5.0"
   documentation_coverage: "excellent"
   metadata_coverage: "excellent"
   orchestration_coverage: "complete"

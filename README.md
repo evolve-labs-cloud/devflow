@@ -1,8 +1,8 @@
-# DevFlow v1.4.0 - Sistema Multi-Agentes para Desenvolvimento de Software
+# DevFlow v1.5.0 - Sistema Multi-Agentes para Desenvolvimento de Software
 
 Sistema de **8 agentes especializados** para desenvolvimento de software com Claude Code, com **Autopilot** para execução automatizada do pipeline completo.
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](docs/CHANGELOG.md)
 [![npm](https://img.shields.io/npm/v/@evolve.labs/devflow.svg)](https://www.npmjs.com/package/@evolve.labs/devflow)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -112,7 +112,7 @@ Ativado com o argumento `team`. Usa Claude Agent Teams (peers que se comunicam d
 | Custo       | 1x tokens                 | 3-5x tokens                |
 | Quando usar | Sub-tarefas independentes | Debate/revisao entre peers |
 
-Use `/agents:team` para orquestracao cross-domain com todos os 6 agentes em paralelo.
+Use `/agents:team` para orquestracao cross-domain com todos os 8 agentes em paralelo.
 
 ---
 
@@ -140,7 +140,7 @@ devflow autopilot docs/specs/minha-spec.md --full-context
 ### Flags do autopilot
 
 ```bash
---phases <list>             # Fases especificas (default: todos os 6 agentes)
+--phases <list>             # Fases especificas (default: todos os 8 agentes)
 --adaptive                  # LLM escolhe fases por complexidade
 --full-context              # Desativa context isolation (N-1 output por padrao)
 --challenger                # Review OpenAI apos guardian (requer OPENAI_API_KEY)
@@ -174,6 +174,24 @@ devflow challenge --model o3
 
 ---
 
+## Documentacao Viva — Repo Wiki + Knowledge Graph
+
+Comandos do `@chronicler` que mantêm a documentação e o mapa do projeto sempre em dia, **aterrados no código** (nada inventado, segredos nunca entram):
+
+```bash
+/quick:wiki init         # gera docs/wiki/ — wiki navegavel do codigo, otimizada para agentes
+/quick:wiki update       # atualiza so as paginas afetadas (diff desde o ultimo commit)
+
+/quick:graph check       # reconcilia o knowledge graph com as fontes (reporta drift)
+/quick:graph regenerate  # reconstroi .devflow/knowledge-graph.json a partir das fontes
+```
+
+- **Repo Wiki** (`docs/wiki/`): indice em `quickstart.md` + secoes por area real (architecture, workflows, api…). Todo no aponta para um arquivo que existe.
+- **Knowledge Graph** (`.devflow/knowledge-graph.json`): agentes, ADRs, features e docs conectados — regeneravel e verificavel.
+- **Diff-Impact no `@guardian`**: usa o grafo para calcular o *ripple* de uma mudanca e alimentar o Regression Map antes do merge.
+
+---
+
 ## Estrutura gerada no projeto
 
 ```
@@ -181,7 +199,7 @@ seu-projeto/
 ├── .claude/
 │   ├── settings.json   # Agent Teams habilitado (automatico)
 │   └── commands/
-│       ├── agents/     # Definicoes dos 7 agentes + team
+│       ├── agents/     # Definicoes dos 8 agentes + team
 │       └── quick/      # Quick start commands
 │
 ├── .devflow/
@@ -217,7 +235,8 @@ seu-projeto/
 | v1.2.8        | Spawn templates com contexto obrigatorio para teammates                                  |
 | v1.2.9        | Cores por agente, scores do challenger, artefatos persistidos, complexidade adaptativa     |
 | v1.3.1        | Security fix SEG-01, /quick:refactor + /quick:debug, challenger.md reescrito, bug fixes    |
-| **v1.4.0**    | **@sentinel: agente de segurança dedicado, @guardian refocado em testes + Regression Map** |
+| v1.4.0        | @sentinel: agente de segurança dedicado, @guardian refocado em testes + Regression Map |
+| **v1.5.0**    | **Repo Wiki + Knowledge Graph aterrado/regeneravel, Guardian Diff-Impact** |
 
 ---
 
@@ -236,4 +255,4 @@ MIT License - veja [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**DevFlow v1.4.0** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)
+**DevFlow v1.5.0** - Desenvolvido por [Evolve Labs](https://plataforma.evolvelabs.cloud)

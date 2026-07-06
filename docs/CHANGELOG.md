@@ -5,6 +5,18 @@ Todas as mudancas notaveis neste projeto serao documentadas neste arquivo.
 O formato e baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-07-06
+
+### Added
+
+- **Repo Wiki** (`/quick:wiki`): wiki navegavel do codigo mantida pelo `@chronicler`, aterrada nas fontes (init/update incremental).
+- **Knowledge Graph aterrado & regeneravel** (`/quick:graph`): `knowledge-graph.json` reconstruido das fontes; todo no cita um arquivo real; reconcile detecta drift.
+- **Guardian Diff-Impact**: `@guardian` usa o grafo para calcular o ripple de uma mudanca e alimentar o Regression Map antes do merge.
+
+### Fixed
+
+- Drift de counters em `project.yaml` (agents 7→8, features, decisions); `devflow-help` "6 agentes" → "8"; contagens do README corrigidas.
+
 ## [1.4.0] - 2026-05-02
 
 ### Added
