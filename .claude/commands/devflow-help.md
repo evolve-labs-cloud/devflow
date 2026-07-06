@@ -120,6 +120,7 @@ Requer Claude Code v2.1.32+. Verifique: `claude --version`
 - `/create-adr` - Criar Architecture Decision Record
 - `/security-check` - Audit de segurança rápido
 - `/system-design` - Criar System Design Document guiado
+- `/wiki` - Gerar/atualizar o Repo Wiki navegável para agentes (init/update)
 
 ---
 
@@ -127,8 +128,9 @@ Requer Claude Code v2.1.32+. Verifique: `claude --version`
 
 ```
 .devflow/
-├── agents/              # 6 agentes especializados
+├── agents/              # 8 agentes especializados
 ├── snapshots/           # Histórico do projeto
+├── wiki-state.json      # Estado incremental do Repo Wiki
 ├── project.yaml         # Estado atual
 └── knowledge-graph.json # Conexões entre decisões
 
@@ -136,7 +138,8 @@ docs/
 ├── decisions/           # ADRs (Architecture Decision Records)
 ├── planning/stories/    # User stories
 ├── security/            # Security audits
-└── performance/         # Performance reports
+├── performance/         # Performance reports
+└── wiki/                # Repo Wiki navegável para agentes (índice: quickstart.md)
 ```
 
 ---

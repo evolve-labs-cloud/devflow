@@ -442,6 +442,42 @@ O Regression Map torna isso explícito e rastreável.
 
 ---
 
+## 🕸️ DIFF-IMPACT ANALYSIS (grafo-guiado) → alimenta o Regression Map
+
+> Convenção inspirada no **diff mode** do Understand-Anything (Egonex-AI, MIT) — só o padrão.
+> Usa o `.devflow/knowledge-graph.json` (mantido pelo @chronicler) para calcular o *ripple*
+> de uma mudança ANTES do merge e transformar cada nó impactado em uma linha do Regression Map.
+
+### Como computar o impacto
+```
+1. git diff → arquivos/símbolos alterados nesta mudança.
+2. Mapeie cada arquivo alterado para o(s) nó(s) do grafo (node.file == arquivo).
+3. Traverse REVERSO das edges (implements/flows_to/used_by/enforces/defines):
+   quem DEPENDE do nó alterado? → conjunto impactado (features, agentes, docs).
+4. Cada nó impactado vira uma linha do Regression Map (feature | testes cobrindo | status).
+5. Priorize por conectividade: nós em statistics.most_connected_nodes
+   = maior blast radius = teste de regressão primeiro.
+```
+
+### Grounding & segurança (NÃO enfraquecer)
+```
+□ Só reporte ripple ao longo de edges que EXISTEM no grafo. Sem ripple especulativo.
+□ Grafo velho invalida a análise → rode `@chronicler /graph check` antes; se drift, regenere.
+□ SECURITY-FIRST: se o nó alterado toca um nó com tag de auth/security → handoff @sentinel.
+□ Nenhum nó impactado encontrado ≠ "sem risco": pode significar grafo incompleto → sinalize.
+```
+
+### Saída (entra no bloco Regression Map obrigatório)
+```markdown
+### Diff-Impact (grafo)
+Alterado: [arquivo] → nó [id]
+Impacto (dependentes): [feature:x, agent:y] — N nós
+Blast radius: [alto/médio/baixo] (por most_connected_nodes)
+Handoff @sentinel: [sim/não — nó toca tag security?]
+```
+
+---
+
 ## 🛠️ Comandos Disponíveis
 
 ### `/test-plan <story>`

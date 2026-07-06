@@ -729,12 +729,19 @@ project/
 │   │   ├── auth.md          # API docs
 │   │   └── changelog/       # API versioning
 │   │
-│   └── migration/           # Migration guides
+│   ├── migration/           # Migration guides
+│   │
+│   └── wiki/                # Repo Wiki navegável para agentes
+│       ├── quickstart.md    # Índice — linka TODAS as seções
+│       ├── architecture/    # (só crie diretórios de áreas reais)
+│       ├── workflows/
+│       └── operations/
 │
 └── .devflow/
-    └── snapshots/           # Snapshots
-        ├── 2025-01-15.md
-        └── 2025-01-15.json
+    ├── snapshots/           # Snapshots
+    │   ├── 2025-01-15.md
+    │   └── 2025-01-15.json
+    └── wiki-state.json      # Estado incremental do Repo Wiki (idempotência)
 ```
 
 ---
@@ -829,6 +836,200 @@ Negative: [Trade-offs]
 - Documente o "why", não apenas o "what"
 - Não documente coisas triviais
 - Use links ao invés de copiar código para docs
+
+---
+
+## 📖 REPO WIKI — Documentação Navegável para Agentes
+
+> Convenção inspirada no padrão **OpenWiki** (langchain-ai/openwiki, MIT). NÃO é dependência —
+> importamos apenas as convenções e a disciplina de geração, sem runtime externo.
+> Complementa CHANGELOG/ADR/snapshot (que registram **eventos**) com um **wiki do código**
+> navegável, otimizado para um agente ler ANTES de editar. Previne drift no nível do
+> **codebase**, não apenas no nível das mudanças.
+
+### Quando gerar / atualizar
+```
+GERAR (init) quando:
+  - O projeto ainda não tem docs/wiki/quickstart.md
+  - Onboarding de um codebase existente sem documentação para agentes
+
+ATUALIZAR (update) quando:
+  - @builder implementou/refatorou código que muda "como o sistema funciona"
+  - Estrutura de módulos, fluxos ou contratos mudaram
+  - Após um milestone (junto com o snapshot)
+```
+
+### Taxonomia fixa — `docs/wiki/`
+`quickstart.md` é o índice e DEVE linkar todas as seções. Um diretório por área **real**:
+
+| Diretório | Conteúdo |
+|---|---|
+| `architecture/` | Formato do runtime, módulos, fluxo de execução |
+| `workflows/` | Fluxos ponta-a-ponta (ex: login, checkout) |
+| `domain/` | Modelo de domínio, regras de negócio |
+| `api/` | Contratos, endpoints, versionamento |
+| `data-models/` | Schemas, entidades, relacionamentos |
+| `operations/` | Deploy, config, runbooks, observabilidade |
+| `integrations/` | Serviços externos, webhooks |
+| `testing/` | Estratégia e mapa de testes |
+
+```
+REGRA ANTI-CONTEÚDO-VAZIO:
+  - NÃO crie um diretório a menos que ele represente uma área REAL de documentação.
+  - Diretório de 1 arquivo só é aceitável se a página é substancial e tende a crescer.
+  - Repo pequeno (≤10 arquivos-fonte principais) → quickstart + no máximo 1-2 páginas.
+```
+
+### Esqueleto do índice — `docs/wiki/quickstart.md`
+```markdown
+# [Projeto] — Quickstart (para agentes)
+
+## O que este repositório faz
+[3-5 bullets: propósito e capacidades principais]
+
+## Comece aqui
+- [Architecture](architecture/overview.md) — como o sistema roda
+- [Workflows](workflows/) — fluxos principais
+- [API](api/) — contratos e endpoints
+- ... (um link por seção que EXISTE)
+
+## Arquivos-fonte principais
+- `path/arquivo` — [papel em 1 linha]
+
+## Mapa da documentação
+- [links compactos de todas as seções]
+
+## Notas para agentes
+- [invariantes, "onde X vive", armadilhas gerais]
+```
+
+### Esqueleto de cada página (escrito para quem vai EDITAR o código)
+Ordem: *o que existe → como roda → por que é assim → como estender → o que observar → source map.*
+```markdown
+# [Área]
+
+## O que existe        # inventário de arquivos, cada um com o papel em 1 linha
+## Como funciona       # fluxo real de execução (prosa + bullets)
+## Por que é assim      # rationale das decisões (link para os ADRs relevantes)
+## Pontos de extensão   # como adicionar/modificar com segurança
+## O que observar       # gotchas, invariantes, efeitos colaterais ao editar
+## Source map           # referências a arquivos (opcional)
+```
+
+### DISCIPLINA DE GERAÇÃO (obrigatória)
+```
+□ GROUNDING: fundamente TODA afirmação importante em código-fonte, docs existentes ou git.
+             NUNCA invente arquivos, funções ou comportamento. Não confirmou no código → não escreva.
+□ WHY via git: use git para explicar POR QUE o código existe, mas NÃO despeje listas
+             de commit hashes dentro da documentação.
+□ PLANO PRIMEIRO: antes de escrever, crie docs/wiki/_plan.md listando as páginas
+             pretendidas + a evidência de cada uma. DELETE o _plan.md antes de finalizar.
+□ ORÇAMENTO DE PÁGINAS: no máximo 8 páginas no init (a menos que o repo seja claramente grande).
+□ SEM ESPECULAÇÃO: não documente código não-implementado (já é hard-stop do Chronicler).
+□ SEGREDOS (security-first): o wiki é gerado DO código — NUNCA embuta valores de env,
+             tokens ou credenciais. Referencie segredos por nome (ex: `DB_PASSWORD`), nunca o valor.
+```
+
+### DISCIPLINA DE UPDATE (edições cirúrgicas)
+```
+- Leia .devflow/wiki-state.json → pegue o último git ref documentado.
+- Compute o diff desde esse ref (git). Atualize SÓ as páginas afetadas.
+- Orçamento leve: < 5 arquivos alterados → atualize no máximo 1-2 páginas.
+- SEM churn de formatação: não reescreva páginas cujo conteúdo não mudou.
+- Update PODE ser no-op: se o wiki já reflete o código, não altere nada e registre "up-to-date".
+```
+
+### Loop incremental idempotente — `.devflow/wiki-state.json`
+Metadados que tornam o update barato e determinístico (análogo ao `.last-update.json` do OpenWiki):
+```json
+{
+  "last_git_ref": "5b4b5a1",
+  "generated_at": "2026-07-06",
+  "content_hash": "sha256:...",
+  "pages": [
+    { "path": "docs/wiki/quickstart.md",              "sources": ["src/cli.tsx"],       "hash": "sha256:..." },
+    { "path": "docs/wiki/architecture/overview.md",   "sources": ["src/agent/index.ts"], "hash": "sha256:..." }
+  ]
+}
+```
+```
+Uso:
+  1. Update lê last_git_ref → git diff <ref>..HEAD → arquivos-fonte alterados.
+  2. Casa arquivos alterados com pages[].sources → regenera SÓ as páginas impactadas.
+  3. Após escrever, atualiza last_git_ref, generated_at, content_hash e o hash das páginas tocadas.
+  4. Nenhum source de nenhuma página mudou → no-op; apenas registra a verificação.
+```
+
+### Âncora nos arquivos de agentes (`CLAUDE.md` / `AGENTS.md`)
+Mantenha uma seção FIXA que aponta os agentes para o wiki (cria o arquivo se nenhum existir):
+```markdown
+## Repo Wiki
+Antes de buscar contexto no código, leia `docs/wiki/quickstart.md` — índice navegável
+mantido pelo @chronicler. Atualize via `/agents:chronicler /wiki update` após mudanças estruturais.
+```
+Regra: edite APENAS dentro dessa seção `## Repo Wiki` (idempotente); não toque no resto do arquivo.
+
+### `/wiki [init|update]`
+```
+@chronicler /wiki init      → gera docs/wiki/ do zero (_plan.md → páginas → wiki-state.json)
+@chronicler /wiki update    → diff desde last_git_ref, atualização cirúrgica, pode ser no-op
+```
+**Output (exemplo):**
+```
+/wiki update
+
+Diff desde 5b4b5a1..HEAD: 3 arquivos-fonte alterados
+Páginas impactadas: docs/wiki/architecture/overview.md
+Orçamento: 3 arquivos < 5 → 1 página atualizada ✅
+wiki-state.json: last_git_ref → aaa7570
+```
+
+---
+
+## 🕸️ KNOWLEDGE GRAPH — Aterrado e Regenerável
+
+> Convenção inspirada no padrão **Understand-Anything** (Egonex-AI, MIT) — importamos só as
+> convenções, sem runtime/plugin externo. O grafo `.devflow/knowledge-graph.json` DEVE ser
+> **regenerado a partir das fontes**, nunca curado à mão. Curadoria manual DRIFTA — foi o que
+> aconteceu com a v1.1.0: dizia "5 agentes" com 8 no projeto e apontava para paths
+> `.devflow/agents/*.md` que não existem mais (os arquivos estão em `.claude/commands/agents/`).
+
+### Princípio: estrutura determinística + semântica LLM
+```
+Espelha o hybrid Tree-sitter + LLM do Understand-Anything, adaptado a um projeto DevFlow:
+  - ESTRUTURA (nós e edges) = derivada DETERMINISTICAMENTE de fontes que existem:
+      • .devflow/project.yaml          → agents, features, decisions, metrics (fonte de verdade)
+      • docs/decisions/*.md            → ADRs reais no disco (id + título do 1º heading)
+      • .claude/commands/agents/*.md   → arquivos de agente (path canônico)
+      • .claude/commands/devflow-help.md → fluxo do pipeline (edges flows_to)
+  - SEMÂNTICA (descrições) = pode ser escrita por LLM, MAS cada nó DEVE citar um arquivo real.
+```
+
+### REGRA DE GROUNDING (obrigatória)
+```
+□ TODO nó tem `file` apontando para um arquivo que EXISTE. Não existe → não crie o nó.
+□ TODO edge liga dois nós reais e reflete uma relação DECLARADA nas fontes. Não invente edges.
+□ NUNCA embuta segredos ou valores de env no grafo (mesma regra do Repo Wiki).
+□ O grafo carrega um manifesto `sources[]` com os arquivos dos quais foi derivado.
+```
+
+### RECONCILE (graph-reviewer) — integra ao `/sync-check`
+```
+Compare o grafo com as fontes e SINALIZE drift (não corrija silenciosamente):
+  1. Contagem de agentes no grafo   vs  project.yaml metrics.total_agents
+  2. node.file de cada nó            →  o arquivo existe? (paths movidos = drift)
+  3. ADRs em docs/decisions/*.md     →  todos presentes como nós decision:*?
+  4. features em project.yaml        →  todas presentes como nós feature:*?
+  5. `generated` (data)              →  anterior ao último commit que tocou as fontes? = grafo velho
+Saída: lista de divergências + "regenerar?" (não aplique regeneração grande sem confirmação).
+```
+
+### `/graph [regenerate|check]`
+```
+@chronicler /graph regenerate  → reconstrói .devflow/knowledge-graph.json das fontes (grounded)
+@chronicler /graph check       → só reconcile: reporta drift, não escreve (parte do /sync-check)
+```
+Regenere quando: agente adicionado/removido, novo ADR, mudança de status de feature, ou milestone.
 
 ---
 

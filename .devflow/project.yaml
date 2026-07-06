@@ -7,7 +7,7 @@ project:
   version: "1.4.0"
   description: "Sistema multi-agentes para desenvolvimento de software com 8 agentes especializados"
   created: "2025-11-15"
-  last_updated: "2026-05-02"
+  last_updated: "2026-07-06"
 
   # Estado atual
   status: "active"
@@ -118,6 +118,19 @@ agents:
       - "CVSS scores"
       - "STRIDE threat model"
 
+  - id: "challenger"
+    name: "Challenger"
+    role: "adversarial-review"
+    focus: "Revisão Adversarial"
+    triggers:
+      - "@challenger"
+      - "challenge"
+      - "adversarial review"
+      - "devflow challenge"
+    outputs:
+      - "Adversarial review findings"
+      - "Challenger verdict"
+
   - id: "chronicler"
     name: "Chronicler"
     role: "documentation"
@@ -132,6 +145,8 @@ agents:
       - ".devflow/snapshots/"
       - "ADRs automáticos"
       - "Knowledge graph"
+      - "docs/wiki/"
+      - ".devflow/wiki-state.json"
 
 # Tecnologias e stack
 tech_stack:
@@ -158,6 +173,7 @@ structure:
     - "docs/api/"
     - "docs/migration/"
     - "docs/system-design/"
+    - "docs/wiki/"
 
   output_dirs:
     - ".devflow/snapshots/"
@@ -278,8 +294,8 @@ decisions:
 # Métricas (atualizadas pelo Chronicler)
 metrics:
   total_agents: 8
-  total_features: 16
-  total_decisions: 4
+  total_features: 15
+  total_decisions: 11   # 3 resumidos no bloco `decisions` + 8 ADRs em docs/decisions/ (ver knowledge-graph.json)
   npm_package: "@evolve.labs/devflow"
   npm_version: "1.4.0"
   documentation_coverage: "excellent"
@@ -293,6 +309,12 @@ config:
     auto_snapshot: false
     snapshot_frequency: "on-demand"
     auto_changelog: true
+    repo_wiki:
+      enabled: true
+      dir: "docs/wiki/"
+      state_file: ".devflow/wiki-state.json"
+      update_on_structural_change: true
+      max_pages_init: 8
 
   documentation:
     format: "markdown"
